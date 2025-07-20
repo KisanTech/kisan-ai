@@ -1,0 +1,18 @@
+{
+  "name": "project-kisan",
+  "version": "0.1.0",
+  "description": "AI-Powered Agricultural Assistant - Google Agentic AI Day Hackathon",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
+    "@tailwindcss/postcss": "^4.1.10",
+    "husky": "^9.1.7"
+  }
+} 

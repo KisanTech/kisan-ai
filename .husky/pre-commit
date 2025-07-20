@@ -1,0 +1,9 @@
+cd backend
+
+echo "🦀 Running Ruff linter and formatter on backend..."
+uv run ruff check --fix . || { echo "❌ Ruff linting failed. Please fix issues and stage the changes. Aborting commit."; exit 1; }
+
+echo "🦀 Running Ruff formatter on backend..."
+uv run ruff format . || { echo "❌ Ruff formatting failed. Please stage the changes. Aborting commit."; exit 1; }
+
+echo "✅ Python formatting and linting complete for backend!"
