@@ -24,21 +24,33 @@ uv sync  # Automatically uses Python 3.13 from .python-version file
 ```
 
 3. **Environment Configuration**
-Create a `.env` file with:
+
+**Quick Setup (Recommended):**
 ```bash
-# Google Cloud Configuration
+# Copy the template file and customize it
+cp env.template .env
+# Edit .env with your actual API keys and credentials
+```
+
+**Manual Setup:**
+Create a `.env` file with your actual credentials:
+```bash
+# Basic Settings
+DEBUG=true
+ENVIRONMENT=development
+
+# Google Cloud (Required for AI features)
 GOOGLE_CLOUD_PROJECT=your-project-id
 GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account-key.json
 
-# Vertex AI Configuration  
+# Indian Government APIs (For real market data)
+DATA_GOV_API_KEY=your-data-gov-api-key
+ENAM_API_KEY=your-enam-api-key
+
+# Optional overrides (defaults work fine)
 VERTEX_AI_REGION=us-central1
 GEMINI_MODEL=gemini-2.0-flash-exp
-
-# Speech API Configuration
 SPEECH_LANGUAGE_CODE=kn-IN
-
-# Development Settings
-DEBUG=true
 ```
 
 4. **Run the development server**
@@ -49,6 +61,60 @@ uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 5. **Access API Documentation**
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+
+## API Keys Setup
+
+### Google Cloud Setup (Required for AI Features)
+1. **Create Google Cloud Project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com)
+   - Create new project or select existing one
+   - Note the Project ID
+
+2. **Enable APIs**
+   ```bash
+   # Enable required APIs
+   gcloud services enable aiplatform.googleapis.com
+   gcloud services enable speech.googleapis.com
+   gcloud services enable storage.googleapis.com
+   ```
+
+3. **Create Service Account**
+   - Go to IAM & Admin > Service Accounts
+   - Create new service account
+   - Download JSON key file
+   - Set `GOOGLE_APPLICATION_CREDENTIALS` to the file path
+
+### Indian Government APIs (Optional for Real Data)
+
+#### Data.gov.in API
+1. Register at [data.gov.in](https://data.gov.in/user/register)
+2. Apply for API access for agriculture data
+3. Add your API key to `DATA_GOV_API_KEY`
+
+#### e-NAM API (Optional)
+1. Contact [e-NAM support](https://enam.gov.in) for API access
+2. Add your API key to `ENAM_API_KEY`
+
+> **🚀 For Hackathon**: Skip API keys setup! The app works with mock data for demo purposes.
+
+## Environment Variables Security
+
+### ⚠️ Important Security Notes
+- **NEVER commit `.env` files** to version control
+- The `.env` file is already in `.gitignore`
+- Use `env.template` as reference for required variables
+- Use different API keys for development/staging/production
+
+### For New Team Members
+```bash
+# 1. Copy the template
+cp env.template .env
+
+# 2. Ask team lead for actual API keys
+# 3. Update .env with real credentials
+# 4. Verify .env is NOT tracked by git
+git status  # Should not show .env file
+```
 
 ## Code Quality & Formatting
 
