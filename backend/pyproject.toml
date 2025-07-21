@@ -8,14 +8,17 @@ authors = [
 dependencies = [
     "fastapi>=0.104.1",
     "uvicorn[standard]>=0.24.0",
-    "python-multipart>=0.0.6",  # For file uploads
-    "google-cloud-aiplatform>=1.38.0",  # Vertex AI
-    "google-cloud-speech>=2.22.0",  # Speech APIs
-    "google-cloud-storage>=2.10.0",  # File storage
-    "requests>=2.31.0",  # External APIs
-    "python-dotenv>=1.0.0",  # Environment variables
+    "python-multipart>=0.0.6", # For file uploads
+    "google-cloud-aiplatform>=1.38.0", # Vertex AI
+    "google-cloud-speech>=2.22.0", # Speech APIs
+    "google-cloud-storage>=2.10.0", # File storage
+    "requests>=2.31.0", # External APIs
+    "python-dotenv>=1.0.0", # Environment variables
     "pydantic>=2.5.0",
-    "pillow>=10.1.0",  # Image processing
+    "pydantic-settings>=2.0.0",  # For BaseSettings
+    "pillow>=10.1.0", # Image processing
+    "aiohttp>=3.12.14",
+    "structlog>=24.5.0",  # Structured logging
 ]
 readme = "README.md"
 requires-python = ">=3.13"
@@ -39,10 +42,10 @@ exclude = [
     ".venv",
     "venv", 
     "__pycache__",
-    "alembic/versions/*",
-    "alembic/versions/**/*.py",
     "app/ai/prompts/*",
     "app/ai/prompts/**/*.py",
+    "tests/*",
+    "tests/**/*.py",
     "scripts/*",
     "scripts/**/*.py",
 ]
