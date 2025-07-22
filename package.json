@@ -7,7 +7,14 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:backend": "cd backend && uv run uvicorn app.main:app --reload",
+    "dev:frontend": "cd frontend && npm start",
+    "install:backend": "cd backend && uv sync",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "format": "cd backend && uv run ruff format",
+    "lint": "cd backend && uv run ruff check --fix"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
