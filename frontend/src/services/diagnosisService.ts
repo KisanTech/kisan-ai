@@ -44,11 +44,6 @@ class DiagnosisService {
    */
   async diagnoseCrop(request: DiagnosisRequest): Promise<DiagnosisResponse> {
     try {
-      console.log('=== Starting crop diagnosis ===');
-      console.log('Image URI:', request.imageUri);
-      console.log('Description:', request.description);
-      console.log('API Base URL:', API_BASE_URL);
-
       // Create FormData with React Native compatible approach
       const formData = new FormData();
 
@@ -65,10 +60,7 @@ class DiagnosisService {
 
       // Construct full URL
       const url = `${API_BASE_URL}${DIAGNOSIS_ENDPOINTS.CROP_DIAGNOSE}`;
-      console.log('Sending request to:', url);
 
-      // Log FormData contents (for debugging)
-      console.log('FormData entries:');
       // @ts-ignore - FormData._parts is React Native specific
       if (formData._parts) {
         // @ts-ignore
@@ -84,31 +76,20 @@ class DiagnosisService {
         // Don't set Content-Type - let React Native set it with proper boundary
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-
       // Log response headers
       const headers: Record<string, string> = {};
       response.headers.forEach((value, key) => {
         headers[key] = value;
       });
-      console.log('Response headers:', headers);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error response:', errorText);
         throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Response data:', JSON.stringify(data, null, 2));
-      console.log('=== Crop diagnosis completed ===');
       return data;
     } catch (error) {
-      console.error('=== Diagnosis request failed ===');
-      console.error('Error:', error);
-      console.error('Error type:', typeof error);
-      console.error('Error message:', error instanceof Error ? error.message : String(error));
       throw error;
     }
   }

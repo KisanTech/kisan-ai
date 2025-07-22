@@ -45,7 +45,7 @@ export const CropHealthScreen: React.FC = () => {
 
     try {
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -67,7 +67,7 @@ export const CropHealthScreen: React.FC = () => {
 
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -116,11 +116,10 @@ export const CropHealthScreen: React.FC = () => {
   };
 
   const photoTips = [
-    '📱 Hold your phone steady and close to the affected leaves',
-    '☀️ Take photos in good natural lighting',
-    '🔍 Focus on the diseased or damaged parts clearly',
-    '📐 Keep the leaf flat and avoid shadows',
-    '🌿 Include multiple affected leaves if possible',
+    '📱 Hold phone steady, close to affected leaves',
+    '☀️ Use good natural light, avoid shadows',
+    '🔍 Focus clearly on damaged areas',
+    '📐 Keep leaf flat and visible',
   ];
 
   return (
@@ -198,19 +197,6 @@ export const CropHealthScreen: React.FC = () => {
             <View className="mb-4">
               <Text className="text-sm font-medium text-gray-600 mb-1">Status:</Text>
               <Text className="text-lg text-green-600">{diagnosis.status}</Text>
-            </View>
-
-            {/* Image Metadata */}
-            <View className="mb-4">
-              <Text className="text-sm font-medium text-gray-600 mb-2">Image Details:</Text>
-              <Text className="text-gray-800">• Filename: {diagnosis.image_metadata.filename}</Text>
-              <Text className="text-gray-800">• Type: {diagnosis.image_metadata.content_type}</Text>
-              <Text className="text-gray-800">• Size: {diagnosis.image_metadata.size_kb} KB</Text>
-              {diagnosis.image_metadata.description && (
-                <Text className="text-gray-800">
-                  • Description: {diagnosis.image_metadata.description}
-                </Text>
-              )}
             </View>
 
             {/* Disease Diagnosis */}

@@ -14,7 +14,7 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
 }) => {
   const buttonStyles = variant === 'primary' ? 'bg-primary' : 'bg-card border border-border';
 
-  const textStyles = variant === 'primary' ? 'text-white font-semibold' : 'text-foreground';
+  const textStyles = variant === 'primary' ? 'text-white font-bold' : 'text-foreground';
 
   return (
     <TouchableOpacity
