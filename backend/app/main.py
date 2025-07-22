@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.crop_diagnosis import router as crop_diagnosis_router
 from app.api.v1.market_prices import router as market_router
 from app.constants import MarketData
 from app.core.config import settings
@@ -85,6 +86,7 @@ async def root() -> APIInfo:
         version=settings.APP_VERSION,
         features=[
             "Market Price Display",
+            "Crop Disease Diagnosis",
         ],
         environment=settings.ENVIRONMENT,
         docs="/docs",
@@ -103,6 +105,7 @@ async def health_check() -> HealthCheckResponse:
 
 
 app.include_router(market_router, prefix="/api/v1/market", tags=["market-prices"])
+app.include_router(crop_diagnosis_router, prefix="/api/v1/crop", tags=["crop-diagnosis"])
 
 
 if __name__ == "__main__":

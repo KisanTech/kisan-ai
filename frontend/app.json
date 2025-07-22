@@ -15,7 +15,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "ai.codekheti.projectkisan"
+      "bundleIdentifier": "ai.codekheti.projectkisan",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to camera to take photos of crops for disease diagnosis.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to photo library to select crop images for disease diagnosis."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +27,8 @@
         "backgroundColor": "#22c55e"
       },
       "edgeToEdgeEnabled": true,
-      "package": "ai.codekheti.projectkisan"
+      "package": "ai.codekheti.projectkisan",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
