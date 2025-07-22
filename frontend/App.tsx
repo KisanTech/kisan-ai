@@ -6,6 +6,7 @@ import './global.css'; // Import global CSS for NativeWind
 import {
   HomeScreen,
   CropHealthScreen,
+  DiagnosisResultScreen,
   MarketPricesScreen,
   GovernmentSchemesScreen,
   VoiceChatScreen,
@@ -62,6 +63,14 @@ export default function App() {
           component={VoiceChatScreen}
           options={({ navigation }) => ({
             title: 'Voice Chat Assistant',
+            headerLeft: () => <NavigateBackButton navigation={navigation} />,
+          })}
+        />
+        <Stack.Screen
+          name="DiagnosisResult"
+          component={DiagnosisResultScreen}
+          options={({ navigation }) => ({
+            title: 'Diagnosis Results',
             headerLeft: () => <NavigateBackButton navigation={navigation} />,
           })}
         />

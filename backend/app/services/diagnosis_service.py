@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Any
 
@@ -52,6 +53,10 @@ class DiagnosisService:
             # TODO: Process AI response
 
             # Generate diagnosis response
+            # TODO - REMOVE THIS TEMPORARY DELAY
+            # Simulate a delay of 4 seconds
+            await asyncio.sleep(4)
+
             return self._generate_diagnosis_response(image, description, image_size_kb)
 
         except HTTPException:

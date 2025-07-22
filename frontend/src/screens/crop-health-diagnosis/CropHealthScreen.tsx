@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,12 @@ import {
   Image,
   Alert,
   ScrollView,
-  ActivityIndicator,
+  Animated,
+  Easing,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -17,10 +21,38 @@ import {
   DiagnosisResponse,
 } from '../../services/diagnosisService';
 
+type NavigationProp = StackNavigationProp<RootStackParamList>;
+
 export const CropHealthScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [diagnosis, setDiagnosis] = useState<DiagnosisResponse | null>(null);
+
+  // Animation value for rotating icon
+  const spinValue = useRef(new Animated.Value(0)).current;
+
+  // Set up rotation animation
+  useEffect(() => {
+    if (isLoading) {
+      Animated.loop(
+        Animated.timing(spinValue, {
+          toValue: 1,
+          duration: 1500,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      ).start();
+    } else {
+      spinValue.setValue(0);
+    }
+  }, [isLoading]);
+
+  // Create interpolated rotation value
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   // Request permissions for camera and media library
   const requestPermissions = async () => {
@@ -97,7 +129,11 @@ export const CropHealthScreen: React.FC = () => {
       };
 
       const response = await diagnosisService.diagnoseCrop(requestData);
-      setDiagnosis(response);
+      // Navigate to results screen instead of setting diagnosis state
+      navigation.navigate('DiagnosisResult', {
+        diagnosis: response,
+        imageUri: selectedImage,
+      });
     } catch (error) {
       console.error('Diagnosis error:', error);
       Alert.alert(
@@ -141,7 +177,7 @@ export const CropHealthScreen: React.FC = () => {
             <View>
               <Image
                 source={{ uri: selectedImage }}
-                className="w-full h-64 rounded-xl"
+                className="w-full h-72 rounded-xl"
                 resizeMode="cover"
               />
               <TouchableOpacity
@@ -165,16 +201,16 @@ export const CropHealthScreen: React.FC = () => {
             onPress={handleCameraCapture}
             className="flex-1 bg-primary py-3 rounded-lg flex-row justify-center items-center"
           >
-            <Ionicons name="camera" size={18} color="white" />
-            <Text className="text-white font-medium ml-2">Capture</Text>
+            <Ionicons name="camera" size={22} color="white" />
+            <Text className="text-white font-bold ml-2">Capture</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleGallerySelect}
-            className="flex-1 bg-secondary py-3 rounded-lg flex-row justify-center items-center"
+            className="flex-1 bg-primary py-3 rounded-lg flex-row justify-center items-center"
           >
-            <Ionicons name="images" size={18} color="white" />
-            <Text className="text-white font-medium ml-2">Gallery</Text>
+            <Ionicons name="images" size={22} color="white" />
+            <Text className="text-white font-bold ml-2">Gallery</Text>
           </TouchableOpacity>
         </View>
 
@@ -187,62 +223,6 @@ export const CropHealthScreen: React.FC = () => {
             </Text>
           ))}
         </View>
-
-        {/* Diagnosis Results */}
-        {diagnosis && (
-          <View className="bg-white rounded-2xl p-4 mb-6 shadow-sm">
-            <Text className="text-lg font-semibold text-gray-800 mb-4">Diagnosis Results</Text>
-
-            {/* Status */}
-            <View className="mb-4">
-              <Text className="text-sm font-medium text-gray-600 mb-1">Status:</Text>
-              <Text className="text-lg text-green-600">{diagnosis.status}</Text>
-            </View>
-
-            {/* Disease Diagnosis */}
-            <View className="mb-4">
-              <Text className="text-sm font-medium text-gray-600 mb-2">Disease Detected:</Text>
-              <Text className="text-xl font-bold text-red-600 mb-1">
-                {diagnosis.diagnosis.disease_name}
-              </Text>
-              <Text className="text-gray-800">
-                • Confidence: {(diagnosis.diagnosis.confidence * 100).toFixed(1)}%
-              </Text>
-              <Text className="text-gray-800">• Severity: {diagnosis.diagnosis.severity}</Text>
-              <Text className="text-gray-800">
-                • Affected Area: {diagnosis.diagnosis.affected_area}
-              </Text>
-            </View>
-
-            {/* Treatment */}
-            <View className="mb-4">
-              <Text className="text-sm font-medium text-gray-600 mb-2">
-                Treatment Recommendations:
-              </Text>
-              <Text className="text-gray-800 mb-1">
-                • Immediate Action: {diagnosis.treatment.immediate_action}
-              </Text>
-              <Text className="text-gray-800 mb-1">
-                • Fungicide: {diagnosis.treatment.recommended_fungicide}
-              </Text>
-              <Text className="text-gray-800">
-                • Frequency: {diagnosis.treatment.application_frequency}
-              </Text>
-            </View>
-
-            {/* Local Suppliers */}
-            {diagnosis.local_suppliers && diagnosis.local_suppliers.length > 0 && (
-              <View>
-                <Text className="text-sm font-medium text-gray-600 mb-2">Nearby Suppliers:</Text>
-                {diagnosis.local_suppliers.map((supplier, index) => (
-                  <Text key={index} className="text-gray-800 mb-1">
-                    • {supplier.name} ({supplier.distance})
-                  </Text>
-                ))}
-              </View>
-            )}
-          </View>
-        )}
       </ScrollView>
 
       {/* Bottom Action Button */}
@@ -251,17 +231,24 @@ export const CropHealthScreen: React.FC = () => {
           onPress={handleDiagnosis}
           disabled={!selectedImage || isLoading}
           className={`py-4 rounded-xl flex-row justify-center items-center ${
-            selectedImage && !isLoading ? 'bg-green-600' : 'bg-gray-300'
+            selectedImage && !isLoading ? 'bg-primary' : 'bg-accent'
           }`}
         >
-          {isLoading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <>
-              <Ionicons name="medical" size={20} color="white" />
-              <Text className="text-white font-bold text-lg ml-2">CHECK CROP HEALTH</Text>
-            </>
-          )}
+          <View className="flex-row items-center justify-center">
+            {isLoading ? (
+              <>
+                <Animated.View style={{ transform: [{ rotate: spin }] }}>
+                  <Ionicons name="hourglass-outline" size={24} color="black" />
+                </Animated.View>
+                <Text className="text-black font-bold text-lg ml-3">ANALYZING...</Text>
+              </>
+            ) : (
+              <>
+                <Ionicons name="leaf" size={24} color="white" />
+                <Text className="text-white font-bold text-lg ml-3">CHECK CROP HEALTH</Text>
+              </>
+            )}
+          </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
