@@ -8,7 +8,7 @@ import {
   CropHealthScreen,
   MarketPricesScreen,
   GovernmentSchemesScreen,
-  VoiceChatScreen
+  VoiceChatScreen,
 } from './src/screens';
 import { RootStackParamList } from './src/types/navigation';
 
@@ -30,11 +30,7 @@ export default function App() {
           },
         }}
       >
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen
           name="CropHealth"
           component={CropHealthScreen}

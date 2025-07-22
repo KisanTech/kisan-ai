@@ -2,4 +2,4 @@
 export { Header } from './Header';
 export { FeatureCard } from './FeatureCard';
 export { QuickActionButton } from './QuickActionButton';
-export { BottomTabBar } from './BottomTabBar'; 
+export { BottomTabBar } from './BottomTabBar';

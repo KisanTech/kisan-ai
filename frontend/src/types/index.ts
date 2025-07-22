@@ -1,66 +1,66 @@
 // API Response Types
 export interface APIResponse<T = any> {
-    data?: T;
-    message: string;
-    status: string;
-    error?: string;
+  data?: T;
+  message: string;
+  status: string;
+  error?: string;
 }
 
 // Crop Diagnosis Types
 export interface CropDiagnosisRequest {
-    image: string; // base64 encoded image
-    cropType?: string;
-    location?: string;
+  image: string; // base64 encoded image
+  cropType?: string;
+  location?: string;
 }
 
 export interface CropDiagnosisResponse {
-    disease: string;
-    confidence: number;
-    treatment: string;
-    prevention: string[];
-    severity: 'low' | 'medium' | 'high';
+  disease: string;
+  confidence: number;
+  treatment: string;
+  prevention: string[];
+  severity: 'low' | 'medium' | 'high';
 }
 
 // Voice Interface Types
 export interface VoiceRequest {
-    audioData: string; // base64 encoded audio
-    language: 'kn-IN' | 'en-IN';
+  audioData: string; // base64 encoded audio
+  language: 'kn-IN' | 'en-IN';
 }
 
 export interface VoiceResponse {
-    transcription: string;
-    intent?: string;
-    response?: string;
+  transcription: string;
+  intent?: string;
+  response?: string;
 }
 
 // Market Price Types
 export interface MarketPrice {
-    commodity: string;
-    price: number;
-    unit: string;
-    market: string;
-    date: string;
-    trend: 'up' | 'down' | 'stable';
+  commodity: string;
+  price: number;
+  unit: string;
+  market: string;
+  date: string;
+  trend: 'up' | 'down' | 'stable';
 }
 
 export interface MarketPricesResponse {
-    prices: MarketPrice[];
-    lastUpdated: string;
+  prices: MarketPrice[];
+  lastUpdated: string;
 }
 
 // Navigation Types
 export type RootStackParamList = {
-    Home: undefined;
-    CropDiagnosis: undefined;
-    VoiceAssistant: undefined;
-    MarketPrices: undefined;
-    Profile: undefined;
+  Home: undefined;
+  CropDiagnosis: undefined;
+  VoiceAssistant: undefined;
+  MarketPrices: undefined;
+  Profile: undefined;
 };
 
 // Component Props Types
 export interface FeatureCardProps {
-    title: string;
-    description: string;
-    icon: string;
-    onPress?: () => void;
-} 
+  title: string;
+  description: string;
+  icon: string;
+  onPress?: () => void;
+}

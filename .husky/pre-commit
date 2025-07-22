@@ -1,3 +1,6 @@
+#!/bin/sh
+
+# Backend formatting and linting
 cd backend
 
 echo "🦀 Running Ruff linter and formatter on backend..."
@@ -7,3 +10,15 @@ echo "🦀 Running Ruff formatter on backend..."
 uv run ruff format . || { echo "❌ Ruff formatting failed. Please stage the changes. Aborting commit."; exit 1; }
 
 echo "✅ Python formatting and linting complete for backend!"
+
+# Return to root directory
+cd ..
+
+# Frontend formatting
+echo "🎨 Running Prettier on frontend files..."
+npx prettier --write "frontend/**/*.{js,jsx,ts,tsx,json,css}" || { echo "❌ Prettier formatting failed. Please fix issues and stage the changes. Aborting commit."; exit 1; }
+
+# Stage the formatted files
+git add .
+
+echo "✅ Frontend formatting complete!"

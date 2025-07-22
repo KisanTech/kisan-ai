@@ -8,21 +8,12 @@ interface HeaderProps {
   onLanguageChange: (languageId: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  title,
-  currentLanguage,
-  onLanguageChange
-}) => {
+export const Header: React.FC<HeaderProps> = ({ title, currentLanguage, onLanguageChange }) => {
   return (
     <View className="flex-row justify-between items-center px-6 py-4 bg-card">
-      <Text className="text-2xl font-bold text-foreground tracking-tighter">
-        {title}
-      </Text>
+      <Text className="text-2xl font-bold text-foreground tracking-tighter">{title}</Text>
 
-      <LanguageSelector
-        currentLanguage={currentLanguage}
-        onLanguageChange={onLanguageChange}
-      />
+      <LanguageSelector currentLanguage={currentLanguage} onLanguageChange={onLanguageChange} />
     </View>
   );
-}; 
+};
