@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+build
+dist
+.next
+out
+
+# Cache
+.cache
+.eslintcache
+
+# Environment files
+.env*
+!.env.example
+
+# Misc
+.DS_Store
+*.pem
+coverage
+*.log
+
+# Backend
+backend/
+docs/ 

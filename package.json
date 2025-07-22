@@ -1,18 +1,28 @@
 {
-  "name": "project-kisan",
-  "version": "0.1.0",
-  "description": "AI-Powered Agricultural Assistant - Google Agentic AI Day Hackathon",
+  "name": "kisan-ai",
+  "version": "1.0.0",
+  "description": "AI-powered agricultural assistant",
   "private": true,
   "engines": {
     "node": ">=22.0.0"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:backend": "cd backend && uv run uvicorn app.main:app --reload",
+    "dev:frontend": "cd frontend && npm start",
+    "install:backend": "cd backend && uv sync",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "format:frontend": "prettier --write \"frontend/**/*.{js,jsx,ts,tsx,json,css}\"",
+    "format:check": "prettier --check \"frontend/**/*.{js,jsx,ts,tsx,json,css}\"",
+    "format": "npm run format:frontend",
+    "lint": "cd backend && uv run ruff check --fix"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
     "@tailwindcss/postcss": "^4.1.10",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "prettier": "^3.2.5"
   }
-} 
+}

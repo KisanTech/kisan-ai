@@ -6,7 +6,7 @@ Project Kisan is a mono-repo for an AI-powered agricultural assistant designed f
 ## Architecture
 
 - **backend/**: FastAPI (Python 3.13) + Multi-Agent AI System
-- **mobile/**: React Native
+- **frontend/**: React Native (Expo + NativeWind/Tailwind CSS)
 - **docs/**: Project documentation and specifications
 
 ## Folder Structure
@@ -14,7 +14,7 @@ Project Kisan is a mono-repo for an AI-powered agricultural assistant designed f
 ```
 codekheti.ai/
 ├── backend/         # FastAPI + AI Agents (Vertex AI + Gemini 2.0)
-├── mobile/          # Mobile app (Future)
+├── frontend/        # React Native Mobile App (Expo + NativeWind)
 ├── docs/            # Project specs and documentation
 └── README.md        # This file
 ```
@@ -94,13 +94,37 @@ uv run ruff format          # Format code
 uv add google-cloud-speech
 ```
 
+### Frontend
+```sh
+cd frontend
+
+# Run development server
+npm start
+# Scan QR code with Expo Go app
+
+# Run on specific platforms
+npm run android    # Android emulator/device
+npm run ios        # iOS simulator/device
+npm run web        # Web browser
+
+# Install dependencies
+npm install
+```
+
 ### Root Commands
 ```sh
-# Format entire codebase
-npm run format
+# Development servers
+npm run dev:backend     # Start FastAPI server
+npm run dev:frontend    # Start Expo development server
 
-# Lint entire codebase  
-npm run lint
+# Installation
+npm run install:all     # Install all dependencies
+npm run install:backend # Install backend dependencies only
+npm run install:frontend# Install frontend dependencies only
+
+# Code quality
+npm run format          # Format entire codebase
+npm run lint            # Lint entire codebase
 ```
 
 ## MVP Features
@@ -128,6 +152,7 @@ npm run lint
 ## Component Documentation
 
 - **Backend Development**: [backend/README.md](./backend/README.md)
+- **Frontend Development**: [frontend/README.md](./frontend/README.md)
 - **Project Specification**: [docs/project_kisan_specification.md](./docs/project_kisan_specification.md)
 
 ---
