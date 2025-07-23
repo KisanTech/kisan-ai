@@ -6,10 +6,12 @@ import './global.css'; // Import global CSS for NativeWind
 import {
   HomeScreen,
   CropHealthScreen,
+  DiagnosisResultScreen,
   MarketPricesScreen,
   GovernmentSchemesScreen,
   VoiceChatScreen,
 } from './src/screens';
+import { NavigateBackButton } from './src/components';
 import { RootStackParamList } from './src/types/navigation';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -19,6 +21,7 @@ export default function App() {
     <NavigationContainer>
       <StatusBar style="dark" />
       <Stack.Navigator
+        id={undefined}
         initialRouteName="Home"
         screenOptions={{
           headerStyle: {
@@ -34,22 +37,42 @@ export default function App() {
         <Stack.Screen
           name="CropHealth"
           component={CropHealthScreen}
-          options={{ title: 'Crop Health Diagnosis' }}
+          options={({ navigation }) => ({
+            title: 'Crop Health Diagnosis',
+            headerLeft: () => <NavigateBackButton navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="MarketPrices"
           component={MarketPricesScreen}
-          options={{ title: 'Market Prices' }}
+          options={({ navigation }) => ({
+            title: 'Market Prices',
+            headerLeft: () => <NavigateBackButton navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="GovernmentSchemes"
           component={GovernmentSchemesScreen}
-          options={{ title: 'Government Schemes' }}
+          options={({ navigation }) => ({
+            title: 'Government Schemes',
+            headerLeft: () => <NavigateBackButton navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="VoiceChat"
           component={VoiceChatScreen}
-          options={{ title: 'Voice Chat Assistant' }}
+          options={({ navigation }) => ({
+            title: 'Voice Chat Assistant',
+            headerLeft: () => <NavigateBackButton navigation={navigation} />,
+          })}
+        />
+        <Stack.Screen
+          name="DiagnosisResult"
+          component={DiagnosisResultScreen}
+          options={({ navigation }) => ({
+            title: 'Diagnosis Results',
+            headerLeft: () => <NavigateBackButton navigation={navigation} />,
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

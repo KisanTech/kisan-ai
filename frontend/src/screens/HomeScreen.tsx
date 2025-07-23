@@ -13,12 +13,6 @@ export const HomeScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [currentLanguage, setCurrentLanguage] = useState('en');
 
-  // Generic handlers using useCallback for optimization
-  const handleMicPress = useCallback(() => {
-    console.log('Voice assistant activated');
-    // TODO: Implement voice assistant functionality
-  }, []);
-
   const handleFeaturePress = useCallback(
     (feature: FeatureConfig) => {
       if (feature.screen === 'Home') {
@@ -30,13 +24,26 @@ export const HomeScreen: React.FC = () => {
     [navigation]
   );
 
-  const handleQuickAction = useCallback((actionId: string) => {
-    const action = QUICK_ACTIONS.find(qa => qa.id === actionId);
-    if (action) {
-      console.log(`Quick action: ${action.action}`);
-      // TODO: Implement specific quick action functionality
-    }
-  }, []);
+  const handleQuickAction = useCallback(
+    (actionId: string) => {
+      const action = QUICK_ACTIONS.find(qa => qa.id === actionId);
+      if (action) {
+        console.log(`Quick action: ${action.action}`);
+
+        switch (actionId) {
+          case 'crop-health':
+            navigation.navigate('CropHealth');
+            break;
+          case 'crop-prices':
+            navigation.navigate('MarketPrices');
+            break;
+          default:
+            console.log(`Quick action not implemented: ${actionId}`);
+        }
+      }
+    },
+    [navigation]
+  );
 
   const handleTabPress = useCallback((tabId: string) => {
     setActiveTab(tabId);
