@@ -1,5 +1,5 @@
 """
-Test package for Project Kisan backend
+Test package for Kisan AI backend
 
 Contains comprehensive tests for:
 - Market data APIs

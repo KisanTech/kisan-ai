@@ -307,6 +307,22 @@ wheels = [
 ]
 
 [[package]]
+name = "google-cloud-firestore"
+version = "2.21.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "google-api-core", extra = ["grpc"] },
+    { name = "google-auth" },
+    { name = "google-cloud-core" },
+    { name = "proto-plus" },
+    { name = "protobuf" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/80/9d/027b9bf61a44422bcdcb00a2acc59152065b1cffa1fc89da62277730973e/google_cloud_firestore-2.21.0.tar.gz", hash = "sha256:0c37faa8506297f827eefc38feb155247a6dcb9a541289631015d125f1b003f8", size = 528159, upload-time = "2025-06-03T19:28:27.195Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0a/03/94755c64a2fb85cba734ac05a4f80096b8c0acfab0508c9d52c57f571687/google_cloud_firestore-2.21.0-py3-none-any.whl", hash = "sha256:bf33ccc38a27afc60748d1f9bb7c46b078d0d39d288636bdfd967611d7b3f17f", size = 368813, upload-time = "2025-06-03T19:28:25.131Z" },
+]
+
+[[package]]
 name = "google-cloud-resource-manager"
 version = "1.14.2"
 source = { registry = "https://pypi.org/simple" }
@@ -671,6 +687,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "fastapi" },
     { name = "google-cloud-aiplatform" },
+    { name = "google-cloud-firestore" },
     { name = "google-cloud-speech" },
     { name = "google-cloud-storage" },
     { name = "pillow" },
@@ -693,6 +710,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.12.14" },
     { name = "fastapi", specifier = ">=0.104.1" },
     { name = "google-cloud-aiplatform", specifier = ">=1.38.0" },
+    { name = "google-cloud-firestore", specifier = ">=2.14.0" },
     { name = "google-cloud-speech", specifier = ">=2.22.0" },
     { name = "google-cloud-storage", specifier = ">=2.10.0" },
     { name = "pillow", specifier = ">=10.1.0" },

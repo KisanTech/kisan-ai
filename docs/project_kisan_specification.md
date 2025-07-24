@@ -1,4 +1,4 @@
-# Project Kisan - AI-Powered Agricultural Assistant
+# Kisan AI - AI-Powered Agricultural Assistant
 
 ## Team Information
 - **Team Name:** CodeKheti.ai
@@ -18,7 +18,7 @@
 
 **The Scale:** 600M+ farmers in India face similar challenges daily
 
-## Solution Overview - Project Kisan
+## Solution Overview - Kisan AI
 
 ### Vision
 "Your Personal Agronomist in Your Pocket" - Transform every smartphone into an agricultural expert system
@@ -52,7 +52,7 @@ An AI-powered multi-agent system that acts as:
 ❌ Generic advice without local context
 ❌ No real-time expert consultation
 
-### Project Kisan Advantages
+### Kisan AI Advantages
 ✅ Multi-agent AI system - Complete farming assistant
 ✅ Voice-first in local languages (Kannada + 10 more)
 ✅ Hyper-local recommendations based on soil/climate
@@ -434,4 +434,4 @@ Screen 3: Results Screen
 - Government APIs for scheme integration
 - Market APIs for real-time price data
 
-This specification provides complete technical and functional requirements for implementing Project Kisan, ensuring no information from the original PDF is lost while making it easily consumable by Cursor for development.
+This specification provides complete technical and functional requirements for implementing Kisan AI, ensuring no information from the original PDF is lost while making it easily consumable by Cursor for development.

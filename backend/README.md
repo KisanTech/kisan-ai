@@ -1,4 +1,4 @@
-# Project Kisan - Backend API
+# Kisan AI - Backend API
 
 AI-Powered Agricultural Assistant for Google Agentic AI Day Hackathon
 

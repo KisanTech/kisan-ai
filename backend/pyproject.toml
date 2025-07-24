@@ -12,6 +12,7 @@ dependencies = [
     "google-cloud-aiplatform>=1.38.0", # Vertex AI
     "google-cloud-speech>=2.22.0", # Speech APIs
     "google-cloud-storage>=2.10.0", # File storage
+    "google-cloud-firestore>=2.14.0", # Firestore database
     "requests>=2.31.0", # External APIs
     "python-dotenv>=1.0.0", # Environment variables
     "pydantic>=2.5.0",

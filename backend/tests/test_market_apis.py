@@ -3,8 +3,15 @@
 Market APIs Test Script
 ======================
 
-Comprehensive testing script for Project Kisan market data APIs.
-Tests functionality, data validation, and performance.
+Comprehensive testing script for Kisan AI market data APIs.
+Tests the new simplified market service functionality, data validation, and performance.
+
+Features tested:
+- Data retrieval with auto-fetch from Data.gov.in
+- Firestore storage and retrieval
+- Price update functionality  
+- Cache behavior (no redundant API calls)
+- Data consistency and validation
 
 Usage: python test_market_apis.py
 """
@@ -13,19 +20,23 @@ import asyncio
 import os
 import sys
 import time
+from datetime import date, datetime
 
 # Add parent directory to path to import app modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.api.v1.market_prices import get_current_prices, refresh_market_cache
-from app.models.market import CacheRefreshResponse, MarketPricesResponse
+from app.constants import DateFormats, FieldNames
+from app.services.market_service import market_service
+from app.utils.gcp.gcp_manager import gcp_manager
 
 
 class MarketAPITester:
-    """Comprehensive market API testing suite"""
+    """Comprehensive market API testing suite for the new simplified endpoints"""
 
     def __init__(self):
         self.test_results = {"passed": 0, "failed": 0, "tests": []}
+        self.test_state = "Karnataka"  # Default test state
+        self.test_date = datetime.now().date()
 
     def log_test(self, test_name: str, passed: bool, message: str, data: dict = None):
         """Log test result"""
@@ -41,365 +52,422 @@ class MarketAPITester:
         else:
             self.test_results["failed"] += 1
 
-    async def test_cache_refresh_api(self):
-        """Test cache refresh endpoint"""
-        print("\n🔄 Testing Cache Refresh API...")
+    async def setup_tests(self):
+        """Initialize GCP services for testing"""
+        print("\n🔧 Setting up test environment...")
+        
+        try:
+            await gcp_manager.initialize()
+            self.log_test("Setup - GCP Initialization", True, "GCP services initialized successfully")
+        except Exception as e:
+            self.log_test("Setup - GCP Initialization", False, f"Failed to initialize GCP: {str(e)}")
+            return False
+        
+        return True
+
+    async def test_data_gov_fetch_and_store(self):
+        """Test fetching fresh data from Data.gov.in and storing in Firestore"""
+        print("\n🌐 Testing Data.gov.in Fetch and Firestore Storage...")
 
         try:
+            # Clear any existing data first (for clean test)
+            await self._clear_test_data()
+            
+            # Call get_market_data - should fetch from Data.gov.in since no data exists
             start_time = time.time()
-            result = await refresh_market_cache(state="Karnataka")
-            latency = (time.time() - start_time) * 1000
+            result = await market_service.get_market_data(
+                state=self.test_state,
+                date=self.test_date
+            )
+            fetch_time = (time.time() - start_time) * 1000
 
-            # Validate response type
-            if isinstance(result, CacheRefreshResponse):
+            # Validate response structure
+            if not isinstance(result, dict):
+                self.log_test("Data Fetch - Response Type", False, f"Wrong response type: {type(result)}")
+                return
+
+            # Check if data was successfully fetched
+            success = result.get(FieldNames.SUCCESS, False)
+            source = result.get("source", "unknown")
+            data = result.get("data", [])
+
+            if success and source == "data_gov_api":
                 self.log_test(
-                    "Cache Refresh - Response Type",
-                    True,
-                    f"Correct response type: {type(result).__name__}",
+                    "Data Fetch - From Data.gov.in", 
+                    True, 
+                    f"Successfully fetched {len(data)} records from Data.gov.in"
                 )
             else:
                 self.log_test(
-                    "Cache Refresh - Response Type",
-                    False,
-                    f"Wrong response type: {type(result).__name__}",
+                    "Data Fetch - From Data.gov.in", 
+                    False, 
+                    f"Failed to fetch from Data.gov.in. Success: {success}, Source: {source}"
                 )
                 return
-
-            # Validate response fields
-            required_fields = ["status", "state", "records_cached", "refreshed_at"]
-            for field in required_fields:
-                if hasattr(result, field):
-                    self.log_test(
-                        f"Cache Refresh - {field} field",
-                        True,
-                        f"{field} present: {getattr(result, field)}",
-                    )
-                else:
-                    self.log_test(
-                        f"Cache Refresh - {field} field", False, f"Missing required field: {field}"
-                    )
 
             # Validate data quality
-            if result.records_cached > 0:
-                self.log_test(
-                    "Cache Refresh - Data Volume",
-                    True,
-                    f"Successfully cached {result.records_cached} records",
-                )
+            if len(data) > 0:
+                self.log_test("Data Fetch - Data Volume", True, f"Retrieved {len(data)} records")
+                await self._validate_market_record(data[0], "Data.gov.in Fetch")
             else:
-                self.log_test("Cache Refresh - Data Volume", False, "No records cached")
+                self.log_test("Data Fetch - Data Volume", False, "No records retrieved")
 
-            # Validate performance
-            if latency < 10000:  # 10 seconds
-                self.log_test("Cache Refresh - Performance", True, f"Completed in {latency:.2f}ms")
+            # Test performance (first fetch should be slower)
+            if fetch_time < 15000:  # 15 seconds max for external API
+                self.log_test("Data Fetch - Performance", True, f"Fetch completed in {fetch_time:.2f}ms")
             else:
-                self.log_test("Cache Refresh - Performance", False, f"Too slow: {latency:.2f}ms")
+                self.log_test("Data Fetch - Performance", False, f"Too slow: {fetch_time:.2f}ms")
 
         except Exception as e:
-            self.log_test("Cache Refresh - Exception", False, f"Error: {str(e)}")
+            self.log_test("Data Fetch - Exception", False, f"Error: {str(e)}")
 
-    async def test_current_prices_api(self):
-        """Test current prices endpoint with various parameters"""
-        print("\n💰 Testing Current Prices API...")
-
-        test_cases = [
-            {
-                "name": "No Filters",
-                "params": {"crop": None, "market": None, "state": None},
-                "expect_data": True,
-            },
-            {
-                "name": "Filter by Crop",
-                "params": {"crop": "Tomato", "market": None, "state": None},
-                "expect_data": True,
-            },
-            {
-                "name": "Filter by State",
-                "params": {"crop": None, "market": None, "state": "Karnataka"},
-                "expect_data": True,
-            },
-            {
-                "name": "Non-existent Crop",
-                "params": {"crop": "NonExistentCrop123", "market": None, "state": None},
-                "expect_data": False,
-            },
-            {
-                "name": "Filter by Market",
-                "params": {"crop": None, "market": "Bangalore", "state": None},
-                "expect_data": True,
-            },
-        ]
-
-        for test_case in test_cases:
-            await self._test_single_price_query(test_case)
-
-    async def _test_single_price_query(self, test_case: dict):
-        """Test a single price query"""
-        test_name = f"Price Query - {test_case['name']}"
+    async def test_firestore_cache_behavior(self):
+        """Test that subsequent calls use Firestore cache instead of Data.gov.in"""
+        print("\n💾 Testing Firestore Cache Behavior...")
 
         try:
+            # First call - should use cached data from previous test
             start_time = time.time()
-            result = await get_current_prices(**test_case["params"])
-            latency = (time.time() - start_time) * 1000
-
-            # Validate response type
-            if not isinstance(result, MarketPricesResponse):
-                self.log_test(
-                    test_name + " - Type", False, f"Wrong response type: {type(result).__name__}"
-                )
-                return
-
-            # Validate structure
-            if hasattr(result, "prices") and hasattr(result, "metadata"):
-                self.log_test(test_name + " - Structure", True, "Response has required fields")
-            else:
-                self.log_test(test_name + " - Structure", False, "Missing required fields")
-                return
-
-            # Validate data expectation
-            has_data = len(result.prices) > 0
-            if test_case["expect_data"]:
-                if has_data:
-                    self.log_test(
-                        test_name + " - Data Present", True, f"Found {len(result.prices)} records"
-                    )
-
-                    # Validate first record if present
-                    await self._validate_price_record(result.prices[0], test_name)
-                else:
-                    self.log_test(
-                        test_name + " - Data Present", False, "Expected data but got empty results"
-                    )
-            else:
-                if not has_data:
-                    self.log_test(
-                        test_name + " - No Data", True, "Correctly returned empty results"
-                    )
-                else:
-                    self.log_test(
-                        test_name + " - No Data",
-                        False,
-                        f"Expected no data but got {len(result.prices)} records",
-                    )
-
-            # Validate performance (should be fast due to caching)
-            if latency < 1000:  # 1 second
-                self.log_test(test_name + " - Performance", True, f"Fast response: {latency:.2f}ms")
-            else:
-                self.log_test(
-                    test_name + " - Performance", False, f"Slow response: {latency:.2f}ms"
-                )
-
-        except Exception as e:
-            self.log_test(test_name + " - Exception", False, f"Error: {str(e)}")
-
-    async def _validate_price_record(self, record, test_context: str):
-        """Validate individual price record data quality"""
-
-        # Required fields
-        required_fields = [
-            "state",
-            "district",
-            "market",
-            "commodity",
-            "variety",
-            "grade",
-            "arrival_date",
-            "min_price_rs",
-            "max_price_rs",
-            "modal_price_rs",
-        ]
-
-        for field in required_fields:
-            if hasattr(record, field) and getattr(record, field) is not None:
-                self.log_test(
-                    f"{test_context} - {field}", True, f"{field}: {getattr(record, field)}"
-                )
-            else:
-                self.log_test(f"{test_context} - {field}", False, f"Missing or null field: {field}")
-
-        # Price validation
-        prices = [record.min_price_rs, record.max_price_rs, record.modal_price_rs]
-
-        # All prices should be positive
-        all_positive = all(p > 0 for p in prices)
-        self.log_test(
-            f"{test_context} - Positive Prices", all_positive, f"All prices positive: {prices}"
-        )
-
-        # Min <= Modal <= Max
-        price_order = record.min_price_rs <= record.modal_price_rs <= record.max_price_rs
-        self.log_test(
-            f"{test_context} - Price Order",
-            price_order,
-            f"Min({record.min_price_rs}) <= Modal({record.modal_price_rs}) <= "
-            f"Max({record.max_price_rs})",
-        )
-
-        # Reasonable price range (₹0.1 to ₹10000 per kg)
-        reasonable_range = all(0.1 <= p <= 10000 for p in prices)
-        self.log_test(
-            f"{test_context} - Price Range",
-            reasonable_range,
-            f"Prices in reasonable range: {prices}",
-        )
-
-        # Currency should be INR
-        correct_currency = record.currency == "INR"
-        self.log_test(
-            f"{test_context} - Currency", correct_currency, f"Currency: {record.currency}"
-        )
-
-    async def test_data_consistency(self):
-        """Test data consistency across multiple calls"""
-        print("\n🔍 Testing Data Consistency...")
-
-        try:
-            # Make two identical calls
-            result1 = await get_current_prices(crop="Tomato", state="Karnataka")
-            await asyncio.sleep(0.1)  # Small delay
-            result2 = await get_current_prices(crop="Tomato", state="Karnataka")
-
-            # Should get same results (due to caching)
-            same_count = len(result1.prices) == len(result2.prices)
-            self.log_test(
-                "Data Consistency - Count",
-                same_count,
-                f"Call 1: {len(result1.prices)}, Call 2: {len(result2.prices)}",
+            result1 = await market_service.get_market_data(
+                state=self.test_state,
+                date=self.test_date
             )
-
-            # Same source
-            same_source = result1.metadata.source == result2.metadata.source
-            self.log_test(
-                "Data Consistency - Source",
-                same_source,
-                f"Both calls from: {result1.metadata.source}",
-            )
-
-        except Exception as e:
-            self.log_test("Data Consistency - Exception", False, f"Error: {str(e)}")
-
-    async def test_cache_functionality(self):
-        """Test cache functionality and performance"""
-        print("\n⚡ Testing Cache Functionality...")
-
-        try:
-            # First call (should populate cache)
-            start_time = time.time()
-            result1 = await get_current_prices(state="Karnataka")
             first_call_time = (time.time() - start_time) * 1000
 
-            # Second call (should use cache)
-            start_time = time.time()
-            result2 = await get_current_prices(state="Karnataka")
-            second_call_time = (time.time() - start_time) * 1000
+            # Validate it used Firestore cache
+            source1 = result1.get("source", "unknown")
+            success1 = result1.get(FieldNames.SUCCESS, False)
 
-            # Second call should be much faster
-            cache_effective = second_call_time < first_call_time / 2
-            self.log_test(
-                "Cache Performance",
-                cache_effective,
-                f"First: {first_call_time:.2f}ms, Second: {second_call_time:.2f}ms",
-            )
-
-            # Should get same data
-            same_data = len(result1.prices) == len(result2.prices)
-            self.log_test(
-                "Cache Data Integrity",
-                same_data,
-                f"Both calls returned {len(result1.prices)} records",
-            )
-
-            # Check cache age in metadata
-            if (
-                hasattr(result2.metadata, "cache_age_hours")
-                and result2.metadata.cache_age_hours is not None
-            ):
+            if success1 and source1 == "firestore":
                 self.log_test(
-                    "Cache Age Tracking",
-                    True,
-                    f"Cache age: {result2.metadata.cache_age_hours} hours",
+                    "Cache Behavior - Firestore Source", 
+                    True, 
+                    f"Correctly used Firestore cache with {len(result1.get('data', []))} records"
                 )
             else:
-                self.log_test("Cache Age Tracking", False, "Cache age not tracked")
+                self.log_test(
+                    "Cache Behavior - Firestore Source", 
+                    False, 
+                    f"Expected Firestore source but got: {source1}"
+                )
+
+            # Second call - should also use cache
+            start_time = time.time()
+            result2 = await market_service.get_market_data(
+                state=self.test_state,
+                date=self.test_date
+            )
+            second_call_time = (time.time() - start_time) * 1000
+
+            # Both calls should be fast (using cache)
+            cache_performance = first_call_time < 2000 and second_call_time < 2000
+            self.log_test(
+                "Cache Behavior - Performance", 
+                cache_performance,
+                f"Cache calls: {first_call_time:.2f}ms, {second_call_time:.2f}ms"
+            )
+
+            # Data should be consistent
+            data1 = result1.get("data", [])
+            data2 = result2.get("data", [])
+            consistent_data = len(data1) == len(data2)
+            self.log_test(
+                "Cache Behavior - Data Consistency", 
+                consistent_data,
+                f"Both calls returned {len(data1)} records"
+            )
 
         except Exception as e:
-            self.log_test("Cache Functionality - Exception", False, f"Error: {str(e)}")
+            self.log_test("Cache Behavior - Exception", False, f"Error: {str(e)}")
 
-    async def analyze_data_quality(self):
-        """Analyze overall data quality"""
-        print("\n📊 Analyzing Data Quality...")
+    async def test_price_update_functionality(self):
+        """Test the crop price update functionality"""
+        print("\n💰 Testing Price Update Functionality...")
 
         try:
-            # Get all data
-            result = await get_current_prices(state="Karnataka")
+            # First get some data to find a record to update
+            result = await market_service.get_market_data(
+                state=self.test_state,
+                date=self.test_date
+            )
 
-            if not result.prices:
-                self.log_test("Data Quality - No Data", False, "No data available for analysis")
+            data = result.get("data", [])
+            if not data:
+                self.log_test("Price Update - No Data", False, "No data available for price update test")
                 return
 
-            # Analyze commodities
-            commodities = {record.commodity for record in result.prices}
-            self.log_test(
-                "Data Quality - Commodity Variety",
-                len(commodities) > 5,
-                f"Found {len(commodities)} unique commodities",
+            # Pick the first record for testing
+            test_record = data[0]
+            original_price = test_record.get(FieldNames.PRICE, 0)
+            
+            # Convert to float for calculation (handle string prices from API)
+            try:
+                original_price_num = float(original_price) if isinstance(original_price, str) else original_price
+            except (ValueError, TypeError):
+                original_price_num = 0
+                
+            new_price = original_price_num + 10.50  # Increase by 10.50
+
+            # Update the price
+            update_result = await market_service.update_crop_price(
+                state=test_record.get(FieldNames.STATE),
+                market=test_record.get(FieldNames.MARKET),
+                commodity=test_record.get(FieldNames.COMMODITY),
+                date=self.test_date,
+                price=new_price,
+                updated_by="test_script"
             )
 
-            # Analyze markets
-            markets = {record.market for record in result.prices}
-            self.log_test(
-                "Data Quality - Market Variety",
-                len(markets) > 3,
-                f"Found {len(markets)} unique markets",
+            # Validate update result
+            update_success = update_result.get(FieldNames.SUCCESS, False)
+            if update_success:
+                self.log_test(
+                    "Price Update - Success", 
+                    True, 
+                    f"Updated {test_record.get(FieldNames.COMMODITY)} price from ₹{original_price_num} to ₹{new_price}"
+                )
+
+                # Verify the update by fetching data again
+                verify_result = await market_service.get_market_data(
+                    state=self.test_state,
+                    date=self.test_date
+                )
+                
+                # Find the updated record
+                verify_data = verify_result.get("data", [])
+                updated_record = None
+                for record in verify_data:
+                    if (record.get(FieldNames.COMMODITY) == test_record.get(FieldNames.COMMODITY) and
+                        record.get(FieldNames.MARKET) == test_record.get(FieldNames.MARKET)):
+                        updated_record = record
+                        break
+
+                if updated_record and updated_record.get(FieldNames.PRICE) == new_price:
+                    self.log_test(
+                        "Price Update - Verification", 
+                        True, 
+                        f"Price update verified in database: ₹{updated_record.get(FieldNames.PRICE)}"
+                    )
+                else:
+                    self.log_test(
+                        "Price Update - Verification", 
+                        False, 
+                        "Updated price not reflected in database"
+                    )
+
+            else:
+                self.log_test(
+                    "Price Update - Success", 
+                    False, 
+                    f"Failed to update price: {update_result.get(FieldNames.MESSAGE, 'Unknown error')}"
+                )
+
+        except Exception as e:
+            self.log_test("Price Update - Exception", False, f"Error: {str(e)}")
+
+    async def test_invalid_scenarios(self):
+        """Test invalid scenarios and error handling"""
+        print("\n⚠️  Testing Invalid Scenarios...")
+
+        # Test non-existent state
+        try:
+            result = await market_service.get_market_data(
+                state="NonExistentState",
+                date=self.test_date
+            )
+            
+            data = result.get("data", [])
+            if len(data) == 0:
+                self.log_test(
+                    "Invalid Scenarios - Non-existent State", 
+                    True, 
+                    "Correctly returned empty data for non-existent state"
+                )
+            else:
+                self.log_test(
+                    "Invalid Scenarios - Non-existent State", 
+                    False, 
+                    f"Expected empty data but got {len(data)} records"
+                )
+
+        except Exception as e:
+            self.log_test("Invalid Scenarios - Non-existent State", False, f"Error: {str(e)}")
+
+        # Test price update for non-existent record
+        try:
+            update_result = await market_service.update_crop_price(
+                state=self.test_state,
+                market="NonExistentMarket",
+                commodity="NonExistentCrop",
+                date=self.test_date,
+                price=100.0,
+                updated_by="test_script"
             )
 
-            # Analyze price ranges
-            all_prices = []
-            for record in result.prices:
-                all_prices.extend([record.min_price_rs, record.max_price_rs, record.modal_price_rs])
+            update_success = update_result.get(FieldNames.SUCCESS, True)  # Should be False
+            if not update_success:
+                self.log_test(
+                    "Invalid Scenarios - Non-existent Record Update", 
+                    True, 
+                    "Correctly failed to update non-existent record"
+                )
+            else:
+                self.log_test(
+                    "Invalid Scenarios - Non-existent Record Update", 
+                    False, 
+                    "Should have failed to update non-existent record"
+                )
 
-            min_price = min(all_prices)
-            max_price = max(all_prices)
-            avg_price = sum(all_prices) / len(all_prices)
+        except Exception as e:
+            self.log_test("Invalid Scenarios - Non-existent Record Update", False, f"Error: {str(e)}")
 
+    async def _validate_market_record(self, record: dict, context: str):
+        """Validate individual market record structure and data quality"""
+        
+        # Check required fields
+        required_fields = [FieldNames.STATE, FieldNames.MARKET, FieldNames.COMMODITY, FieldNames.PRICE]
+        
+        for field in required_fields:
+            if field in record and record[field] is not None:
+                self.log_test(
+                    f"{context} - {field} Field", 
+                    True, 
+                    f"{field}: {record[field]}"
+                )
+            else:
+                self.log_test(
+                    f"{context} - {field} Field", 
+                    False, 
+                    f"Missing or null field: {field}"
+                )
+
+        # Validate price is non-negative (0 is valid for no trading data)
+        price = record.get(FieldNames.PRICE, 0)
+        
+        # Convert to float if it's a string
+        try:
+            price_num = float(price) if isinstance(price, str) else price
+            if isinstance(price_num, (int, float)) and price_num >= 0:
+                self.log_test(
+                    f"{context} - Price Validity", 
+                    True, 
+                    f"Valid price: ₹{price_num}"
+                )
+            else:
+                self.log_test(
+                    f"{context} - Price Validity", 
+                    False, 
+                    f"Invalid price: {price}"
+                )
+        except (ValueError, TypeError):
             self.log_test(
-                "Data Quality - Price Analysis",
-                True,
-                f"Price range: ₹{min_price:.2f} - ₹{max_price:.2f}, Average: ₹{avg_price:.2f}",
+                f"{context} - Price Validity", 
+                False, 
+                f"Invalid price format: {price}"
             )
 
-            # Check for data freshness
-            fresh_data = "2025" in result.prices[0].arrival_date
+        # Check metadata fields
+        metadata_fields = [FieldNames.STORED_AT, FieldNames.DATA_SOURCE]
+        for field in metadata_fields:
+            if field in record:
+                self.log_test(
+                    f"{context} - {field} Metadata", 
+                    True, 
+                    f"{field}: {record[field]}"
+                )
+
+    async def test_date_parameter_handling(self):
+        """Test different date parameter scenarios"""
+        print("\n📅 Testing Date Parameter Handling...")
+
+        try:
+            # Test with today's date (default)
+            result_today = await market_service.get_market_data(state=self.test_state)
+            
+            today_success = result_today.get(FieldNames.SUCCESS, False)
+            today_date = result_today.get(FieldNames.DATE, "")
+            
+            expected_date = datetime.now().date().strftime(DateFormats.ISO_DATE)
+            correct_date = today_date == expected_date
+            
             self.log_test(
-                "Data Quality - Freshness",
-                fresh_data,
-                f"Sample date: {result.prices[0].arrival_date}",
+                "Date Handling - Default (Today)", 
+                today_success and correct_date,
+                f"Used default date: {today_date}"
+            )
+
+            # Test with explicit date
+            from datetime import timedelta
+            yesterday = datetime.now().date() - timedelta(days=1)
+            
+            result_yesterday = await market_service.get_market_data(
+                state=self.test_state,
+                date=yesterday
+            )
+            
+            yesterday_success = result_yesterday.get(FieldNames.SUCCESS, False)
+            yesterday_date = result_yesterday.get(FieldNames.DATE, "")
+            expected_yesterday = yesterday.strftime(DateFormats.ISO_DATE)
+            
+            self.log_test(
+                "Date Handling - Explicit Date", 
+                yesterday_success and yesterday_date == expected_yesterday,
+                f"Used explicit date: {yesterday_date}"
             )
 
         except Exception as e:
-            self.log_test("Data Quality Analysis - Exception", False, f"Error: {str(e)}")
+            self.log_test("Date Handling - Exception", False, f"Error: {str(e)}")
+
+    async def _clear_test_data(self):
+        """Clear test data from Firestore (for clean testing)"""
+        try:
+            # This is a helper method to clear data for testing
+            # In a real scenario, you might want to use a test database
+            date_str = self.test_date.strftime(DateFormats.ISO_DATE)
+            
+            # Query and delete documents for the test date
+            docs = gcp_manager.firestore.collection("daily_market_prices")\
+                     .where(FieldNames.STATE, "==", self.test_state)\
+                     .where(FieldNames.DATE, "==", date_str)\
+                     .stream()
+            
+            deleted_count = 0
+            for doc in docs:
+                doc.reference.delete()
+                deleted_count += 1
+            
+            if deleted_count > 0:
+                print(f"🧹 Cleared {deleted_count} test records from Firestore")
+            
+        except Exception as e:
+            print(f"⚠️  Could not clear test data: {str(e)}")
 
     async def run_all_tests(self):
         """Run comprehensive test suite"""
-        print("🧪 Starting Market APIs Test Suite")
-        print("=" * 50)
+        print("🧪 Starting Kisan AI Market APIs Test Suite")
+        print("=" * 60)
+        
+        # Setup
+        setup_success = await self.setup_tests()
+        if not setup_success:
+            print("❌ Setup failed. Cannot continue with tests.")
+            return
 
         # Run all test categories
-        await self.test_cache_refresh_api()
-        await self.test_current_prices_api()
-        await self.test_data_consistency()
-        await self.test_cache_functionality()
-        await self.analyze_data_quality()
+        await self.test_data_gov_fetch_and_store()
+        await self.test_firestore_cache_behavior()
+        await self.test_price_update_functionality()
+        await self.test_date_parameter_handling()
+        await self.test_invalid_scenarios()
 
         # Print summary
         self._print_summary()
 
     def _print_summary(self):
         """Print test summary"""
-        print("\n" + "=" * 50)
+        print("\n" + "=" * 60)
         print("📋 TEST SUMMARY")
-        print("=" * 50)
+        print("=" * 60)
 
         total_tests = self.test_results["passed"] + self.test_results["failed"]
         pass_rate = (self.test_results["passed"] / total_tests * 100) if total_tests > 0 else 0
@@ -417,9 +485,12 @@ class MarketAPITester:
 
         # Overall status
         if self.test_results["failed"] == 0:
-            print("\n🎉 ALL TESTS PASSED! Market APIs are working perfectly! ✨")
+            print("\n🎉 ALL TESTS PASSED! Kisan AI Market APIs are working perfectly! ✨")
         else:
             print("\n⚠️  Some tests failed. Please review and fix issues.")
+
+        print(f"\n🌾 Tested with state: {self.test_state}")
+        print(f"📅 Tested with date: {self.test_date}")
 
 
 async def main():

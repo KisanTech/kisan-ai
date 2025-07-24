@@ -1,16 +1,12 @@
 # Node
 node_modules/
 .next/
-.env/
-.env.*
 
 # Python
 __pycache__/
 *.py[cod]
 venv/
 .venv/
-.env/
-*.env
 
 # macOS
 .DS_Store
@@ -33,6 +29,42 @@ build/
 *.bak
 
 .ruff_cache/
+
+# Credentials & API Keys
+credentials/
+credentials/*
+*.json
+!package.json
+!package-lock.json
+!app.json
+!tsconfig.json
+!tailwind.config.js
+!metro.config.js
+!babel.config.js
+!uv.lock
+
+# Google Cloud credentials
+service-account*.json
+*-service-account*.json
+gcp-*.json
+google-cloud-*.json
+
+# Environment files with API keys
+.env
+.env.*
+!.env.template
+
+# API Keys and tokens
+*api-key*
+*api_key*
+*access-token*
+*access_token*
+apikey*
+token*
+secret*
+
+# Cloud provider credentials
+gcp-credentials*
 
 # Conversation Storage
 conversations/
