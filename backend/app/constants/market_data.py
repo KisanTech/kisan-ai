@@ -11,7 +11,3 @@ class MarketData:
 
     # Cache configuration
     DEFAULT_CACHE_TTL_HOURS = 24
-
-    # API limits
-    DEFAULT_BATCH_SIZE = 100
-    DEFAULT_MAX_RECORDS = 2000

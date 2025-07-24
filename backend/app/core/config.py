@@ -5,10 +5,10 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    """Project Kisan application settings"""
+    """Kisan AI application settings"""
 
     # App Info
-    APP_NAME: str = Field(default="Project Kisan API", description="Application name")
+    APP_NAME: str = Field(default="Kisan AI", description="Application name")
     APP_VERSION: str = Field(default="0.1.0", description="Application version")
     ENVIRONMENT: str = Field(default="dev", description="Environment (dev/staging/prod)")
     DEBUG: bool = Field(default=False, description="Enable debug mode")
@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     GOOGLE_CLOUD_PROJECT: str = Field(default="", description="Google Cloud project ID")
     GOOGLE_APPLICATION_CREDENTIALS: str = Field(
         default="", description="Path to GCP service account key"
+    )
+
+    # Google Cloud Services
+    FIRESTORE_DATABASE: str = Field(default="kisan-db", description="Firestore database name")
+    CLOUD_STORAGE_BUCKET: str = Field(
+        default="kisan-ai-bucket", description="Cloud Storage bucket name"
     )
 
     # Vertex AI Configuration

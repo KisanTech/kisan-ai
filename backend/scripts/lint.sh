@@ -1,5 +1,5 @@
 #!/bin/bash
-# Project Kisan - Quick Lint & Format Script
+# Kisan AI - Quick Lint & Format Script
 # Usage: ./scripts/lint.sh
 
 echo "🔧 Running ruff linter and formatter..."

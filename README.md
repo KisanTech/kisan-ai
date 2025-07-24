@@ -1,7 +1,7 @@
-# Project Kisan 🌾 - AI-Powered Agricultural Assistant
+# Kisan AI 🌾 - AI-Powered Agricultural Assistant
 
 ## Overview
-Project Kisan is a mono-repo for an AI-powered agricultural assistant designed for Indian farmers. Built for a 30-hour hackathon with Google Cloud Vertex AI, focusing on crop disease diagnosis, Kannada voice interface, and real-time market intelligence.
+Kisan AI is a mono-repo for an AI-powered agricultural assistant designed for Indian farmers. Built for a 30-hour hackathon with Google Cloud Vertex AI, focusing on crop disease diagnosis, Kannada voice interface, and real-time market intelligence.
 
 ## Architecture
 

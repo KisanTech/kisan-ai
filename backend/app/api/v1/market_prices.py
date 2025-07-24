@@ -1,62 +1,135 @@
 """
-Market prices API endpoints with production-ready error handling
+Simple Market Data API
+Only handles data retrieval and price updates
 """
 
-from fastapi import APIRouter, HTTPException, Query, status
+from datetime import datetime
 
-from app.constants import MarketData
-from app.models.market import CacheRefreshResponse, MarketPricesResponse
+from fastapi import APIRouter, Body, HTTPException, Query, status
+from pydantic import BaseModel
+
+from app.constants import DateFormats
 from app.services.market_service import market_service
 from app.utils.logger import logger
 
 router = APIRouter()
 
 
-@router.get("/current", response_model=MarketPricesResponse)
-async def get_current_prices(
-    crop: str | None = Query(None, description="Specific crop name"),
-    market: str | None = Query(None, description="Market/Mandi name"),
-    state: str | None = Query(MarketData.DEFAULT_STATE, description="State name"),
-) -> MarketPricesResponse:
-    """
-    Get current market prices for crops
+class MarketDataResponse(BaseModel):
+    """Simple market data response"""
 
-    Returns market price data with caching for performance.
-    Defaults to {MarketData.DEFAULT_STATE} state if not specified.
+    success: bool
+    data: list
+    source: str
+    state: str
+    date: str
+    total_records: int
+    error: str | None = None
+
+
+class PriceUpdateRequest(BaseModel):
+    """Price update request"""
+
+    state: str
+    market: str
+    commodity: str
+    date: str  # YYYY-MM-DD format
+    price: float
+    updated_by: str = "api"
+
+
+class PriceUpdateResponse(BaseModel):
+    """Price update response"""
+
+    success: bool
+    message: str
+    old_price: float | None = None
+    new_price: float | None = None
+    state: str
+    market: str
+    commodity: str
+    date: str
+    error: str | None = None
+
+
+@router.get("/data", response_model=MarketDataResponse)
+async def get_market_data(
+    state: str = Query(..., description="State name (required)"),
+    date: str | None = Query(
+        None, description=f"Date in {DateFormats.ISO_DATE} format (defaults to today)"
+    ),
+) -> MarketDataResponse:
+    """
+    Get market data for a specific state and date
+
+    Automatically fetches from Data.gov.in if data doesn't exist in Firestore.
+    Returns all crops and markets for the given state and date.
     """
     try:
-        result = await market_service.get_commodity_prices(
-            commodity=crop, state=state, market=market
-        )
-        return MarketPricesResponse(**result)
+        # Parse date if provided
+        target_date = None
+        if date:
+            try:
+                target_date = datetime.strptime(date, DateFormats.ISO_DATE).date()
+            except ValueError:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid date format. Use {DateFormats.ISO_DATE}",
+                )
 
+        result = await market_service.get_market_data(state=state, date=target_date)
+        return MarketDataResponse(**result)
+
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(
-            "Failed to fetch market prices", error=str(e), crop=crop, market=market, state=state
-        )
+        logger.error("Failed to get market data", error=str(e), state=state, date=date)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Market data service temporarily unavailable",
         )
 
 
-@router.post("/cache/refresh", response_model=CacheRefreshResponse)
-async def refresh_market_cache(
-    state: str = Query(MarketData.DEFAULT_STATE, description="State to refresh cache for"),
-) -> CacheRefreshResponse:
+@router.put("/price", response_model=PriceUpdateResponse)
+async def update_crop_price(request: PriceUpdateRequest = Body(...)) -> PriceUpdateResponse:
     """
-    Manually refresh market data cache for a state
+    Update price for a specific crop in a specific market
 
-    Forces a fresh fetch from Data.gov.in API and updates the cache.
-    Use this when you need the latest data immediately.
+    Updates the price for an existing crop record.
+    The record must already exist in the database.
     """
     try:
-        result = await market_service.refresh_cache(state)
-        return CacheRefreshResponse(**result)
+        # Parse and validate date
+        try:
+            target_date = datetime.strptime(request.date, DateFormats.ISO_DATE).date()
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid date format. Use {DateFormats.ISO_DATE}",
+            )
 
+        # Validate price
+        if request.price < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Price must be non-negative"
+            )
+
+        result = await market_service.update_crop_price(
+            state=request.state,
+            market=request.market,
+            commodity=request.commodity,
+            date=target_date,
+            price=request.price,
+            updated_by=request.updated_by,
+        )
+
+        return PriceUpdateResponse(**result)
+
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error("Failed to refresh cache", error=str(e), state=state)
+        logger.error("Failed to update crop price", error=str(e), request=request.dict())
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Cache refresh service temporarily unavailable",
+            detail="Price update service temporarily unavailable",
         )

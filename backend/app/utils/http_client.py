@@ -73,12 +73,12 @@ async def api_request(
                 else:
                     response.raise_for_status()
 
-    except aiohttp.ClientTimeout:
+    except TimeoutError:
         logger.error("Request timeout", url=url, timeout=timeout)
         raise ValueError(f"Request timeout after {timeout} seconds")
     except aiohttp.ClientError as e:
         logger.error("HTTP client error", error=str(e), url=url)
-        raise
+        raise ValueError(f"HTTP client error: {str(e)}")
     except Exception as e:
         logger.error("Unexpected error in HTTP request", error=str(e), url=url)
-        raise
+        raise ValueError(f"Unexpected error: {str(e)}")

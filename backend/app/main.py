@@ -1,4 +1,4 @@
-"""Main FastAPI application entry point for Project Kisan"""
+"""Main FastAPI application entry point for Kisan AI"""
 
 import os
 from contextlib import asynccontextmanager
@@ -9,10 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.crop_diagnosis import router as crop_diagnosis_router
 from app.api.v1.market_prices import router as market_router
-from app.constants import MarketData
 from app.core.config import settings
 from app.models.market import APIInfo, HealthCheckResponse
-from app.services.market_service import market_service
+from app.utils.gcp.gcp_manager import gcp_manager
 from app.utils.logger import logger
 
 # Load environment variables
@@ -23,38 +22,41 @@ load_dotenv()
 async def lifespan(app: FastAPI):
     """Application lifespan handler"""
     logger.info(
-        "Starting Project Kisan API", version=settings.APP_VERSION, environment=settings.ENVIRONMENT
+        "Starting Kisan AI API", version=settings.APP_VERSION, environment=settings.ENVIRONMENT
     )
 
     try:
         # Ensure logs directory exists
         os.makedirs("logs", exist_ok=True)
 
-        # Pre-load market data cache for Karnataka (startup optimization)
-        if settings.DATA_GOV_API_KEY:
-            try:
-                logger.info(f"Pre-loading market data cache for {MarketData.DEFAULT_STATE}")
-                await market_service.refresh_cache(MarketData.DEFAULT_STATE)
-            except Exception as cache_error:
-                logger.warning("Failed to pre-load market cache", error=str(cache_error))
+        # Initialize Google Cloud Platform services
+        try:
+            await gcp_manager.initialize()
+        except Exception as gcp_error:
+            logger.warning("Failed to initialize GCP services", error=str(gcp_error))
+
+        # Market service is ready - no pre-loading needed
+        logger.info("Market service initialized successfully")
 
         logger.info(
-            "Project Kisan API startup complete",
+            "Kisan AI API startup complete",
             debug_mode=settings.DEBUG,
             cors_origins=len(settings.CORS_ORIGINS),
             has_market_api_key=bool(settings.DATA_GOV_API_KEY),
+            gcp_project=settings.GOOGLE_CLOUD_PROJECT,
+            firestore_db=settings.FIRESTORE_DATABASE,
         )
 
     except Exception as e:
-        logger.error("Failed to start Project Kisan API", error=str(e), error_type=type(e).__name__)
+        logger.error("Failed to start Kisan AI API", error=str(e), error_type=type(e).__name__)
         raise
 
     yield
 
     try:
-        logger.info("Project Kisan API shutdown complete")
+        logger.info("Kisan AI API shutdown complete")
     except Exception as e:
-        logger.error("Error during Project Kisan API shutdown", error=str(e))
+        logger.error("Error during Kisan AI API shutdown", error=str(e))
 
 
 # Create FastAPI app with lifespan management
@@ -85,8 +87,12 @@ async def root() -> APIInfo:
         message=f"{settings.APP_NAME} - Ready for Hackathon!",
         version=settings.APP_VERSION,
         features=[
-            "Market Price Display",
-            "Crop Disease Diagnosis",
+            "Simple Market Data Storage & Retrieval",
+            "Data.gov.in API Integration",
+            "Individual Price Updates",
+            "Firestore Time-Series Storage",
+            "TTL-based Data Cleanup",
+            "Google Cloud Platform Integration",
         ],
         environment=settings.ENVIRONMENT,
         docs="/docs",
@@ -104,9 +110,8 @@ async def health_check() -> HealthCheckResponse:
     )
 
 
-app.include_router(market_router, prefix="/api/v1/market", tags=["market-prices"])
+app.include_router(market_router, prefix="/api/v1/market", tags=["market-data"])
 app.include_router(crop_diagnosis_router, prefix="/api/v1/crop", tags=["crop-diagnosis"])
-
 
 if __name__ == "__main__":
     import uvicorn
