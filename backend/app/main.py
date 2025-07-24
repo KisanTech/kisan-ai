@@ -3,7 +3,6 @@
 import os
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,8 +13,7 @@ from app.models.market import APIInfo, HealthCheckResponse
 from app.utils.gcp.gcp_manager import gcp_manager
 from app.utils.logger import logger
 
-# Load environment variables
-load_dotenv()
+# Environment variables and credentials are loaded in app/__init__.py
 
 
 @asynccontextmanager
