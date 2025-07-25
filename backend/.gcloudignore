@@ -1,0 +1,57 @@
+# Kisan AI - Cloud Run deployment ignore file
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+.ruff_cache/
+
+# Environment files (security)
+.env
+credentials/
+*.json
+*.key
+*.pem
+
+# Development
+.vscode/
+.idea/
+*.swp
+*~
+
+# Testing
+.pytest_cache/
+tests/
+test_*.py
+*_test.py
+
+# Documentation
+docs/
+*.md
+
+# Deployment scripts
+scripts/deploy_simple.sh
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+._*
+
+# Git
+.git/
+.gitignore
+
+# Temporary files
+tmp/
+temp/ 
+
+env.template
+
+scripts/
