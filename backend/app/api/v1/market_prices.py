@@ -5,11 +5,12 @@ Only handles data retrieval and price updates
 
 from datetime import datetime
 
+from fastapi import APIRouter, Body, HTTPException, Query, status
+from pydantic import BaseModel
+
 from app.constants import DateFormats
 from app.services.market_service import market_service
 from app.utils.logger import logger
-from fastapi import APIRouter, Body, HTTPException, Query, status
-from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -70,14 +71,12 @@ async def get_market_data(
         # Validate pagination parameters
         if limit < 1 or limit > 1000:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Limit must be between 1 and 1000"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Limit must be between 1 and 1000"
             )
 
         if offset < 0:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Offset must be non-negative"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Offset must be non-negative"
             )
         # Parse date if provided
         target_date = None

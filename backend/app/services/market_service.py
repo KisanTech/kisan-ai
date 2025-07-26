@@ -3,8 +3,11 @@ Market Data Service
 Handles data storage, retrieval, and price updates
 """
 
-from datetime import date as date_type
-from datetime import datetime, timedelta
+from datetime import (
+    date as date_type,
+    datetime,
+    timedelta,
+)
 
 from app.constants import (
     APIEndpoints,
