@@ -154,19 +154,19 @@
     "pleaseWait": "Please wait while we process your audio...",
     "whatYouCanGet": "What You Can Get:",
     "currentCropPrices": {
-      "title": "💰 Current Crop Prices",
+      "title": "Current Crop Prices",
       "description": "Get today's market rates for rice, wheat, sugarcane, cotton, and other major crops across different mandis and regions."
     },
     "priceTrends": {
-      "title": "📊 Price Trends & Analytics",
+      "title": "Price Trends & Analytics",
       "description": "Understand price movements over weeks and months. Identify the best time to sell your harvest for maximum profit."
     },
     "marketInsights": {
-      "title": "🎯 Market Insights",
+      "title": "Market Insights",
       "description": "Get advice on which crops are in high demand, seasonal price patterns, and market conditions in your area."
     },
     "regionalComparison": {
-      "title": "🗺️ Regional Price Comparison",
+      "title": "Regional Price Comparison",
       "description": "Compare prices across different markets and find the best places to sell your produce for better returns."
     },
     "sampleQuestions": {
@@ -201,23 +201,23 @@
     "voiceSubtitle": "Speak in Hindi or Kannada to get instant scheme information",
     "whatYouCanGet": "What You Can Get:",
     "agriculturalSubsidies": {
-      "title": "🌾 Agricultural Subsidies",
+      "title": "Agricultural Subsidies",
       "description": "Learn about fertilizer subsidies, seed subsidies, equipment purchase schemes, and irrigation support programs available in your region."
     },
     "farmerWelfare": {
-      "title": "👨‍🌾 Farmer Welfare Programs",
+      "title": "Farmer Welfare Programs",
       "description": "Get details about PM-KISAN, Pradhan Mantri Fasal Bima Yojana, pension schemes, and health insurance for farmers."
     },
     "reliefSupport": {
-      "title": "🆘 Relief & Emergency Support",
+      "title": "Relief & Emergency Support",
       "description": "Information about crop loss compensation, natural disaster relief, debt relief programs, and emergency financial assistance."
     },
     "creditLoans": {
-      "title": "💰 Credit & Loan Schemes",
+      "title": "Credit & Loan Schemes",
       "description": "Find out about KCC (Kisan Credit Card), agricultural loans, interest subsidies, and microfinance options for farmers."
     },
     "trainingDevelopment": {
-      "title": "📚 Training & Skill Development",
+      "title": "Training & Skill Development",
       "description": "Learn about agricultural training programs, modern farming techniques, and skill development initiatives for farmers."
     },
     "sampleQuestions": {

@@ -48,7 +48,7 @@ export const API_BASE_URL = getApiUrl('default'); // Keep for backward compatibi
 const createBaseApiClient = (serviceType: ServiceType = 'default'): AxiosInstance => {
   const client = axios.create({
     baseURL: getApiUrl(serviceType),
-    timeout: 30000, // Increased to 30 seconds for voice processing
+    timeout: 90000, // Increased to 90 seconds for voice processing
     headers: {
       'Content-Type': 'application/json',
     },
