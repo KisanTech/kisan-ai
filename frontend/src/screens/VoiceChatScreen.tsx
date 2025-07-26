@@ -14,7 +14,7 @@ import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { voiceChatService, ChatMessage } from '../services/voiceChatService';
 
-// PCM Recording configuration
+// PCM Recording configuration for expo-audio
 const PCM_RECORDING_OPTIONS = {
   android: {
     extension: '.wav',
