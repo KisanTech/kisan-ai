@@ -1221,6 +1221,7 @@ name = "kisan-ai-agents"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "google-adk" },
     { name = "google-cloud-aiplatform", extra = ["adk", "ag2", "agent-engines", "langchain", "llama-index"] },
     { name = "google-genai" },
@@ -1237,6 +1238,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.12.14" },
     { name = "google-adk", specifier = "==1.0.0" },
     { name = "google-cloud-aiplatform", extras = ["agent-engines", "adk", "langchain", "ag2", "llama-index"], specifier = "==1.88.0" },
     { name = "google-genai", specifier = ">=1.9.0" },
