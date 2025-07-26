@@ -17,13 +17,9 @@ from google.adk.agents import Agent
 from .corpus_manager import CorpusManager
 from .prompt import GOVERNMENT_SCHEMES_SYSTEM_PROMPT
 from .tools import (
-    check_scheme_eligibility,
-    get_application_guidance,
-    get_application_status,
-    get_scheme_categories,
-    search_schemes_by_need,
+    list_corpus_files,
+    search_corpus,
     set_corpus_manager,
-    validate_documents,
 )
 from vertexai.generative_models import GenerativeModel
 from vertexai.preview.reasoning_engines import AdkApp
@@ -91,7 +87,7 @@ def initialize_corpus_manager() -> bool:
 
         # Create and initialize corpus manager
         corpus_manager = CorpusManager(
-            project_id=project_id, location=location, config_file="corpus_config.json"
+            project_id=project_id, location=location, config_file="./corpus_config.json"
         )
 
         # Initialize the corpus
@@ -121,12 +117,8 @@ root_agent = Agent(
     instruction=GOVERNMENT_SCHEMES_SYSTEM_PROMPT,
     generate_content_config=generate_content_config,
     tools=[
-        check_scheme_eligibility,
-        get_scheme_categories,
-        validate_documents,
-        get_application_guidance,
-        get_application_status,
-        search_schemes_by_need,
+        list_corpus_files,
+        search_corpus,
     ],
 )
 
