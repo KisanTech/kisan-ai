@@ -1,0 +1,240 @@
+{
+  "common": {
+    "appName": "Kisan",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "ok": "OK",
+    "yes": "Yes",
+    "no": "No",
+    "select": "Select",
+    "or": "or"
+  },
+  "header": {
+    "title": "Kisan"
+  },
+  "home": {
+    "title": "Home",
+    "sections": {
+      "features": "Features",
+      "quickActions": "Quick Actions"
+    },
+    "features": {
+      "cropHealth": {
+        "title": "Crop Health Diagnosis",
+        "subtitle": "AI-powered disease detection"
+      },
+      "marketPrices": {
+        "title": "Market Prices",
+        "subtitle": "Real-time crop prices"
+      },
+      "govSchemes": {
+        "title": "Government Schemes",
+        "subtitle": "Agricultural schemes info"
+      },
+      "voiceChat": {
+        "title": "Voice Chat Assistant",
+        "subtitle": "Ask questions via voice"
+      },
+      "farmAnalytics": {
+        "title": "My Farm Analytics",
+        "subtitle": "Track your farm data"
+      },
+      "alerts": {
+        "title": "Alerts & Reminders",
+        "subtitle": "Important notifications"
+      }
+    },
+    "quickActions": {
+      "checkCropPrices": "Check Crop Prices",
+      "assessCropHealth": "Assess Crop Health"
+    }
+  },
+  "bottomTabs": {
+    "home": "Home",
+    "community": "Community",
+    "profile": "Profile"
+  },
+  "cropHealth": {
+    "title": "Crop Health Diagnosis",
+    "subtitle": "Take a clear photo of the affected leaves",
+    "diagnosePlantDisease": "Diagnose Plant Disease",
+    "noImageSelected": "No image selected",
+    "capture": "Capture",
+    "gallery": "Gallery",
+    "retake": "Retake",
+    "analyzing": "ANALYZING...",
+    "checkCropHealth": "CHECK CROP HEALTH",
+    "permissionsRequired": "Permissions Required",
+    "permissionsMessage": "We need camera and photo library permissions to help diagnose your crops.",
+    "errorCapture": "Failed to capture image. Please try again.",
+    "errorSelect": "Failed to select image. Please try again.",
+    "noImage": "No Image",
+    "selectImageFirst": "Please capture or select an image first.",
+    "diagnosisFailed": "Diagnosis Failed",
+    "diagnosisFailedMessage": "Unable to analyze the image. Please try again with a clearer photo.",
+    "photoTips": {
+      "title": "Tips for better photos",
+      "tip1": "📱 Hold phone steady, close to affected leaves",
+      "tip2": "☀️ Use good natural light, avoid shadows",
+      "tip3": "🔍 Focus clearly on damaged areas",
+      "tip4": "📐 Keep leaf flat and visible"
+    }
+  },
+  "diagnosisResult": {
+    "title": "Diagnosis Results",
+    "unableToProcess": "Unable to process diagnosis",
+    "errorMessage": "There was an error processing the response",
+    "goBack": "Go Back",
+    "imageQuality": "📸 Image Quality",
+    "quality": "Quality",
+    "confidence": "Confidence",
+    "note": "Note",
+    "cropIdentification": "🌱 Crop Identification",
+    "growthStage": "Growth Stage",
+    "diseaseDetected": "🦠 Disease Detected",
+    "scientificName": "Scientific name",
+    "severity": "Severity",
+    "affectedArea": "Affected area",
+    "symptomsObserved": "Symptoms observed",
+    "otherPossibilities": "Other possibilities",
+    "treatmentRecommendations": "💊 Treatment Recommendations",
+    "immediateAction": "⚡ Immediate Action",
+    "urgency": "urgency",
+    "organicTreatment": "🌿 Organic Treatment",
+    "treatment": "Treatment",
+    "method": "Method",
+    "frequency": "Frequency",
+    "cost": "Cost",
+    "chemicalTreatment": "🧪 Chemical Treatment",
+    "dosage": "Dosage",
+    "availableBrands": "Available brands",
+    "precautions": "⚠️",
+    "prevention": "🛡️ Prevention",
+    "culturalPractices": "Cultural practices",
+    "seasonalTiming": "Seasonal timing",
+    "regionalContext": "🇮🇳 Karnataka Context",
+    "prevalence": "Prevalence",
+    "season": "Season",
+    "followUp": "📋 Follow-up",
+    "monitoring": "Monitoring",
+    "successIndicators": "✅ Success indicators",
+    "contactExpertIf": "🚨 Contact expert if",
+    "disclaimer": "⚠️ Disclaimer",
+    "callExpert": "📞 Call Expert",
+    "secondOpinion": "🔄 Second Opinion",
+    "saveReport": "💾 Save Report"
+  },
+  "marketPrices": {
+    "title": "📈 Market Prices",
+    "subtitle": "Get real-time crop prices, market trends, and agricultural insights",
+    "voiceAssistant": "🎤 Voice Assistant",
+    "voiceSubtitle": "Speak in Hindi or Kannada to get instant market information",
+    "startRecording": "🎤 Start Recording",
+    "recording": "🔴 Recording...",
+    "processing": "🔄 Processing...",
+    "status": "Status",
+    "readyToRecord": "Ready to record",
+    "recordingInProgress": "Recording in progress...",
+    "processingRecording": "Processing recording...",
+    "processingAudio": "Processing audio...",
+    "audioTranscribed": "Audio transcribed successfully!",
+    "gettingAIResponse": "Getting AI response...",
+    "responseReceived": "Response received!",
+    "errorProcessAudio": "Error: Failed to process audio",
+    "processingError": "Processing Error",
+    "processingErrorMessage": "Failed to process the audio. Please try again.",
+    "recordingError": "Recording Error",
+    "pleaseWait": "Please wait while we process your audio...",
+    "whatYouCanGet": "What You Can Get:",
+    "currentCropPrices": {
+      "title": "💰 Current Crop Prices",
+      "description": "Get today's market rates for rice, wheat, sugarcane, cotton, and other major crops across different mandis and regions."
+    },
+    "priceTrends": {
+      "title": "📊 Price Trends & Analytics",
+      "description": "Understand price movements over weeks and months. Identify the best time to sell your harvest for maximum profit."
+    },
+    "marketInsights": {
+      "title": "🎯 Market Insights",
+      "description": "Get advice on which crops are in high demand, seasonal price patterns, and market conditions in your area."
+    },
+    "regionalComparison": {
+      "title": "🗺️ Regional Price Comparison",
+      "description": "Compare prices across different markets and find the best places to sell your produce for better returns."
+    },
+    "sampleQuestions": {
+      "title": "💬 Ask Questions Like:",
+      "question1": "• \"What is today's rice price in Bangalore mandi?\"",
+      "question2": "• \"Show me cotton price trends for this month\"",
+      "question3": "• \"Which crops have the best prices right now?\"",
+      "question4": "• \"Compare wheat prices in different districts\"",
+      "question5": "• \"When is the best time to sell my sugarcane?\""
+    },
+    "recordingResults": "📱 Recording Results",
+    "playbackRecordedAudio": "Playback Recorded Audio",
+    "playRecording": "▶ Play Recording",
+    "pause": "⏸ Pause",
+    "replay": "🔄 Replay",
+    "playbackError": "Playback Error",
+    "playbackErrorMessage": "Failed to play the recorded audio.",
+    "recordedAudioBase64": "Recorded Audio (Base64):",
+    "fullLength": "Full length",
+    "characters": "characters",
+    "transcription": "Transcription:",
+    "userQuestion": "Your Question:",
+    "response": "Response:",
+    "playResponseAudio": "Play AI Response Audio",
+    "playResponse": "▶ Play Response",
+    "voiceProcessingComplete": "Voice Processing Complete"
+  },
+  "governmentSchemes": {
+    "title": "🏛️ Government Schemes",
+    "subtitle": "Get information about agricultural schemes, farmer welfare, and relief programs",
+    "voiceAssistant": "🎤 Voice Assistant",
+    "voiceSubtitle": "Speak in Hindi or Kannada to get instant scheme information",
+    "whatYouCanGet": "What You Can Get:",
+    "agriculturalSubsidies": {
+      "title": "🌾 Agricultural Subsidies",
+      "description": "Learn about fertilizer subsidies, seed subsidies, equipment purchase schemes, and irrigation support programs available in your region."
+    },
+    "farmerWelfare": {
+      "title": "👨‍🌾 Farmer Welfare Programs",
+      "description": "Get details about PM-KISAN, Pradhan Mantri Fasal Bima Yojana, pension schemes, and health insurance for farmers."
+    },
+    "reliefSupport": {
+      "title": "🆘 Relief & Emergency Support",
+      "description": "Information about crop loss compensation, natural disaster relief, debt relief programs, and emergency financial assistance."
+    },
+    "creditLoans": {
+      "title": "💰 Credit & Loan Schemes",
+      "description": "Find out about KCC (Kisan Credit Card), agricultural loans, interest subsidies, and microfinance options for farmers."
+    },
+    "trainingDevelopment": {
+      "title": "📚 Training & Skill Development",
+      "description": "Learn about agricultural training programs, modern farming techniques, and skill development initiatives for farmers."
+    },
+    "sampleQuestions": {
+      "title": "💬 Ask Questions Like:",
+      "question1": "• \"How can I apply for PM-KISAN scheme?\"",
+      "question2": "• \"What fertilizer subsidies are available?\"",
+      "question3": "• \"Tell me about crop insurance schemes\"",
+      "question4": "• \"How to get Kisan Credit Card?\"",
+      "question5": "• \"What relief is available for crop damage?\"",
+      "question6": "• \"Are there any schemes for organic farming?\""
+    }
+  },
+  "language": {
+    "selectLanguage": "Select Language",
+    "currentLanguage": "Current Language"
+  },
+  "voiceChat": {
+    "title": "Voice Chat Assistant",
+    "subtitle": "Ask questions about farming, crops, and agriculture"
+  }
+} 

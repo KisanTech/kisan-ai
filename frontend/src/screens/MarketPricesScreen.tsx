@@ -13,8 +13,9 @@ export const MarketPricesScreen: React.FC = () => {
   const [audioBase64, setAudioBase64] = useState<string>('');
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingStatus, setRecordingStatus] = useState<string>(t('marketPrices.readyToRecord'));
-  const [transcription, setTranscription] = useState<string>('');
+  const [userQuestion, setUserQuestion] = useState<string>('');
   const [response, setResponse] = useState<string>('');
+  const [responseAudioData, setResponseAudioData] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const handleAudioRecorded = async (base64Audio: string) => {
@@ -25,35 +26,31 @@ export const MarketPricesScreen: React.FC = () => {
     try {
       // Get language codes based on current language
       const speechLanguageCode = getSpeechRecognitionCode(currentLanguage);
-      const textApiLanguageCode = getTextApiCode(currentLanguage);
       
       // Send audio to speech-to-text API
       const speechResult = await voiceChatService.speechToText(base64Audio, speechLanguageCode);
       
-      setTranscription(speechResult.transcription);
-      setRecordingStatus(t('marketPrices.audioTranscribed'));
-      
-      console.log('Transcription:', speechResult.transcription);
-      console.log('Translation:', speechResult.translation);
-      console.log('Confidence:', speechResult.confidence);
-      
-      // Optionally, send the transcribed text to get AI response
-      if (speechResult.transcription) {
-        setRecordingStatus(t('marketPrices.gettingAIResponse'));
-        const aiResponse = await voiceChatService.sendTextMessage(
-          speechResult.transcription, 
-          textApiLanguageCode
-        );
-        
-        setResponse(aiResponse.response_text);
+      // Handle the new response format
+      if (speechResult.success) {
+        setUserQuestion(speechResult.original_transcript);
+        setResponse(speechResult.agent_response_translated);
+        setResponseAudioData(speechResult.response_audio_data);
         setRecordingStatus(t('marketPrices.responseReceived'));
         
-        // Show success alert with transcription and response
+        console.log('Original Transcript:', speechResult.original_transcript);
+        console.log('Translated Text:', speechResult.translated_text);
+        console.log('Agent Response:', speechResult.agent_response);
+        console.log('Agent Response Translated:', speechResult.agent_response_translated);
+        console.log('Confidence:', speechResult.transcription_confidence);
+        
+        // Show success alert with user question and response
         Alert.alert(
           t('marketPrices.voiceProcessingComplete'), 
-          `${t('marketPrices.transcription')} ${speechResult.transcription}\n\n${t('marketPrices.response')} ${aiResponse.response_text}`,
+          `${t('marketPrices.userQuestion')} ${speechResult.original_transcript}\n\n${t('marketPrices.response')} ${speechResult.agent_response_translated}`,
           [{ text: t('common.ok') }]
         );
+      } else {
+        throw new Error(speechResult.error || 'Unknown error occurred');
       }
 
     } catch (error) {
@@ -223,7 +220,7 @@ export const MarketPricesScreen: React.FC = () => {
         </View>
 
         {/* Recording Results Section */}
-        {audioBase64 && (
+        {responseAudioData && (
           <View className="mt-8">
             <Text className="text-lg font-semibold text-foreground mb-4">
               {t('marketPrices.recordingResults')}
@@ -231,17 +228,17 @@ export const MarketPricesScreen: React.FC = () => {
             
             <View className="mb-4">
               <Text className="text-sm font-medium text-gray-700 mb-2 text-center">
-                {t('marketPrices.playbackRecordedAudio')}
+                {t('marketPrices.playResponseAudio')}
               </Text>
               <VoicePlayer
-                base64Audio={audioBase64}
-                onPlay={() => console.log('Playing recorded audio')}
-                onPause={() => console.log('Paused audio playback')}
+                base64Audio={responseAudioData}
+                onPlay={() => console.log('Playing response audio')}
+                onPause={() => console.log('Paused response audio playback')}
                 onError={(error) => {
-                  console.error('Audio playback error:', error);
+                  console.error('Response audio playback error:', error);
                   Alert.alert(t('marketPrices.playbackError'), t('marketPrices.playbackErrorMessage'));
                 }}
-                playButtonText={t('marketPrices.playRecording')}
+                playButtonText={t('marketPrices.playResponse')}
                 pauseButtonText={t('marketPrices.pause')}
                 replayButtonText={t('marketPrices.replay')}
                 customStyles={{
@@ -278,14 +275,14 @@ export const MarketPricesScreen: React.FC = () => {
           </View>
         )}
 
-        {transcription && (
+        {userQuestion && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              {t('marketPrices.transcription')}
+              {t('marketPrices.userQuestion')}
             </Text>
             <View className="bg-blue-50 p-4 rounded-lg">
               <Text className="text-sm text-gray-700">
-                {transcription}
+                {userQuestion}
               </Text>
             </View>
           </View>

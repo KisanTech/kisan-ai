@@ -24,10 +24,24 @@ export interface TextChatResponse {
 }
 
 export interface SpeechToTextResponse {
-  transcription: string;
-  translation: string;
-  confidence: number;
-  language: string;
+  success: boolean;
+  translated_text: string;
+  original_transcript: string;
+  detected_language: string;
+  transcription_confidence: number;
+  agent_response: string;
+  agent_response_translated: string;
+  response_audio_data: string;
+  response_audio_encoding: string;
+  response_audio_size_bytes: number;
+  user_id: string;
+  session_id: string;
+  error: string | null;
+  // Legacy properties for backward compatibility
+  transcription?: string;
+  translation?: string;
+  confidence?: number;
+  language?: string;
 }
 
 export class VoiceChatService {
@@ -93,11 +107,28 @@ export class VoiceChatService {
         session_id: '123',
       });
       console.log('Speech to text response:', response.data);
+      
+      // Return the full response from the API
+      const apiResponse = response.data;
       return {
-        transcription: response.data.transcription || '',
-        translation: response.data.translation || '',
-        confidence: response.data.confidence || 0,
-        language: response.data.detected_language || languageCode,
+        success: apiResponse.success || false,
+        translated_text: apiResponse.translated_text || '',
+        original_transcript: apiResponse.original_transcript || '',
+        detected_language: apiResponse.detected_language || languageCode,
+        transcription_confidence: apiResponse.transcription_confidence || 0,
+        agent_response: apiResponse.agent_response || '',
+        agent_response_translated: apiResponse.agent_response_translated || '',
+        response_audio_data: apiResponse.response_audio_data || '',
+        response_audio_encoding: apiResponse.response_audio_encoding || 'MP3',
+        response_audio_size_bytes: apiResponse.response_audio_size_bytes || 0,
+        user_id: apiResponse.user_id || '123',
+        session_id: apiResponse.session_id || '123',
+        error: apiResponse.error || null,
+        // Legacy properties for backward compatibility
+        transcription: apiResponse.original_transcript || apiResponse.transcription || '',
+        translation: apiResponse.translated_text || apiResponse.translation || '',
+        confidence: apiResponse.transcription_confidence || apiResponse.confidence || 0,
+        language: apiResponse.detected_language || apiResponse.language || languageCode,
       };
     } catch (error) {
       console.error('Speech to text error:', error);

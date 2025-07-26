@@ -42,6 +42,7 @@ credentials/*
 !metro.config.js
 !babel.config.js
 !uv.lock
+!frontend/src/i18n/locales/*.json
 
 # Google Cloud credentials
 service-account*.json
