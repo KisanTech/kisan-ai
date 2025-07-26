@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, View, ScrollView, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { VoiceRecorder } from '../components/VoiceRecorder';
+import { VoiceRecorder, VoicePlayer } from '../components';
 import { voiceChatService } from '../services/voiceChatService';
 
 export const MarketPricesScreen: React.FC = () => {
@@ -104,6 +104,34 @@ export const MarketPricesScreen: React.FC = () => {
               },
             }}
           />
+          
+          {audioBase64 && (
+            <View className="mt-4">
+              <Text className="text-sm font-medium text-gray-700 mb-2 text-center">
+                Playback Recorded Audio
+              </Text>
+              <VoicePlayer
+                base64Audio={audioBase64}
+                onPlay={() => console.log('Playing recorded audio')}
+                onPause={() => console.log('Paused audio playback')}
+                onError={(error) => {
+                  console.error('Audio playback error:', error);
+                  Alert.alert('Playback Error', 'Failed to play the recorded audio.');
+                }}
+                playButtonText="▶ Play Recording"
+                pauseButtonText="⏸ Pause"
+                replayButtonText="🔄 Replay"
+                customStyles={{
+                  container: { marginVertical: 10 },
+                  button: {
+                    paddingHorizontal: 24,
+                    paddingVertical: 12,
+                    borderRadius: 25,
+                  },
+                }}
+              />
+            </View>
+          )}
         </View>
 
         <View className="mb-6">

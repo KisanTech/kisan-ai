@@ -57,6 +57,41 @@ export interface RecordingState {
   recording?: any; // expo-audio Recording object
 }
 
+// Voice Player Component Types
+export interface VoicePlayerProps {
+  base64Audio?: string;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onStop?: () => void;
+  onError?: (error: string) => void;
+  onLoadStart?: () => void;
+  onLoadComplete?: () => void;
+  disabled?: boolean;
+  autoPlay?: boolean;
+  customStyles?: {
+    container?: object;
+    button?: object;
+    buttonPlaying?: object;
+    buttonDisabled?: object;
+    text?: object;
+    textPlaying?: object;
+    textDisabled?: object;
+    errorText?: object;
+  };
+  playButtonText?: string;
+  pauseButtonText?: string;
+  loadingText?: string;
+  replayButtonText?: string;
+}
+
+export interface PlayerState {
+  isLoading: boolean;
+  isPlaying: boolean;
+  hasError: boolean;
+  errorMessage?: string;
+  audioUri?: string;
+}
+
 // Market Price Types
 export interface MarketPrice {
   commodity: string;
