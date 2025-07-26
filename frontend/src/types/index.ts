@@ -33,6 +33,29 @@ export interface VoiceResponse {
   response?: string;
 }
 
+// Voice Recording Component Types
+export interface VoiceRecorderProps {
+  onAudioRecorded: (base64Audio: string) => void;
+  onRecordingStart?: () => void;
+  onRecordingStop?: () => void;
+  onError?: (error: string) => void;
+  customStyles?: {
+    container?: object;
+    button?: object;
+    buttonRecording?: object;
+    text?: object;
+    textRecording?: object;
+  };
+  buttonText?: string;
+  recordingText?: string;
+}
+
+export interface RecordingState {
+  isRecording: boolean;
+  permissionStatus: 'granted' | 'denied' | 'undetermined';
+  recording?: any; // expo-audio Recording object
+}
+
 // Market Price Types
 export interface MarketPrice {
   commodity: string;

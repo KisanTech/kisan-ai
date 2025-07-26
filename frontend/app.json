@@ -28,7 +28,11 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "ai.codekheti.projectkisan",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,5 +40,13 @@
     "extra": {
       "apiUrl": "http://localhost:8000/api/v1"
     }
-  }
+  },
+  "plugins": [
+    [
+      "expo-audio",
+      {
+        "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+      }
+    ]
+  ]
 }
