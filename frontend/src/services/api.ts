@@ -12,11 +12,11 @@ export type { DiagnosisRequest, DiagnosisResponse } from './diagnosisService';
 
 // Re-export voice chat service
 export { voiceChatService, VoiceChatService } from './voiceChatService';
-export type { 
-  ChatMessage, 
-  VoiceQueryResponse, 
-  TextChatResponse, 
-  SpeechToTextResponse 
+export type {
+  ChatMessage,
+  VoiceQueryResponse,
+  TextChatResponse,
+  SpeechToTextResponse,
 } from './voiceChatService';
 
 // Legacy API Endpoints (kept for backward compatibility)

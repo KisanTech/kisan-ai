@@ -120,7 +120,7 @@ export const CropHealthScreen: React.FC = () => {
     try {
       const response = await fetch(imageUri);
       const blob = await response.blob();
-      
+
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -149,13 +149,13 @@ export const CropHealthScreen: React.FC = () => {
     try {
       // Convert image to base64 first
       const base64Image = await convertImageToBase64(selectedImage);
-      
+
       // Call the AI service with base64 image and description
       const response = await aiService.diagnoseCrop(
-        base64Image, 
+        base64Image,
         'Image of the crop - to be processed for analysis'
       );
-      
+
       // Navigate to results screen with the AI agent response
       navigation.navigate('DiagnosisResult', {
         diagnosis: response,
