@@ -3,11 +3,8 @@ Market Data Service
 Handles data storage, retrieval, and price updates
 """
 
-from datetime import (
-    date as date_type,
-    datetime,
-    timedelta,
-)
+from datetime import date as date_type
+from datetime import datetime, timedelta
 
 from app.constants import (
     APIEndpoints,
@@ -27,9 +24,11 @@ class MarketService:
         self.daily_prices_collection = "daily_market_prices"
 
     @log_latency("get_market_data")
-    async def get_market_data(self, state: str, date: date_type | None = None) -> dict:
+    async def get_market_data(
+        self, state: str, date: date_type | None = None, limit: int = 100, offset: int = 0
+    ) -> dict:
         """
-        Get market data for a specific state and date
+        Get market data for a specific state and date with pagination
         Fetches from Data.gov.in if not available in Firestore
         """
         target_state = state or MarketData.DEFAULT_STATE
@@ -37,8 +36,8 @@ class MarketService:
         date_str = target_date.strftime(DateFormats.ISO_DATE)
 
         try:
-            # Check if data exists in Firestore
-            existing_data = await self._get_stored_data(target_state, date_str)
+            # Check if data exists in Firestore with pagination
+            existing_data = await self._get_stored_data(target_state, date_str, limit, offset)
 
             if existing_data:
                 logger.info(
@@ -192,17 +191,22 @@ class MarketService:
                 FieldNames.ERROR: str(e),
             }
 
-    async def _get_stored_data(self, state: str, date_str: str) -> list[dict]:
-        """Get all crop records for a specific state and date"""
+    async def _get_stored_data(
+        self, state: str, date_str: str, limit: int = 100, offset: int = 0
+    ) -> list[dict]:
+        """Get crop records for a specific state and date with pagination"""
         try:
-            # Query all documents that start with state_date pattern
-            # This gets all crops across all markets for the state on that date
-            docs = (
+            # Query with pagination
+            query = (
                 gcp_manager.firestore.collection(self.daily_prices_collection)
                 .where(FieldNames.STATE, "==", state)
                 .where(FieldNames.DATE, "==", date_str)
-                .stream()
+                .order_by(FieldNames.COMMODITY)  # Consistent ordering for pagination
+                .limit(limit)
+                .offset(offset)
             )
+
+            docs = query.stream()
 
             all_data = []
             for doc in docs:
@@ -213,7 +217,14 @@ class MarketService:
             return all_data
 
         except Exception as e:
-            logger.error("Failed to get stored data", error=str(e), state=state, date=date_str)
+            logger.error(
+                "Failed to get stored data",
+                error=str(e),
+                state=state,
+                date=date_str,
+                limit=limit,
+                offset=offset,
+            )
             return []
 
     async def _fetch_from_data_gov(self, state: str) -> list[dict]:

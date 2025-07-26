@@ -3,7 +3,7 @@ Market Agent Tools
 ==================
 
 Tools for fetching and analyzing agricultural market data from Kisan AI backend.
-Includes flexible commodity matching to handle singular/plural variations.
+Uses intelligent caching for fast access to all historical data.
 """
 
 import asyncio
@@ -13,50 +13,35 @@ from typing import Any, Dict, Optional
 import aiohttp
 from google.adk.tools import FunctionTool
 
+# Import cache manager
+from market_agent.cache_manager import (
+    get_cache_status,
+    get_cached_commodity_data,
+    get_cached_market_comparison,
+    get_cached_market_data,
+)
+
 # Backend API configuration from environment
 BACKEND_API_URL = os.getenv("BACKEND_API_URL")
 
 
 async def _get_market_data_raw(state: str, date: Optional[str] = None) -> Dict[str, Any]:
-    """Raw function to fetch market data."""
+    """Raw function to fetch market data from cache (no API calls)."""
     try:
-        async with aiohttp.ClientSession() as session:
-            url = f"{BACKEND_API_URL}/api/v1/market/data"
-            params = {"state": state}
+        # Get data from cache - much faster than API calls!
+        result = get_cached_market_data(state, date)
 
-            if date:
-                params["date"] = date
+        # Add metadata for consistency with old API
+        if result["success"]:
+            result["state"] = state
+            result["date"] = date or "latest"
 
-            async with session.get(url, params=params, timeout=30) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    return {
-                        "success": True,
-                        "data": data.get("data", []),
-                        "total_records": len(data.get("data", [])),
-                        "source": data.get("source", "unknown"),
-                        "state": state,
-                        "date": date or "latest",
-                    }
-                else:
-                    return {
-                        "success": False,
-                        "error": f"API returned status {response.status}",
-                        "state": state,
-                        "date": date or "latest",
-                    }
+        return result
 
-    except asyncio.TimeoutError:
-        return {
-            "success": False,
-            "error": "Request timeout - backend API took too long to respond",
-            "state": state,
-            "date": date or "latest",
-        }
     except Exception as e:
         return {
             "success": False,
-            "error": f"Failed to fetch market data: {str(e)}",
+            "error": f"Failed to fetch cached market data: {str(e)}",
             "state": state,
             "date": date or "latest",
         }

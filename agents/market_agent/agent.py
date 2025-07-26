@@ -2,19 +2,25 @@
 Market Agent Configuration
 =========================
 
-Kisan AI Market Analysis Agent with real-time market data integration.
+Kisan AI Market Analysis Agent with intelligent caching and real-time analysis.
 """
 
+import asyncio
+import logging
 import os
 
 import vertexai
 from google.adk.agents import Agent
 from google.genai import types
+from market_agent.cache_manager import initialize_cache
 
 # Import market agent components
 from market_agent.prompt import MARKET_ANALYSIS_PROMPT
 from market_agent.tools import calculate_revenue, get_market_data, get_price_summary
 from vertexai.preview.reasoning_engines import AdkApp
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 vertexai.init(
     project=os.getenv("GOOGLE_CLOUD_PROJECT"),
@@ -60,5 +66,20 @@ root_agent = Agent(
 # Create ADK App for deployment
 app = AdkApp(agent=root_agent)
 
+
+# Initialize cache on module import (for deployment)
+async def _init_cache():
+    """Initialize cache asynchronously"""
+    logger.info("🚀 Initializing market data cache...")
+    success = await initialize_cache()
+    if success:
+        logger.info("✅ Cache initialized successfully!")
+    else:
+        logger.error("❌ Cache initialization failed!")
+
+
+# Note: In production, you may want to call this explicitly in your deployment script
+# asyncio.run(_init_cache())
+
 # Export for deployment scripts
-__all__ = ["root_agent", "app"]
+__all__ = ["root_agent", "app", "_init_cache"]

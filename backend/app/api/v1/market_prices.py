@@ -5,12 +5,11 @@ Only handles data retrieval and price updates
 
 from datetime import datetime
 
-from fastapi import APIRouter, Body, HTTPException, Query, status
-from pydantic import BaseModel
-
 from app.constants import DateFormats
 from app.services.market_service import market_service
 from app.utils.logger import logger
+from fastapi import APIRouter, Body, HTTPException, Query, status
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -58,14 +57,28 @@ async def get_market_data(
     date: str | None = Query(
         None, description=f"Date in {DateFormats.ISO_DATE} format (defaults to today)"
     ),
+    limit: int = Query(100, description="Number of records per page (default: 100, max: 1000)"),
+    offset: int = Query(0, description="Number of records to skip (default: 0)"),
 ) -> MarketDataResponse:
     """
-    Get market data for a specific state and date
+    Get market data for a specific state and date with pagination
 
-    Automatically fetches from Data.gov.in if data doesn't exist in Firestore.
-    Returns all crops and markets for the given state and date.
+    Supports pagination for large datasets. Use limit=1000 and iterate with offset
+    to get all data for caching purposes.
     """
     try:
+        # Validate pagination parameters
+        if limit < 1 or limit > 1000:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Limit must be between 1 and 1000"
+            )
+
+        if offset < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Offset must be non-negative"
+            )
         # Parse date if provided
         target_date = None
         if date:
@@ -77,7 +90,9 @@ async def get_market_data(
                     detail=f"Invalid date format. Use {DateFormats.ISO_DATE}",
                 )
 
-        result = await market_service.get_market_data(state=state, date=target_date)
+        result = await market_service.get_market_data(
+            state=state, date=target_date, limit=limit, offset=offset
+        )
         return MarketDataResponse(**result)
 
     except HTTPException:
