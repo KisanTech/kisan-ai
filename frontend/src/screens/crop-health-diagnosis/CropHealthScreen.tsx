@@ -20,6 +20,7 @@ import {
   DiagnosisRequest,
   DiagnosisResponse,
 } from '../../services/diagnosisService';
+import aiService from '../../services/aiService';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -114,6 +115,29 @@ export const CropHealthScreen: React.FC = () => {
     }
   };
 
+  // Convert image URI to base64
+  const convertImageToBase64 = async (imageUri: string): Promise<string> => {
+    try {
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          // Remove data URL prefix (data:image/jpeg;base64,)
+          const base64Data = base64.split(',')[1];
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      throw new Error('Failed to process image');
+    }
+  };
+
   // Handle crop health diagnosis
   const handleDiagnosis = async () => {
     if (!selectedImage) {
@@ -123,13 +147,16 @@ export const CropHealthScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const requestData: DiagnosisRequest = {
-        imageUri: selectedImage,
-        description: 'Crop health diagnosis from mobile app',
-      };
-
-      const response = await diagnosisService.diagnoseCrop(requestData);
-      // Navigate to results screen instead of setting diagnosis state
+      // Convert image to base64 first
+      const base64Image = await convertImageToBase64(selectedImage);
+      
+      // Call the AI service with base64 image and description
+      const response = await aiService.diagnoseCrop(
+        base64Image, 
+        'Image of the crop - to be processed for analysis'
+      );
+      
+      // Navigate to results screen with the AI agent response
       navigation.navigate('DiagnosisResult', {
         diagnosis: response,
         imageUri: selectedImage,
