@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.crop_diagnosis import router as crop_diagnosis_router
 from app.api.v1.market_prices import router as market_router
+from app.api.v1.speech import router as speech_router
 from app.core.config import settings
 from app.models.market import APIInfo, HealthCheckResponse
 from app.utils.gcp.gcp_manager import gcp_manager
@@ -85,6 +86,8 @@ async def root() -> APIInfo:
         message=f"{settings.APP_NAME} - Ready for Hackathon!",
         version=settings.APP_VERSION,
         features=[
+            "Speech-to-Text with Google Chirp Model",
+            "Multi-language Support (Hindi, English, Kannada, etc.)",
             "Simple Market Data Storage & Retrieval",
             "Data.gov.in API Integration",
             "Individual Price Updates",
@@ -110,6 +113,7 @@ async def health_check() -> HealthCheckResponse:
 
 app.include_router(market_router, prefix="/api/v1/market", tags=["market-data"])
 app.include_router(crop_diagnosis_router, prefix="/api/v1/crop", tags=["crop-diagnosis"])
+app.include_router(speech_router, prefix="/api/v1/speech", tags=["speech"])
 
 if __name__ == "__main__":
     import uvicorn
