@@ -45,8 +45,10 @@ export class VoiceChatService {
       console.error('Text chat error:', error);
       // Return fallback response
       return {
-        response_text: 'I apologize, but I am currently experiencing technical difficulties. Please try again later.',
-        response_translation: 'ಕ್ಷಮಿಸಿ, ನಾನು ಪ್ರಸ್ತುತ ತಾಂತ್ರಿಕ ತೊಂದರೆಗಳನ್ನು ಅನುಭವಿಸುತ್ತಿದ್ದೇನೆ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ.',
+        response_text:
+          'I apologize, but I am currently experiencing technical difficulties. Please try again later.',
+        response_translation:
+          'ಕ್ಷಮಿಸಿ, ನಾನು ಪ್ರಸ್ತುತ ತಾಂತ್ರಿಕ ತೊಂದರೆಗಳನ್ನು ಅನುಭವಿಸುತ್ತಿದ್ದೇನೆ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ.',
       };
     }
   }
@@ -76,8 +78,10 @@ export class VoiceChatService {
       return {
         query_text: 'Audio not recognized',
         query_translation: 'ಆಡಿಯೋ ಗುರುತಿಸಲಾಗಿಲ್ಲ',
-        response_text: 'I apologize, but I could not understand your voice message. Please try speaking clearly or use text instead.',
-        response_translation: 'ಕ್ಷಮಿಸಿ, ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ನಾನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ಪಷ್ಟವಾಗಿ ಮಾತನಾಡಲು ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಬದಲಿಗೆ ಪಠ್ಯವನ್ನು ಬಳಸಿ.',
+        response_text:
+          'I apologize, but I could not understand your voice message. Please try speaking clearly or use text instead.',
+        response_translation:
+          'ಕ್ಷಮಿಸಿ, ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ನಾನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ಪಷ್ಟವಾಗಿ ಮಾತನಾಡಲು ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಬದಲಿಗೆ ಪಠ್ಯವನ್ನು ಬಳಸಿ.',
       };
     }
   }
@@ -108,4 +112,4 @@ export class VoiceChatService {
   }
 }
 
-export const voiceChatService = new VoiceChatService(); 
+export const voiceChatService = new VoiceChatService();

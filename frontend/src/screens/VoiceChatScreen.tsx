@@ -55,7 +55,8 @@ export const VoiceChatScreen: React.FC = () => {
     const welcomeMessage: ChatMessage = {
       id: 'welcome',
       type: 'assistant',
-      content: 'Hello! I am Kisan AI, your agricultural assistant. You can ask me about crops, market prices, farming techniques, or any agriculture-related questions. You can type your message or use the microphone to speak.',
+      content:
+        'Hello! I am Kisan AI, your agricultural assistant. You can ask me about crops, market prices, farming techniques, or any agriculture-related questions. You can type your message or use the microphone to speak.',
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
@@ -101,7 +102,7 @@ export const VoiceChatScreen: React.FC = () => {
 
     try {
       const response = await voiceChatService.sendTextMessage(userMessage);
-      
+
       // Add AI response
       addMessage({
         type: 'assistant',
@@ -123,7 +124,10 @@ export const VoiceChatScreen: React.FC = () => {
     try {
       const permission = await Audio.requestPermissionsAsync();
       if (permission.status !== 'granted') {
-        Alert.alert('Permission required', 'Please allow microphone access to record voice messages.');
+        Alert.alert(
+          'Permission required',
+          'Please allow microphone access to record voice messages.'
+        );
         return;
       }
 
@@ -163,7 +167,7 @@ export const VoiceChatScreen: React.FC = () => {
 
         // Send voice message to API
         const response = await voiceChatService.sendVoiceMessage(uri);
-        
+
         // Update user message with transcription
         setMessages(prev => {
           const updated = [...prev];
@@ -185,7 +189,8 @@ export const VoiceChatScreen: React.FC = () => {
       console.error('Error processing voice message:', error);
       addMessage({
         type: 'assistant',
-        content: 'Sorry, I could not process your voice message. Please try again or use text instead.',
+        content:
+          'Sorry, I could not process your voice message. Please try again or use text instead.',
       });
     } finally {
       setIsLoading(false);
@@ -204,7 +209,7 @@ export const VoiceChatScreen: React.FC = () => {
       );
       setSound(newSound);
 
-      newSound.setOnPlaybackStatusUpdate((status) => {
+      newSound.setOnPlaybackStatusUpdate(status => {
         if (status.isLoaded && status.didJustFinish) {
           newSound.unloadAsync();
           setSound(null);
@@ -225,51 +230,32 @@ export const VoiceChatScreen: React.FC = () => {
 
   const renderMessage = (message: ChatMessage) => {
     const isUser = message.type === 'user';
-    
+
     return (
-      <View
-        key={message.id}
-        className={`mb-4 ${isUser ? 'items-end' : 'items-start'}`}
-      >
+      <View key={message.id} className={`mb-4 ${isUser ? 'items-end' : 'items-start'}`}>
         <View
           className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-            isUser
-              ? 'bg-green-600 rounded-br-sm'
-              : 'bg-gray-200 rounded-bl-sm'
+            isUser ? 'bg-green-600 rounded-br-sm' : 'bg-gray-200 rounded-bl-sm'
           }`}
         >
-          <Text
-            className={`text-base ${
-              isUser ? 'text-white' : 'text-gray-800'
-            }`}
-          >
+          <Text className={`text-base ${isUser ? 'text-white' : 'text-gray-800'}`}>
             {message.content}
           </Text>
-          
+
           {message.audioUrl && !isUser && (
             <TouchableOpacity
               onPress={() => playAudioResponse(message.audioUrl!)}
               className="mt-2 flex-row items-center"
             >
-              <Ionicons
-                name="play-circle"
-                size={24}
-                color={isUser ? 'white' : '#059669'}
-              />
-              <Text
-                className={`ml-2 text-sm ${
-                  isUser ? 'text-green-100' : 'text-green-600'
-                }`}
-              >
+              <Ionicons name="play-circle" size={24} color={isUser ? 'white' : '#059669'} />
+              <Text className={`ml-2 text-sm ${isUser ? 'text-green-100' : 'text-green-600'}`}>
                 Play audio response
               </Text>
             </TouchableOpacity>
           )}
         </View>
-        
-        <Text className="text-xs text-gray-500 mt-1 mx-2">
-          {formatTime(message.timestamp)}
-        </Text>
+
+        <Text className="text-xs text-gray-500 mt-1 mx-2">{formatTime(message.timestamp)}</Text>
       </View>
     );
   };
@@ -287,7 +273,7 @@ export const VoiceChatScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         >
           {messages.map(renderMessage)}
-          
+
           {isLoading && (
             <View className="items-start mb-4">
               <View className="bg-gray-200 px-4 py-3 rounded-2xl rounded-bl-sm">
@@ -318,18 +304,10 @@ export const VoiceChatScreen: React.FC = () => {
               onPress={isRecording ? stopRecording : startRecording}
               disabled={isLoading}
               className={`w-12 h-12 rounded-full items-center justify-center ${
-                isRecording
-                  ? 'bg-red-500'
-                  : isLoading
-                  ? 'bg-gray-300'
-                  : 'bg-green-600'
+                isRecording ? 'bg-red-500' : isLoading ? 'bg-gray-300' : 'bg-green-600'
               }`}
             >
-              <Ionicons
-                name={isRecording ? 'stop' : 'mic'}
-                size={24}
-                color="white"
-              />
+              <Ionicons name={isRecording ? 'stop' : 'mic'} size={24} color="white" />
             </TouchableOpacity>
 
             {/* Send button */}
@@ -337,16 +315,10 @@ export const VoiceChatScreen: React.FC = () => {
               onPress={sendTextMessage}
               disabled={!inputText.trim() || isLoading}
               className={`w-12 h-12 rounded-full items-center justify-center ${
-                inputText.trim() && !isLoading
-                  ? 'bg-green-600'
-                  : 'bg-gray-300'
+                inputText.trim() && !isLoading ? 'bg-green-600' : 'bg-gray-300'
               }`}
             >
-              <Ionicons
-                name="send"
-                size={20}
-                color="white"
-              />
+              <Ionicons name="send" size={20} color="white" />
             </TouchableOpacity>
           </View>
 

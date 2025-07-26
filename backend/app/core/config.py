@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # API Configuration
     API_V1_STR: str = Field(default="/api/v1", description="API v1 prefix")
     HOST: str = Field(default="0.0.0.0", description="Server host")
-    PORT: int = Field(default=8000, description="Server port")
+    PORT: int = Field(default=8100, description="Server port")
 
     # Google Cloud Configuration
     GOOGLE_CLOUD_PROJECT: str = Field(default="", description="Google Cloud project ID")
