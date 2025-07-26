@@ -70,11 +70,8 @@ python setup_government_schemes.py
 ```bash
 cd agents/government_schemes_agent
 
-# Create sample documents
-python startup.py
-
 # Setup RAG corpus
-python corpus_setup.py --project-id YOUR_PROJECT_ID
+uv run python corpus_setup.py --project-id <project id> --location us-central1 --corpus-name government-schemes-corpus --documents-path ./scheme_documents --gcs-bucket <bucket> --force-recreate
 
 # Check status
 python corpus_setup.py --project-id YOUR_PROJECT_ID --status-only

@@ -14,7 +14,6 @@ import vertexai
 from google.genai import types
 from google.adk.agents import Agent
 
-from agents.crop_diagnosis_agent.agent import root_agent
 from .corpus_manager import CorpusManager
 from .prompt import GOVERNMENT_SCHEMES_SYSTEM_PROMPT
 from .tools import (
@@ -131,70 +130,4 @@ root_agent = Agent(
     ],
 )
 
-
-class GovernmentSchemesAgent:
-    """Government Schemes Agent with RAG capabilities."""
-
-    def __init__(self):
-        """Initialize the Government Schemes Agent."""
-        self.agent = root_agent
-        self.corpus_manager = corpus_manager
-
-    async def initialize(self) -> bool:
-        """Initialize the agent.
-
-        Returns:
-            True if initialization successful, False otherwise
-        """
-        try:
-            # Check if corpus manager is ready
-            if not self.corpus_manager or not self.corpus_manager.is_ready():
-                logger.error("Corpus manager not ready")
-                return False
-
-            logger.info("Government Schemes Agent initialized successfully")
-            return True
-
-        except Exception as e:
-            logger.error(f"Error initializing Government Schemes Agent: {e}")
-            return False
-
-    def get_corpus_info(self) -> Dict[str, Any]:
-        """Get information about the RAG corpus.
-
-        Returns:
-            Dictionary with corpus information
-        """
-        if self.corpus_manager:
-            return self.corpus_manager.get_corpus_info()
-        else:
-            return {"status": "not_initialized", "message": "Corpus manager not available"}
-
-    async def process_query(
-        self, query: str, context: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
-        """Process a government schemes query.
-
-        Args:
-            query: User's query about government schemes
-            context: Optional context (farmer details, location, etc.)
-
-        Returns:
-            Dictionary with response and metadata
-        """
-        try:
-            # Use the agent to process the query
-            # The agent will automatically use the available tools based on the query
-            response = await self.agent.send_message(query)
-
-            return {
-                "response": response,
-                "context": context,
-                "corpus_status": "ready"
-                if self.corpus_manager and self.corpus_manager.is_ready()
-                else "not_ready",
-            }
-
-        except Exception as e:
-            logger.error(f"Error processing query: {e}")
-            return {"error": str(e), "context": context, "corpus_status": "error"}
+app = AdkApp(agent=root_agent)
