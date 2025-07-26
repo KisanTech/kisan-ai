@@ -32,10 +32,16 @@ class MarketService:
     ) -> dict:
         """
         Get market data for a specific state and date with pagination
+        If no date provided, returns most recent available data from Firestore
         Fetches from Data.gov.in if not available in Firestore
         """
         target_state = state or MarketData.DEFAULT_STATE
-        target_date = date or datetime.now().date()
+        
+        # If no date provided, get most recent available data
+        if date is None:
+            return await self._get_recent_data(target_state, limit, offset)
+            
+        target_date = date
         date_str = target_date.strftime(DateFormats.ISO_DATE)
 
         try:
@@ -90,6 +96,7 @@ class MarketService:
                 FieldNames.SOURCE: "none",
                 FieldNames.STATE: target_state,
                 FieldNames.DATE: date_str,
+                FieldNames.TOTAL_RECORDS: 0,
                 FieldNames.ERROR: "No data available from any source",
             }
 
@@ -103,6 +110,7 @@ class MarketService:
                 FieldNames.SOURCE: "error",
                 FieldNames.STATE: target_state,
                 FieldNames.DATE: date_str,
+                FieldNames.TOTAL_RECORDS: 0,
                 FieldNames.ERROR: str(e),
             }
 
@@ -191,6 +199,103 @@ class MarketService:
                 FieldNames.MARKET: market,
                 FieldNames.COMMODITY: commodity,
                 FieldNames.DATE: date_str,
+                FieldNames.ERROR: str(e),
+            }
+
+    async def _get_recent_data(
+        self, state: str, limit: int = 100, offset: int = 0
+    ) -> dict:
+        """Get most recent available data for a state (all dates)"""
+        try:
+            # Simple query - get all data for this state, then sort in Python
+            # This avoids needing a composite index
+            query = (
+                gcp_manager.firestore.collection(self.daily_prices_collection)
+                .where(FieldNames.STATE, "==", state)
+                .limit(limit * 3)  # Get more records to find recent ones
+            )
+
+            docs = query.stream()
+
+            # Collect all data and sort by date in Python
+            all_records = []
+            for doc in docs:
+                doc_data = doc.to_dict()
+                if doc_data and FieldNames.DATE in doc_data:
+                    all_records.append(doc_data)
+
+            # Sort by date descending in Python
+            all_records.sort(key=lambda x: x.get(FieldNames.DATE, ""), reverse=True)
+            
+            # Apply limit and offset after sorting
+            start_idx = offset
+            end_idx = offset + limit
+            all_data = all_records[start_idx:end_idx]
+            
+            latest_date = all_records[0].get(FieldNames.DATE, "unknown") if all_records else None
+
+            if all_data:
+                logger.info(
+                    "Retrieved recent market data from Firestore",
+                    state=state,
+                    latest_date=latest_date,
+                    records=len(all_data),
+                )
+                return {
+                    FieldNames.SUCCESS: True,
+                    FieldNames.DATA: all_data,
+                    FieldNames.SOURCE: "firestore",
+                    FieldNames.STATE: state,
+                    FieldNames.DATE: latest_date or "recent",
+                    FieldNames.TOTAL_RECORDS: len(all_data),
+                }
+            else:
+                # No data in Firestore, try fetching fresh data
+                logger.info(
+                    "No recent data found in Firestore, fetching from Data.gov.in",
+                    state=state,
+                )
+                fresh_data = await self._fetch_from_data_gov(state)
+                if fresh_data:
+                    # Store the fresh data with current date
+                    current_date = datetime.now().date()
+                    date_str = current_date.strftime(DateFormats.ISO_DATE)
+                    await self._store_data(state, date_str, fresh_data)
+                    
+                    return {
+                        FieldNames.SUCCESS: True,
+                        FieldNames.DATA: fresh_data[:limit],  # Apply limit
+                        FieldNames.SOURCE: "data_gov_api",
+                        FieldNames.STATE: state,
+                        FieldNames.DATE: date_str,
+                        FieldNames.TOTAL_RECORDS: len(fresh_data[:limit]),
+                    }
+                else:
+                    return {
+                        FieldNames.SUCCESS: False,
+                        FieldNames.DATA: [],
+                        FieldNames.SOURCE: "none",
+                        FieldNames.STATE: state,
+                        FieldNames.DATE: "recent",
+                        FieldNames.TOTAL_RECORDS: 0,
+                        FieldNames.ERROR: "No recent data available from any source",
+                    }
+
+        except Exception as e:
+            logger.error(
+                "Failed to get recent data",
+                error=str(e),
+                state=state,
+                limit=limit,
+                offset=offset,
+            )
+            return {
+                FieldNames.SUCCESS: False,
+                FieldNames.DATA: [],
+                FieldNames.SOURCE: "error",
+                FieldNames.STATE: state,
+                FieldNames.DATE: "recent",
+                FieldNames.TOTAL_RECORDS: 0,
                 FieldNames.ERROR: str(e),
             }
 
