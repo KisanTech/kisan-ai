@@ -5,10 +5,11 @@ This service provides text translation capabilities using Google Cloud Translati
 Supports translation between multiple languages with automatic language detection.
 """
 
+from typing import Any
+
 import structlog
-from typing import Optional, List, Dict, Any
-from google.cloud import translate_v3 as translate
 from google.api_core import exceptions as gcp_exceptions
+from google.cloud import translate_v3 as translate
 
 from app.core.config import settings
 
@@ -54,8 +55,8 @@ class TranslationService:
             raise Exception(f"Translation service initialization failed: {str(e)}")
 
     async def translate_text(
-        self, text: str, target_language: str, source_language: Optional[str] = None
-    ) -> Dict[str, Any]:
+        self, text: str, target_language: str, source_language: str | None = None
+    ) -> dict[str, Any]:
         """
         Translate text from source language to target language.
 
@@ -123,8 +124,8 @@ class TranslationService:
             raise Exception(f"Translation failed: {str(e)}")
 
     async def translate_batch(
-        self, texts: List[str], target_language: str, source_language: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+        self, texts: list[str], target_language: str, source_language: str | None = None
+    ) -> list[dict[str, Any]]:
         """
         Translate multiple texts in a single batch request.
 
@@ -195,7 +196,7 @@ class TranslationService:
             )
             raise Exception(f"Batch translation failed: {str(e)}")
 
-    async def detect_language(self, text: str) -> Dict[str, Any]:
+    async def detect_language(self, text: str) -> dict[str, Any]:
         """
         Detect the language of the given text.
 
@@ -254,7 +255,7 @@ class TranslationService:
 
     async def get_supported_languages(
         self, target_language_code: str = "en"
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """
         Get list of supported languages.
 

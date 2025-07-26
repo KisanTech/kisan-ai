@@ -1,23 +1,22 @@
 # Pydantic Models Package
 
 from .speech import (
+    AudioValidationResponse,
     SpeechToTextRequest,
     SpeechToTextResponse,
     SupportedLanguagesResponse,
-    AudioValidationResponse,
     TranscriptionResult,
     WordInfo,
 )
-
 from .translation import (
-    TranslationRequest,
     BatchTranslationRequest,
-    TranslationResponse,
     BatchTranslationResponse,
     LanguageDetectionRequest,
     LanguageDetectionResponse,
     SupportedLanguage,
     SupportedLanguagesResponse as TranslationSupportedLanguagesResponse,
+    TranslationRequest,
+    TranslationResponse,
 )
 
 __all__ = [

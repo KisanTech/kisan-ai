@@ -4,16 +4,11 @@ Handles base64 encoded audio data from React Native app
 """
 
 import base64
-import io
-from typing import Optional, List, Dict
-import time
 from concurrent.futures import TimeoutError
 
-from google.cloud import speech
-from google.cloud import texttospeech
+from google.cloud import speech, texttospeech
 from google.cloud.speech import RecognitionAudio, RecognitionConfig
 
-from app.core.config import settings
 from app.utils.logger import logger
 
 
@@ -371,7 +366,7 @@ class SpeechToTextService:
         self,
         text: str,
         language_code: str = "hi-IN",
-        voice_name: Optional[str] = None,
+        voice_name: str | None = None,
         gender: str = "NEUTRAL",
         audio_encoding: str = "MP3",
         speaking_rate: float = 1.0,
@@ -506,7 +501,7 @@ class SpeechToTextService:
                 "error": str(e),
             }
 
-    async def get_available_voices(self, language_code: Optional[str] = None) -> dict:
+    async def get_available_voices(self, language_code: str | None = None) -> dict:
         """
         Get list of available voices for text-to-speech
 

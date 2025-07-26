@@ -2,7 +2,6 @@
 Pydantic models for Speech-to-Text API
 """
 
-from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -21,7 +20,7 @@ class TranscriptionResult(BaseModel):
 
     transcript: str = Field(..., description="The transcribed text")
     confidence: float = Field(..., description="Overall confidence score (0.0-1.0)")
-    words: List[WordInfo] = Field(default=[], description="Word-level timing and confidence")
+    words: list[WordInfo] = Field(default=[], description="Word-level timing and confidence")
 
 
 class SpeechToTextRequest(BaseModel):
@@ -53,12 +52,12 @@ class SpeechToTextResponse(BaseModel):
     success: bool = Field(..., description="Whether the transcription was successful")
     language_code: str = Field(..., description="Language code used for transcription")
     model_used: str = Field(..., description="Model used for transcription (chirp/latest_long)")
-    results: List[TranscriptionResult] = Field(default=[], description="Transcription results")
+    results: list[TranscriptionResult] = Field(default=[], description="Transcription results")
     full_transcript: str = Field(default="", description="Complete transcribed text")
     average_confidence: float = Field(default=0.0, description="Average confidence score")
     total_duration: float = Field(default=0.0, description="Total audio duration in seconds")
-    error: Optional[str] = Field(None, description="Error message if transcription failed")
-    error_type: Optional[str] = Field(None, description="Type of error if transcription failed")
+    error: str | None = Field(None, description="Error message if transcription failed")
+    error_type: str | None = Field(None, description="Type of error if transcription failed")
 
 
 class SupportedLanguagesResponse(BaseModel):
@@ -66,7 +65,7 @@ class SupportedLanguagesResponse(BaseModel):
 
     supported_languages: dict = Field(..., description="Dictionary of supported language codes")
     default_language: str = Field(..., description="Default language code")
-    recommended_for_agriculture: List[str] = Field(
+    recommended_for_agriculture: list[str] = Field(
         ..., description="Recommended languages for agriculture"
     )
 
@@ -77,13 +76,13 @@ class AudioValidationResponse(BaseModel):
     is_valid: bool = Field(..., description="Whether the audio format is valid")
     audio_size_bytes: int = Field(..., description="Audio size in bytes")
     audio_size_mb: float = Field(..., description="Audio size in MB")
-    estimated_duration_seconds: Optional[float] = Field(
+    estimated_duration_seconds: float | None = Field(
         None, description="Estimated duration in seconds"
     )
-    recommendations: List[str] = Field(
+    recommendations: list[str] = Field(
         default=[], description="Recommendations for audio optimization"
     )
-    error: Optional[str] = Field(None, description="Error message if validation failed")
+    error: str | None = Field(None, description="Error message if validation failed")
 
 
 class TextToSpeechRequest(BaseModel):
@@ -93,7 +92,7 @@ class TextToSpeechRequest(BaseModel):
     language_code: str = Field(
         default="hi-IN", description="Language code (e.g., 'hi-IN', 'en-US')"
     )
-    voice_name: Optional[str] = Field(None, description="Specific voice name to use")
+    voice_name: str | None = Field(None, description="Specific voice name to use")
     gender: str = Field(default="NEUTRAL", description="Voice gender: MALE, FEMALE, or NEUTRAL")
     audio_encoding: str = Field(
         default="MP3", description="Output audio encoding: MP3, LINEAR16, OGG_OPUS"
@@ -126,16 +125,16 @@ class TextToSpeechResponse(BaseModel):
     """Response model for text-to-speech conversion"""
 
     success: bool = Field(..., description="Whether the conversion was successful")
-    audio_data: Optional[str] = Field(None, description="Base64 encoded audio data")
+    audio_data: str | None = Field(None, description="Base64 encoded audio data")
     audio_encoding: str = Field(..., description="Audio encoding format used")
     audio_size_bytes: int = Field(..., description="Audio size in bytes")
     audio_size_mb: float = Field(..., description="Audio size in MB")
-    estimated_duration_seconds: Optional[float] = Field(
+    estimated_duration_seconds: float | None = Field(
         None, description="Estimated audio duration"
     )
-    voice_used: Optional[str] = Field(None, description="Voice name that was used")
+    voice_used: str | None = Field(None, description="Voice name that was used")
     language_code: str = Field(..., description="Language code used")
-    error: Optional[str] = Field(None, description="Error message if conversion failed")
+    error: str | None = Field(None, description="Error message if conversion failed")
 
 
 class VoiceInfo(BaseModel):
@@ -150,6 +149,6 @@ class VoiceInfo(BaseModel):
 class AvailableVoicesResponse(BaseModel):
     """Response model for available voices"""
 
-    voices: List[VoiceInfo] = Field(..., description="List of available voices")
+    voices: list[VoiceInfo] = Field(..., description="List of available voices")
     total_voices: int = Field(..., description="Total number of available voices")
-    languages_supported: List[str] = Field(..., description="List of supported language codes")
+    languages_supported: list[str] = Field(..., description="List of supported language codes")

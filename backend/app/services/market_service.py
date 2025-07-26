@@ -51,22 +51,24 @@ class MarketService:
             if existing_data:
                 logger.info(
                     "Retrieved market data from Firestore",
+                    count=len(existing_data),
                     state=target_state,
                     date=date_str,
-                    records=len(existing_data),
+                    limit=limit,
+                    offset=offset,
                 )
                 return {
                     FieldNames.SUCCESS: True,
                     FieldNames.DATA: existing_data,
-                    FieldNames.SOURCE: "firestore",
+                    FieldNames.SOURCE: "Firestore",
                     FieldNames.STATE: target_state,
                     FieldNames.DATE: date_str,
                     FieldNames.TOTAL_RECORDS: len(existing_data),
                 }
 
-            # Data doesn't exist, fetch from Data.gov.in
+            # If no data in Firestore, fetch from Data.gov.in API (only for current/recent dates)
             logger.info(
-                "Data not found in Firestore, fetching from Data.gov.in",
+                "No data found in Firestore, fetching from Data.gov.in",
                 state=target_state,
                 date=date_str,
             )
@@ -80,24 +82,24 @@ class MarketService:
                     date=date_str,
                     records=len(fresh_data),
                 )
+                # Apply pagination to fetched data
+                paginated_data = fresh_data[offset : offset + limit]
                 return {
                     FieldNames.SUCCESS: True,
-                    FieldNames.DATA: fresh_data,
-                    FieldNames.SOURCE: "data_gov_api",
+                    FieldNames.DATA: paginated_data,
+                    FieldNames.SOURCE: "Data.gov.in",
                     FieldNames.STATE: target_state,
                     FieldNames.DATE: date_str,
-                    FieldNames.TOTAL_RECORDS: len(fresh_data),
+                    FieldNames.TOTAL_RECORDS: len(paginated_data),
                 }
 
-            # No data available anywhere
             return {
-                FieldNames.SUCCESS: False,
+                FieldNames.SUCCESS: True,
                 FieldNames.DATA: [],
-                FieldNames.SOURCE: "none",
+                FieldNames.SOURCE: "None",
                 FieldNames.STATE: target_state,
                 FieldNames.DATE: date_str,
                 FieldNames.TOTAL_RECORDS: 0,
-                FieldNames.ERROR: "No data available from any source",
             }
 
         except Exception as e:
@@ -107,10 +109,141 @@ class MarketService:
             return {
                 FieldNames.SUCCESS: False,
                 FieldNames.DATA: [],
-                FieldNames.SOURCE: "error",
+                FieldNames.SOURCE: "Error",
                 FieldNames.STATE: target_state,
                 FieldNames.DATE: date_str,
                 FieldNames.TOTAL_RECORDS: 0,
+                FieldNames.ERROR: str(e),
+            }
+
+    @log_latency("get_filtered_market_data")
+    async def get_filtered_market_data(
+        self,
+        state: str,
+        commodity: str | None = None,
+        market: str | None = None,
+        start_date: date_type | None = None,
+        end_date: date_type | None = None,
+        limit: int = 1000,
+    ) -> dict:
+        """
+        Get filtered market data for Market Agent V3
+
+        Args:
+            state: State name (required)
+            commodity: Commodity/crop name (optional)
+            market: Market name (optional)
+            start_date: Start date for range (optional)
+            end_date: End date for range (optional)
+            limit: Maximum records to return
+
+        Returns:
+            Filtered market data matching the criteria
+        """
+        try:
+            # Set default date range if not provided (last 60 days for Agent V3)
+            if start_date is None and end_date is None:
+                end_date = datetime.now().date()
+                start_date = end_date - timedelta(days=60)
+            elif start_date is None:
+                start_date = end_date - timedelta(days=60)
+            elif end_date is None:
+                end_date = datetime.now().date()
+
+            # Build filters dict for logging
+            filters_applied = {
+                "state": state,
+                "commodity": commodity,
+                "market": market,
+                "start_date": start_date.strftime(DateFormats.ISO_DATE) if start_date else None,
+                "end_date": end_date.strftime(DateFormats.ISO_DATE) if end_date else None,
+                "limit": limit,
+            }
+
+            logger.info("Fetching filtered market data", **filters_applied)
+
+            # Get Firestore collection reference
+            collection_ref = gcp_manager.firestore.collection(self.daily_prices_collection)
+
+            # Start building the query
+            query = collection_ref
+
+            # Filter by state (required)
+            query = query.where(FieldNames.STATE, "==", state)
+
+            # Note: Commodity filtering is done in post-processing for case-insensitive matching
+
+            # Note: Market filtering is done in post-processing for case-insensitive matching
+
+            # Filter by date range
+            if start_date:
+                start_date_str = start_date.strftime(DateFormats.ISO_DATE)
+                query = query.where(FieldNames.DATE, ">=", start_date_str)
+
+            if end_date:
+                end_date_str = end_date.strftime(DateFormats.ISO_DATE)
+                query = query.where(FieldNames.DATE, "<=", end_date_str)
+
+            # Order by date (most recent first) and limit results
+            query = query.order_by(FieldNames.DATE, direction="DESCENDING")
+            query = query.limit(limit)
+
+            # Execute query
+            docs = query.stream()
+
+            # Process results
+            filtered_data = []
+            for doc in docs:
+                doc_data = doc.to_dict()
+
+                # Additional filtering for partial matches (since Firestore has limited string matching)
+                if (
+                    commodity
+                    and commodity.lower() not in doc_data.get(FieldNames.COMMODITY, "").lower()
+                ):
+                    continue
+
+                if market and market.lower() not in doc_data.get(FieldNames.MARKET, "").lower():
+                    continue
+
+                filtered_data.append(doc_data)
+
+            # Sort by date again to ensure consistency (descending - most recent first)
+            filtered_data.sort(key=lambda x: x.get(FieldNames.DATE, ""), reverse=True)
+
+            logger.info(
+                "Successfully retrieved filtered market data",
+                total_records=len(filtered_data),
+                **filters_applied,
+            )
+
+            return {
+                FieldNames.SUCCESS: True,
+                FieldNames.DATA: filtered_data,
+                FieldNames.TOTAL_RECORDS: len(filtered_data),
+                "filters_applied": filters_applied,
+                "date_range": {
+                    "start_date": start_date.strftime(DateFormats.ISO_DATE) if start_date else None,
+                    "end_date": end_date.strftime(DateFormats.ISO_DATE) if end_date else None,
+                    "days": (end_date - start_date).days if start_date and end_date else None,
+                },
+            }
+
+        except Exception as e:
+            logger.error(
+                "Failed to get filtered market data",
+                error=str(e),
+                state=state,
+                commodity=commodity,
+                market=market,
+                start_date=start_date,
+                end_date=end_date,
+            )
+            return {
+                FieldNames.SUCCESS: False,
+                FieldNames.DATA: [],
+                FieldNames.TOTAL_RECORDS: 0,
+                "filters_applied": filters_applied if "filters_applied" in locals() else {},
                 FieldNames.ERROR: str(e),
             }
 
@@ -424,6 +557,114 @@ class MarketService:
             f"{state}{Separators.UNDERSCORE}{date_str}{Separators.UNDERSCORE}"
             f"{clean_market}{Separators.UNDERSCORE}{clean_commodity}"
         )
+
+    @log_latency("get_bulk_market_data")
+    async def get_bulk_market_data(
+        self,
+        date: date_type | None = None,
+        states: list[str] | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> dict:
+        """
+        Get market data for multiple states or all states for a specific date.
+
+        This method is optimized for bulk data loading and cache initialization.
+        Returns data organized by state for easy processing.
+
+        Args:
+            date: Target date (defaults to today if None)
+            states: List of state names (defaults to all available states if None)
+            limit: Maximum records to return per query
+            offset: Number of records to skip
+
+        Returns:
+            dict: {
+                "success": bool,
+                "data": {
+                    "state_name": [records...],
+                    "state_name": [records...],
+                    ...
+                },
+                "total_records": int,
+                "states_included": [state_names],
+                "date": str,
+                "source": str
+            }
+        """
+        if date is None:
+            date = datetime.now().date()
+
+        date_str = date.strftime(DateFormats.ISO_DATE)
+
+        # Define target states
+        if states is None:
+            # Default to our main states if none specified
+            target_states = ["Karnataka", "Tamil Nadu", "Punjab"]
+        else:
+            target_states = states
+
+        logger.info(
+            "Getting bulk market data",
+            date=date_str,
+            states=target_states,
+            limit=limit,
+            offset=offset,
+        )
+
+        try:
+            result_data = {}
+            total_records = 0
+
+            # Get data for each state
+            for state in target_states:
+                try:
+                    # Get data for this state using existing method
+                    state_result = await self.get_market_data(
+                        state=state, date=date, limit=limit, offset=offset
+                    )
+
+                    if state_result.get(FieldNames.SUCCESS, False):
+                        state_data = state_result.get(FieldNames.DATA, [])
+                        result_data[state] = state_data
+                        total_records += len(state_data)
+                    else:
+                        # State had no data or error - include empty list
+                        result_data[state] = []
+
+                except Exception as e:
+                    logger.error(f"Error getting data for {state}", error=str(e))
+                    result_data[state] = []
+
+            logger.info(
+                "Bulk market data retrieved successfully",
+                total_records=total_records,
+                states_count=len(target_states),
+                date=date_str,
+            )
+
+            return {
+                FieldNames.SUCCESS: True,
+                FieldNames.DATA: result_data,
+                FieldNames.TOTAL_RECORDS: total_records,
+                "states_included": target_states,
+                FieldNames.DATE: date_str,
+                FieldNames.SOURCE: "bulk_firestore",
+            }
+
+        except Exception as e:
+            logger.error(
+                "Failed to get bulk market data", error=str(e), date=date_str, states=target_states
+            )
+            return {
+                FieldNames.SUCCESS: False,
+                "error": f"Failed to get bulk market data: {str(e)}",
+                FieldNames.DATA: {},
+                FieldNames.TOTAL_RECORDS: 0,
+                "states_included": [],
+                FieldNames.DATE: date_str,
+                FieldNames.SOURCE: "error",
+            }
 
 
 # Global market service instance

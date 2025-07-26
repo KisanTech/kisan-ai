@@ -18,10 +18,10 @@ dependencies = [
     "requests>=2.31.0", # External APIs
     "python-dotenv>=1.0.0", # Environment variables
     "pydantic>=2.5.0",
-    "pydantic-settings>=2.0.0",  # For BaseSettings
+    "pydantic-settings>=2.0.0", # For BaseSettings
     "pillow>=10.1.0", # Image processing
     "aiohttp>=3.12.14",
-    "structlog>=24.5.0",  # Structured logging
+    "structlog>=24.5.0", # Structured logging
 ]
 readme = "README.md"
 requires-python = ">=3.13"

@@ -8,7 +8,7 @@ set -e  # Exit on any error
 # Configuration
 PROJECT_ID="kisanai-466809"
 SERVICE_NAME="kisan-ai-api"
-REGION="asia-south1"  # Mumbai region
+REGION="us-central1"  
 SERVICE_ACCOUNT="kisan-ai-service-account@${PROJECT_ID}.iam.gserviceaccount.com"
 
 # Colors for output

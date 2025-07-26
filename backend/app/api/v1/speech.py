@@ -2,7 +2,6 @@
 Speech-to-Text API endpoints using Google Cloud Speech API with latest models
 """
 
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -306,7 +305,7 @@ async def synthesize_speech(request: TextToSpeechRequest) -> TextToSpeechRespons
     summary="Get available voices for text-to-speech",
     description="Retrieve list of available voices from Google Cloud Text-to-Speech API, optionally filtered by language",
 )
-async def get_available_voices(language_code: Optional[str] = None) -> AvailableVoicesResponse:
+async def get_available_voices(language_code: str | None = None) -> AvailableVoicesResponse:
     """
     Get list of available voices for text-to-speech
 

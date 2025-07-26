@@ -2,7 +2,7 @@
 Pydantic models for Google Cloud Translation API.
 """
 
-from typing import Optional, List
+
 from pydantic import BaseModel, Field
 
 
@@ -11,7 +11,7 @@ class TranslationRequest(BaseModel):
 
     text: str = Field(..., description="Text to translate", min_length=1, max_length=30000)
     target_language: str = Field(..., description="Target language code (e.g., 'en', 'hi', 'kn')")
-    source_language: Optional[str] = Field(
+    source_language: str | None = Field(
         None, description="Source language code. If not provided, auto-detect."
     )
 
@@ -28,11 +28,11 @@ class TranslationRequest(BaseModel):
 class BatchTranslationRequest(BaseModel):
     """Request model for batch text translation."""
 
-    texts: List[str] = Field(
+    texts: list[str] = Field(
         ..., description="List of texts to translate", min_items=1, max_items=100
     )
     target_language: str = Field(..., description="Target language code")
-    source_language: Optional[str] = Field(
+    source_language: str | None = Field(
         None, description="Source language code. If not provided, auto-detect."
     )
 
@@ -70,7 +70,7 @@ class TranslationResponse(BaseModel):
 class BatchTranslationResponse(BaseModel):
     """Response model for batch text translation."""
 
-    translations: List[TranslationResponse] = Field(..., description="List of translation results")
+    translations: list[TranslationResponse] = Field(..., description="List of translation results")
     total_count: int = Field(..., description="Total number of translations")
 
     class Config:
@@ -136,7 +136,7 @@ class SupportedLanguage(BaseModel):
 class SupportedLanguagesResponse(BaseModel):
     """Response model for supported languages."""
 
-    languages: List[SupportedLanguage] = Field(..., description="List of supported languages")
+    languages: list[SupportedLanguage] = Field(..., description="List of supported languages")
     total_count: int = Field(..., description="Total number of supported languages")
     display_language_code: str = Field(..., description="Language code used for display names")
 
