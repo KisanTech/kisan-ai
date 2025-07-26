@@ -36,11 +36,11 @@ class MarketService:
         Fetches from Data.gov.in if not available in Firestore
         """
         target_state = state or MarketData.DEFAULT_STATE
-        
+
         # If no date provided, get most recent available data
         if date is None:
             return await self._get_recent_data(target_state, limit, offset)
-            
+
         target_date = date
         date_str = target_date.strftime(DateFormats.ISO_DATE)
 
@@ -202,9 +202,7 @@ class MarketService:
                 FieldNames.ERROR: str(e),
             }
 
-    async def _get_recent_data(
-        self, state: str, limit: int = 100, offset: int = 0
-    ) -> dict:
+    async def _get_recent_data(self, state: str, limit: int = 100, offset: int = 0) -> dict:
         """Get most recent available data for a state (all dates)"""
         try:
             # Simple query - get all data for this state, then sort in Python
@@ -226,12 +224,12 @@ class MarketService:
 
             # Sort by date descending in Python
             all_records.sort(key=lambda x: x.get(FieldNames.DATE, ""), reverse=True)
-            
+
             # Apply limit and offset after sorting
             start_idx = offset
             end_idx = offset + limit
             all_data = all_records[start_idx:end_idx]
-            
+
             latest_date = all_records[0].get(FieldNames.DATE, "unknown") if all_records else None
 
             if all_data:
@@ -261,7 +259,7 @@ class MarketService:
                     current_date = datetime.now().date()
                     date_str = current_date.strftime(DateFormats.ISO_DATE)
                     await self._store_data(state, date_str, fresh_data)
-                    
+
                     return {
                         FieldNames.SUCCESS: True,
                         FieldNames.DATA: fresh_data[:limit],  # Apply limit
