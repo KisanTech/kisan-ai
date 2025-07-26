@@ -4,9 +4,12 @@ import { useTranslation } from 'react-i18next';
 import * as FileSystem from 'expo-file-system';
 import { VoiceRecorder, VoicePlayer } from '../components';
 import { voiceChatService } from '../services/voiceChatService';
+import { useLanguage } from '../i18n/LanguageContext';
+import { getSpeechRecognitionCode, getTextApiCode } from '../config/languages';
 
 export const MarketPricesScreen: React.FC = () => {
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
   const [audioBase64, setAudioBase64] = useState<string>('');
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingStatus, setRecordingStatus] = useState<string>(t('marketPrices.readyToRecord'));
@@ -20,8 +23,12 @@ export const MarketPricesScreen: React.FC = () => {
     setRecordingStatus(t('marketPrices.processingAudio'));
 
     try {
+      // Get language codes based on current language
+      const speechLanguageCode = getSpeechRecognitionCode(currentLanguage);
+      const textApiLanguageCode = getTextApiCode(currentLanguage);
+      
       // Send audio to speech-to-text API
-      const speechResult = await voiceChatService.speechToText(base64Audio, 'hi-IN');
+      const speechResult = await voiceChatService.speechToText(base64Audio, speechLanguageCode);
       
       setTranscription(speechResult.transcription);
       setRecordingStatus(t('marketPrices.audioTranscribed'));
@@ -35,7 +42,7 @@ export const MarketPricesScreen: React.FC = () => {
         setRecordingStatus(t('marketPrices.gettingAIResponse'));
         const aiResponse = await voiceChatService.sendTextMessage(
           speechResult.transcription, 
-          'kn-IN'
+          textApiLanguageCode
         );
         
         setResponse(aiResponse.response_text);

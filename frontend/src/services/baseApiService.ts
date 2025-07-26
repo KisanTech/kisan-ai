@@ -16,15 +16,15 @@ const getApiUrl = (serviceType: ServiceType = 'default'): string => {
 
   // Fallback URLs for development based on service type
   if (__DEV__) {
-    const baseUrl = Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1';
+    const baseUrl = Platform.OS === 'android' ? '10.0.2.2' : 'https://kisan-ai-api-556613941388.us-central1.run.app';
     
     switch (serviceType) {
       case 'diagnosis':
-        return `http://${baseUrl}:8000/api/v1`;
+        return `${baseUrl}/api/v1`;
       case 'voiceChat':
-        return `http://${baseUrl}:8100/api/v1`;
+        return `${baseUrl}/api/v1`;
       default:
-        return `http://${baseUrl}:8100/api/v1`;
+        return `${baseUrl}/api/v1`;
     }
   }
 
@@ -33,9 +33,9 @@ const getApiUrl = (serviceType: ServiceType = 'default'): string => {
     case 'diagnosis':
       return 'http://127.0.0.1:8000/api/v1';
     case 'voiceChat':
-      return 'http://127.0.0.1:8100/api/v1';
+      return 'http://127.0.0.1:8000/api/v1';
     default:
-      return 'http://127.0.0.1:8100/api/v1';
+      return 'http://127.0.0.1:8000/api/v1';
   }
 };
 

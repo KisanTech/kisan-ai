@@ -85,10 +85,12 @@ export class VoiceChatService {
   async speechToText(base64Audio: string, languageCode: string = 'hi-IN'): Promise<SpeechToTextResponse> {
     try {
       console.log('Speech to text request received', base64Audio);
-      const response = await voiceChatApiClient.post('/speech/speech/transcribe', {
+      const response = await voiceChatApiClient.post('/invoke/voice', {
         audio_data: base64Audio,
         audio_encoding: 'MP3',
         language_code: languageCode,
+        user_id: '123',
+        session_id: '123',
       });
       console.log('Speech to text response:', response.data);
       return {
