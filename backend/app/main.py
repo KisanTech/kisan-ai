@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.agent_invocation import router as agent_invocation_router
 from app.api.v1.crop_diagnosis import router as crop_diagnosis_router
 from app.api.v1.market_prices import router as market_router
 from app.api.v1.speech import router as speech_router
@@ -114,6 +115,7 @@ async def health_check() -> HealthCheckResponse:
     )
 
 
+app.include_router(agent_invocation_router, prefix="/api/v1", tags=["agent-invocation"])
 app.include_router(market_router, prefix="/api/v1/market", tags=["market-data"])
 app.include_router(crop_diagnosis_router, prefix="/api/v1/crop", tags=["crop-diagnosis"])
 app.include_router(speech_router, prefix="/api/v1/speech", tags=["speech"])

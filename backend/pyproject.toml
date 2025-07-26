@@ -9,19 +9,23 @@ dependencies = [
     "fastapi>=0.104.1",
     "uvicorn[standard]>=0.24.0",
     "python-multipart>=0.0.6", # For file uploads
-    "google-cloud-aiplatform>=1.38.0", # Vertex AI
+    "google-cloud-aiplatform[agent_engines,adk,langchain,ag2,llama_index]==1.88.0", # Vertex AI with agent features
     "google-cloud-speech>=2.22.0", # Speech APIs
     "google-cloud-texttospeech>=2.27.0", # Text-to-Speech API
     "google-cloud-translate>=3.12.0", # Translation API
     "google-cloud-storage>=2.10.0", # File storage
     "google-cloud-firestore>=2.14.0", # Firestore database
+    "google-genai>=1.9.0", # Google Generative AI
+    "google-adk==1.0.0", # Google Agent Development Kit
     "requests>=2.31.0", # External APIs
     "python-dotenv>=1.0.0", # Environment variables
-    "pydantic>=2.5.0",
-    "pydantic-settings>=2.0.0", # For BaseSettings
+    "pydantic==2.10.6", # Updated to match agents version
+    "pydantic-settings>=2.0.0",  # For BaseSettings
     "pillow>=10.1.0", # Image processing
     "aiohttp>=3.12.14",
-    "structlog>=24.5.0", # Structured logging
+    "structlog>=24.5.0",  # Structured logging
+    "langchain>=0.1.0", # LangChain framework
+    "langgraph>=0.1.0", # LangGraph for agent workflows
 ]
 readme = "README.md"
 requires-python = ">=3.13"
