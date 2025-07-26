@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, View, ScrollView, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as FileSystem from 'expo-file-system';
 import { VoiceRecorder, VoicePlayer } from '../components';
 import { voiceChatService } from '../services/voiceChatService';
 
 export const MarketPricesScreen: React.FC = () => {
+  const { t } = useTranslation();
   const [audioBase64, setAudioBase64] = useState<string>('');
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [recordingStatus, setRecordingStatus] = useState<string>('Ready to record');
+  const [recordingStatus, setRecordingStatus] = useState<string>(t('marketPrices.readyToRecord'));
   const [transcription, setTranscription] = useState<string>('');
   const [response, setResponse] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -15,14 +17,14 @@ export const MarketPricesScreen: React.FC = () => {
   const handleAudioRecorded = async (base64Audio: string) => {
     setAudioBase64(base64Audio);
     setIsProcessing(true);
-    setRecordingStatus('Processing audio...');
+    setRecordingStatus(t('marketPrices.processingAudio'));
 
     try {
       // Send audio to speech-to-text API
       const speechResult = await voiceChatService.speechToText(base64Audio, 'hi-IN');
       
       setTranscription(speechResult.transcription);
-      setRecordingStatus('Audio transcribed successfully!');
+      setRecordingStatus(t('marketPrices.audioTranscribed'));
       
       console.log('Transcription:', speechResult.transcription);
       console.log('Translation:', speechResult.translation);
@@ -30,27 +32,27 @@ export const MarketPricesScreen: React.FC = () => {
       
       // Optionally, send the transcribed text to get AI response
       if (speechResult.transcription) {
-        setRecordingStatus('Getting AI response...');
+        setRecordingStatus(t('marketPrices.gettingAIResponse'));
         const aiResponse = await voiceChatService.sendTextMessage(
           speechResult.transcription, 
           'kn-IN'
         );
         
         setResponse(aiResponse.response_text);
-        setRecordingStatus('Response received!');
+        setRecordingStatus(t('marketPrices.responseReceived'));
         
         // Show success alert with transcription and response
         Alert.alert(
-          'Voice Processing Complete', 
-          `Transcription: ${speechResult.transcription}\n\nResponse: ${aiResponse.response_text}`,
-          [{ text: 'OK' }]
+          t('marketPrices.voiceProcessingComplete'), 
+          `${t('marketPrices.transcription')} ${speechResult.transcription}\n\n${t('marketPrices.response')} ${aiResponse.response_text}`,
+          [{ text: t('common.ok') }]
         );
       }
 
     } catch (error) {
       console.error('Failed to process audio:', error);
-      setRecordingStatus('Error: Failed to process audio');
-      Alert.alert('Processing Error', 'Failed to process the audio. Please try again.');
+      setRecordingStatus(t('marketPrices.errorProcessAudio'));
+      Alert.alert(t('marketPrices.processingError'), t('marketPrices.processingErrorMessage'));
     } finally {
       setIsProcessing(false);
     }
@@ -58,19 +60,19 @@ export const MarketPricesScreen: React.FC = () => {
 
   const handleRecordingStart = () => {
     setIsRecording(true);
-    setRecordingStatus('Recording in progress...');
+    setRecordingStatus(t('marketPrices.recordingInProgress'));
     setAudioBase64(''); // Clear previous recording
   };
 
   const handleRecordingStop = () => {
     setIsRecording(false);
-    setRecordingStatus('Processing recording...');
+    setRecordingStatus(t('marketPrices.processingRecording'));
   };
 
   const handleRecordingError = (error: string) => {
     setIsRecording(false);
-    setRecordingStatus(`Error: ${error}`);
-    Alert.alert('Recording Error', error);
+    setRecordingStatus(`${t('marketPrices.errorProcessAudio')}: ${error}`);
+    Alert.alert(t('marketPrices.recordingError'), error);
   };
 
   return (
@@ -78,10 +80,10 @@ export const MarketPricesScreen: React.FC = () => {
       <ScrollView className="flex-1 p-4">
         <View className="items-center mb-8">
           <Text className="text-2xl font-bold text-foreground tracking-tighter mb-2">
-            📈 Market Prices
+            {t('marketPrices.title')}
           </Text>
           <Text className="text-sm text-gray-600 text-center">
-            Get real-time crop prices, market trends, and agricultural insights
+            {t('marketPrices.subtitle')}
           </Text>
         </View>
 
@@ -89,10 +91,10 @@ export const MarketPricesScreen: React.FC = () => {
         <View className="bg-white border border-gray-200 rounded-lg p-4 mb-8">
           <View className="items-center mb-4">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              🎤 Voice Assistant
+              {t('marketPrices.voiceAssistant')}
             </Text>
             <Text className="text-sm text-gray-600 text-center">
-              Speak in Hindi or Kannada to get instant market information
+              {t('marketPrices.voiceSubtitle')}
             </Text>
           </View>
 
@@ -103,8 +105,8 @@ export const MarketPricesScreen: React.FC = () => {
               onRecordingStop={handleRecordingStop}
               onError={handleRecordingError}
               disabled={isProcessing}
-              buttonText={isProcessing ? "🔄 Processing..." : "🎤 Start Recording"}
-              recordingText="🔴 Recording..."
+              buttonText={isProcessing ? t('marketPrices.processing') : t('marketPrices.startRecording')}
+              recordingText={t('marketPrices.recording')}
               customStyles={{
                 container: { marginVertical: 20 },
                 button: { 
@@ -119,7 +121,7 @@ export const MarketPricesScreen: React.FC = () => {
 
           <View className="mb-2">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Status:
+              {t('marketPrices.status')}:
             </Text>
             <Text className={`text-sm ${
               isRecording ? 'text-red-600' : 
@@ -130,7 +132,7 @@ export const MarketPricesScreen: React.FC = () => {
             </Text>
             {isProcessing && (
               <Text className="text-xs text-blue-500 mt-1">
-                Please wait while we process your audio...
+                {t('marketPrices.pleaseWait')}
               </Text>
             )}
           </View>
@@ -139,7 +141,7 @@ export const MarketPricesScreen: React.FC = () => {
         {/* Feature Information Cards */}
         <View className="mb-8">
           <Text className="text-lg font-semibold text-foreground mb-4">
-            What You Can Get:
+            {t('marketPrices.whatYouCanGet')}
           </Text>
           
           <View className="space-y-4">
@@ -148,10 +150,10 @@ export const MarketPricesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">💰</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-green-800 mb-1">
-                  Current Crop Prices
+                  {t('marketPrices.currentCropPrices.title')}
                 </Text>
                 <Text className="text-sm text-green-700">
-                  Get today's market rates for rice, wheat, sugarcane, cotton, and other major crops across different mandis and regions.
+                  {t('marketPrices.currentCropPrices.description')}
                 </Text>
               </View>
             </View>
@@ -161,10 +163,10 @@ export const MarketPricesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">📊</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-blue-800 mb-1">
-                  Price Trends & Analytics
+                  {t('marketPrices.priceTrends.title')}
                 </Text>
                 <Text className="text-sm text-blue-700">
-                  Understand price movements over weeks and months. Identify the best time to sell your harvest for maximum profit.
+                  {t('marketPrices.priceTrends.description')}
                 </Text>
               </View>
             </View>
@@ -174,10 +176,10 @@ export const MarketPricesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">🎯</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-purple-800 mb-1">
-                  Market Insights
+                  {t('marketPrices.marketInsights.title')}
                 </Text>
                 <Text className="text-sm text-purple-700">
-                  Get advice on which crops are in high demand, seasonal price patterns, and market conditions in your area.
+                  {t('marketPrices.marketInsights.description')}
                 </Text>
               </View>
             </View>
@@ -187,10 +189,10 @@ export const MarketPricesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">🗺️</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-orange-800 mb-1">
-                  Regional Price Comparison
+                  {t('marketPrices.regionalComparison.title')}
                 </Text>
                 <Text className="text-sm text-orange-700">
-                  Compare prices across different markets and find the best places to sell your produce for better returns.
+                  {t('marketPrices.regionalComparison.description')}
                 </Text>
               </View>
             </View>
@@ -200,15 +202,15 @@ export const MarketPricesScreen: React.FC = () => {
         {/* Sample Questions */}
         <View className="mb-8">
           <Text className="text-lg font-semibold text-foreground mb-4">
-            💬 Ask Questions Like:
+            {t('marketPrices.sampleQuestions.title')}
           </Text>
           <View className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <View className="space-y-3">
-              <Text className="text-sm text-gray-700">• "What is today's rice price in Bangalore mandi?"</Text>
-              <Text className="text-sm text-gray-700">• "Show me cotton price trends for this month"</Text>
-              <Text className="text-sm text-gray-700">• "Which crops have the best prices right now?"</Text>
-              <Text className="text-sm text-gray-700">• "Compare wheat prices in different districts"</Text>
-              <Text className="text-sm text-gray-700">• "When is the best time to sell my sugarcane?"</Text>
+              <Text className="text-sm text-gray-700">{t('marketPrices.sampleQuestions.question1')}</Text>
+              <Text className="text-sm text-gray-700">{t('marketPrices.sampleQuestions.question2')}</Text>
+              <Text className="text-sm text-gray-700">{t('marketPrices.sampleQuestions.question3')}</Text>
+              <Text className="text-sm text-gray-700">{t('marketPrices.sampleQuestions.question4')}</Text>
+              <Text className="text-sm text-gray-700">{t('marketPrices.sampleQuestions.question5')}</Text>
             </View>
           </View>
         </View>
@@ -217,12 +219,12 @@ export const MarketPricesScreen: React.FC = () => {
         {audioBase64 && (
           <View className="mt-8">
             <Text className="text-lg font-semibold text-foreground mb-4">
-              📱 Recording Results
+              {t('marketPrices.recordingResults')}
             </Text>
             
             <View className="mb-4">
               <Text className="text-sm font-medium text-gray-700 mb-2 text-center">
-                Playback Recorded Audio
+                {t('marketPrices.playbackRecordedAudio')}
               </Text>
               <VoicePlayer
                 base64Audio={audioBase64}
@@ -230,11 +232,11 @@ export const MarketPricesScreen: React.FC = () => {
                 onPause={() => console.log('Paused audio playback')}
                 onError={(error) => {
                   console.error('Audio playback error:', error);
-                  Alert.alert('Playback Error', 'Failed to play the recorded audio.');
+                  Alert.alert(t('marketPrices.playbackError'), t('marketPrices.playbackErrorMessage'));
                 }}
-                playButtonText="▶ Play Recording"
-                pauseButtonText="⏸ Pause"
-                replayButtonText="🔄 Replay"
+                playButtonText={t('marketPrices.playRecording')}
+                pauseButtonText={t('marketPrices.pause')}
+                replayButtonText={t('marketPrices.replay')}
                 customStyles={{
                   container: { marginVertical: 10 },
                   button: {
@@ -251,7 +253,7 @@ export const MarketPricesScreen: React.FC = () => {
         {audioBase64 && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Recorded Audio (Base64):
+              {t('marketPrices.recordedAudioBase64')}
             </Text>
             <View className="bg-gray-100 p-4 rounded-lg">
               <Text className="text-xs font-mono text-gray-700 leading-5">
@@ -262,7 +264,7 @@ export const MarketPricesScreen: React.FC = () => {
               </Text>
               {audioBase64.length > 200 && (
                 <Text className="text-xs text-gray-500 mt-2">
-                  Full length: {audioBase64.length} characters
+                  {t('marketPrices.fullLength')}: {audioBase64.length} {t('marketPrices.characters')}
                 </Text>
               )}
             </View>
@@ -272,7 +274,7 @@ export const MarketPricesScreen: React.FC = () => {
         {transcription && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Transcription:
+              {t('marketPrices.transcription')}
             </Text>
             <View className="bg-blue-50 p-4 rounded-lg">
               <Text className="text-sm text-gray-700">
@@ -285,7 +287,7 @@ export const MarketPricesScreen: React.FC = () => {
         {response && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Response:
+              {t('marketPrices.response')}
             </Text>
             <View className="bg-green-50 p-4 rounded-lg">
               <Text className="text-sm text-gray-700">

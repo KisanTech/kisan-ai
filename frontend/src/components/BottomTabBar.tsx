@@ -1,7 +1,19 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { TABS } from '../config/app';
+import { useTranslation } from 'react-i18next';
+
+interface TabConfig {
+  id: string;
+  titleKey: string;
+  iconName: string;
+}
+
+const TABS: TabConfig[] = [
+  { id: 'home', titleKey: 'bottomTabs.home', iconName: 'home-outline' },
+  { id: 'community', titleKey: 'bottomTabs.community', iconName: 'account-group-outline' },
+  { id: 'profile', titleKey: 'bottomTabs.profile', iconName: 'account-outline' },
+];
 
 interface BottomTabBarProps {
   activeTab: string;
@@ -9,6 +21,8 @@ interface BottomTabBarProps {
 }
 
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPress }) => {
+  const { t } = useTranslation();
+
   return (
     <View className="flex-row bg-card border-t border-muted">
       {TABS.map(tab => (
@@ -28,7 +42,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
               activeTab === tab.id ? 'text-secondary' : 'text-foreground opacity-50'
             }`}
           >
-            {tab.title}
+            {t(tab.titleKey)}
           </Text>
         </TouchableOpacity>
       ))}

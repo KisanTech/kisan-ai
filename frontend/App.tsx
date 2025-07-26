@@ -2,7 +2,10 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
 import './global.css'; // Import global CSS for NativeWind
+import './src/i18n'; // Initialize i18n
+import { LanguageProvider } from './src/i18n/LanguageContext';
 import {
   HomeScreen,
   CropHealthScreen,
@@ -15,7 +18,9 @@ import { RootStackParamList } from './src/types/navigation';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-export default function App() {
+const AppNavigator: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <NavigationContainer>
       <StatusBar style="dark" />
@@ -37,7 +42,7 @@ export default function App() {
           name="CropHealth"
           component={CropHealthScreen}
           options={({ navigation }) => ({
-            title: 'Crop Health Diagnosis',
+            title: t('cropHealth.title'),
             headerLeft: () => <NavigateBackButton navigation={navigation} />,
           })}
         />
@@ -45,7 +50,7 @@ export default function App() {
           name="MarketPrices"
           component={MarketPricesScreen}
           options={({ navigation }) => ({
-            title: 'Market Prices',
+            title: t('marketPrices.title'),
             headerLeft: () => <NavigateBackButton navigation={navigation} />,
           })}
         />
@@ -53,7 +58,7 @@ export default function App() {
           name="GovernmentSchemes"
           component={GovernmentSchemesScreen}
           options={({ navigation }) => ({
-            title: 'Government Schemes',
+            title: t('governmentSchemes.title'),
             headerLeft: () => <NavigateBackButton navigation={navigation} />,
           })}
         />
@@ -61,11 +66,19 @@ export default function App() {
           name="DiagnosisResult"
           component={DiagnosisResultScreen}
           options={({ navigation }) => ({
-            title: 'Diagnosis Results',
+            title: t('diagnosisResult.title'),
             headerLeft: () => <NavigateBackButton navigation={navigation} />,
           })}
         />
       </Stack.Navigator>
     </NavigationContainer>
+  );
+};
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppNavigator />
+    </LanguageProvider>
   );
 }

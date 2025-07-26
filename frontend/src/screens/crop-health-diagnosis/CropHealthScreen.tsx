@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../../types/navigation';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,6 +30,7 @@ export const CropHealthScreen: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [diagnosis, setDiagnosis] = useState<DiagnosisResponse | null>(null);
+  const { t } = useTranslation();
 
   // Animation value for rotating icon
   const spinValue = useRef(new Animated.Value(0)).current;
@@ -62,9 +64,9 @@ export const CropHealthScreen: React.FC = () => {
 
     if (cameraStatus !== 'granted' || mediaStatus !== 'granted') {
       Alert.alert(
-        'Permissions Required',
-        'We need camera and photo library permissions to help diagnose your crops.',
-        [{ text: 'OK' }]
+        t('cropHealth.permissionsRequired'),
+        t('cropHealth.permissionsMessage'),
+        [{ text: t('common.ok') }]
       );
       return false;
     }
@@ -89,7 +91,7 @@ export const CropHealthScreen: React.FC = () => {
         setDiagnosis(null); // Clear previous diagnosis
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to capture image. Please try again.');
+      Alert.alert(t('common.error'), t('cropHealth.errorCapture'));
     }
   };
 
@@ -111,7 +113,7 @@ export const CropHealthScreen: React.FC = () => {
         setDiagnosis(null); // Clear previous diagnosis
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to select image. Please try again.');
+      Alert.alert(t('common.error'), t('cropHealth.errorSelect'));
     }
   };
 
@@ -141,7 +143,7 @@ export const CropHealthScreen: React.FC = () => {
   // Handle crop health diagnosis
   const handleDiagnosis = async () => {
     if (!selectedImage) {
-      Alert.alert('No Image', 'Please capture or select an image first.');
+      Alert.alert(t('cropHealth.noImage'), t('cropHealth.selectImageFirst'));
       return;
     }
 
@@ -164,8 +166,8 @@ export const CropHealthScreen: React.FC = () => {
     } catch (error) {
       console.error('Diagnosis error:', error);
       Alert.alert(
-        'Diagnosis Failed',
-        'Unable to analyze the image. Please try again with a clearer photo.'
+        t('cropHealth.diagnosisFailed'),
+        t('cropHealth.diagnosisFailedMessage')
       );
     } finally {
       setIsLoading(false);
@@ -179,10 +181,10 @@ export const CropHealthScreen: React.FC = () => {
   };
 
   const photoTips = [
-    '📱 Hold phone steady, close to affected leaves',
-    '☀️ Use good natural light, avoid shadows',
-    '🔍 Focus clearly on damaged areas',
-    '📐 Keep leaf flat and visible',
+    t('cropHealth.photoTips.tip1'),
+    t('cropHealth.photoTips.tip2'),
+    t('cropHealth.photoTips.tip3'),
+    t('cropHealth.photoTips.tip4'),
   ];
 
   return (
@@ -191,10 +193,10 @@ export const CropHealthScreen: React.FC = () => {
         {/* Header */}
         <View className="mb-6">
           <Text className="text-lg font-bold text-gray-800 text-center mb-2">
-            Diagnose Plant Disease
+            {t('cropHealth.diagnosePlantDisease')}
           </Text>
           <Text className="text-gray-600 text-center">
-            Take a clear photo of the affected leaves
+            {t('cropHealth.subtitle')}
           </Text>
         </View>
 
@@ -211,13 +213,13 @@ export const CropHealthScreen: React.FC = () => {
                 onPress={handleRetake}
                 className="mt-4 bg-gray-100 px-4 py-2 rounded-lg self-center"
               >
-                <Text className="text-gray-700 font-medium">Retake</Text>
+                <Text className="text-gray-700 font-medium">{t('cropHealth.retake')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <View className="h-64 bg-gray-100 rounded-xl justify-center items-center">
               <Ionicons name="camera-outline" size={48} color="#9CA3AF" />
-              <Text className="text-gray-500 mt-2">No image selected</Text>
+              <Text className="text-gray-500 mt-2">{t('cropHealth.noImageSelected')}</Text>
             </View>
           )}
         </View>
@@ -229,7 +231,7 @@ export const CropHealthScreen: React.FC = () => {
             className="flex-1 bg-primary py-3 rounded-lg flex-row justify-center items-center"
           >
             <Ionicons name="camera" size={22} color="white" />
-            <Text className="text-white font-bold ml-2">Capture</Text>
+            <Text className="text-white font-bold ml-2">{t('cropHealth.capture')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -237,13 +239,13 @@ export const CropHealthScreen: React.FC = () => {
             className="flex-1 bg-primary py-3 rounded-lg flex-row justify-center items-center"
           >
             <Ionicons name="images" size={22} color="white" />
-            <Text className="text-white font-bold ml-2">Gallery</Text>
+            <Text className="text-white font-bold ml-2">{t('cropHealth.gallery')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Photo Tips */}
         <View className="bg-white rounded-2xl p-4 mb-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">Tips for better photos</Text>
+          <Text className="text-lg font-semibold text-gray-800 mb-3">{t('cropHealth.photoTips.title')}</Text>
           {photoTips.map((tip, index) => (
             <Text key={index} className="text-gray-600 mb-2 leading-5">
               {tip}
@@ -267,12 +269,12 @@ export const CropHealthScreen: React.FC = () => {
                 <Animated.View style={{ transform: [{ rotate: spin }] }}>
                   <Ionicons name="hourglass-outline" size={24} color="black" />
                 </Animated.View>
-                <Text className="text-black font-bold text-lg ml-3">ANALYZING...</Text>
+                <Text className="text-black font-bold text-lg ml-3">{t('cropHealth.analyzing')}</Text>
               </>
             ) : (
               <>
                 <Ionicons name="leaf" size={24} color="white" />
-                <Text className="text-white font-bold text-lg ml-3">CHECK CROP HEALTH</Text>
+                <Text className="text-white font-bold text-lg ml-3">{t('cropHealth.checkCropHealth')}</Text>
               </>
             )}
           </View>

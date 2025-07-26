@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, View, ScrollView, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as FileSystem from 'expo-file-system';
 import { VoiceRecorder, VoicePlayer } from '../components';
 import { voiceChatService } from '../services/voiceChatService';
 
 export const GovernmentSchemesScreen: React.FC = () => {
+  const { t } = useTranslation();
   const [audioBase64, setAudioBase64] = useState<string>('');
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [recordingStatus, setRecordingStatus] = useState<string>('Ready to record');
+  const [recordingStatus, setRecordingStatus] = useState<string>(t('marketPrices.readyToRecord'));
   const [transcription, setTranscription] = useState<string>('');
   const [response, setResponse] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -15,14 +17,14 @@ export const GovernmentSchemesScreen: React.FC = () => {
   const handleAudioRecorded = async (base64Audio: string) => {
     setAudioBase64(base64Audio);
     setIsProcessing(true);
-    setRecordingStatus('Processing audio...');
+    setRecordingStatus(t('marketPrices.processingAudio'));
 
     try {
       // Send audio to speech-to-text API
       const speechResult = await voiceChatService.speechToText(base64Audio, 'hi-IN');
       
       setTranscription(speechResult.transcription);
-      setRecordingStatus('Audio transcribed successfully!');
+      setRecordingStatus(t('marketPrices.audioTranscribed'));
       
       console.log('Transcription:', speechResult.transcription);
       console.log('Translation:', speechResult.translation);
@@ -30,27 +32,27 @@ export const GovernmentSchemesScreen: React.FC = () => {
       
       // Optionally, send the transcribed text to get AI response
       if (speechResult.transcription) {
-        setRecordingStatus('Getting AI response...');
+        setRecordingStatus(t('marketPrices.gettingAIResponse'));
         const aiResponse = await voiceChatService.sendTextMessage(
           speechResult.transcription, 
           'kn-IN'
         );
         
         setResponse(aiResponse.response_text);
-        setRecordingStatus('Response received!');
+        setRecordingStatus(t('marketPrices.responseReceived'));
         
         // Show success alert with transcription and response
         Alert.alert(
-          'Voice Processing Complete', 
-          `Transcription: ${speechResult.transcription}\n\nResponse: ${aiResponse.response_text}`,
-          [{ text: 'OK' }]
+          t('marketPrices.voiceProcessingComplete'), 
+          `${t('marketPrices.transcription')} ${speechResult.transcription}\n\n${t('marketPrices.response')} ${aiResponse.response_text}`,
+          [{ text: t('common.ok') }]
         );
       }
 
     } catch (error) {
       console.error('Failed to process audio:', error);
-      setRecordingStatus('Error: Failed to process audio');
-      Alert.alert('Processing Error', 'Failed to process the audio. Please try again.');
+      setRecordingStatus(t('marketPrices.errorProcessAudio'));
+      Alert.alert(t('marketPrices.processingError'), t('marketPrices.processingErrorMessage'));
     } finally {
       setIsProcessing(false);
     }
@@ -58,19 +60,19 @@ export const GovernmentSchemesScreen: React.FC = () => {
 
   const handleRecordingStart = () => {
     setIsRecording(true);
-    setRecordingStatus('Recording in progress...');
+    setRecordingStatus(t('marketPrices.recordingInProgress'));
     setAudioBase64(''); // Clear previous recording
   };
 
   const handleRecordingStop = () => {
     setIsRecording(false);
-    setRecordingStatus('Processing recording...');
+    setRecordingStatus(t('marketPrices.processingRecording'));
   };
 
   const handleRecordingError = (error: string) => {
     setIsRecording(false);
-    setRecordingStatus(`Error: ${error}`);
-    Alert.alert('Recording Error', error);
+    setRecordingStatus(`${t('marketPrices.errorProcessAudio')}: ${error}`);
+    Alert.alert(t('marketPrices.recordingError'), error);
   };
 
   return (
@@ -78,10 +80,10 @@ export const GovernmentSchemesScreen: React.FC = () => {
       <ScrollView className="flex-1 p-4">
         <View className="items-center mb-8">
           <Text className="text-2xl font-bold text-foreground tracking-tighter mb-2">
-            🏛️ Government Schemes
+            {t('governmentSchemes.title')}
           </Text>
           <Text className="text-sm text-gray-600 text-center">
-            Get information about agricultural schemes, farmer welfare, and relief programs
+            {t('governmentSchemes.subtitle')}
           </Text>
         </View>
 
@@ -89,10 +91,10 @@ export const GovernmentSchemesScreen: React.FC = () => {
         <View className="bg-white border border-gray-200 rounded-lg p-4 mb-8">
           <View className="items-center mb-4">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              🎤 Voice Assistant
+              {t('governmentSchemes.voiceAssistant')}
             </Text>
             <Text className="text-sm text-gray-600 text-center">
-              Speak in Hindi or Kannada to get instant scheme information
+              {t('governmentSchemes.voiceSubtitle')}
             </Text>
           </View>
 
@@ -103,8 +105,8 @@ export const GovernmentSchemesScreen: React.FC = () => {
               onRecordingStop={handleRecordingStop}
               onError={handleRecordingError}
               disabled={isProcessing}
-              buttonText={isProcessing ? "🔄 Processing..." : "🎤 Start Recording"}
-              recordingText="🔴 Recording..."
+              buttonText={isProcessing ? t('marketPrices.processing') : t('marketPrices.startRecording')}
+              recordingText={t('marketPrices.recording')}
               customStyles={{
                 container: { marginVertical: 20 },
                 button: { 
@@ -119,7 +121,7 @@ export const GovernmentSchemesScreen: React.FC = () => {
 
           <View className="mb-2">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Status:
+              {t('marketPrices.status')}:
             </Text>
             <Text className={`text-sm ${
               isRecording ? 'text-red-600' : 
@@ -130,7 +132,7 @@ export const GovernmentSchemesScreen: React.FC = () => {
             </Text>
             {isProcessing && (
               <Text className="text-xs text-blue-500 mt-1">
-                Please wait while we process your audio...
+                {t('marketPrices.pleaseWait')}
               </Text>
             )}
           </View>
@@ -139,7 +141,7 @@ export const GovernmentSchemesScreen: React.FC = () => {
         {/* Feature Information Cards */}
         <View className="mb-8">
           <Text className="text-lg font-semibold text-foreground mb-4">
-            What You Can Get:
+            {t('governmentSchemes.whatYouCanGet')}
           </Text>
           
           <View className="space-y-4">
@@ -148,10 +150,10 @@ export const GovernmentSchemesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">🌾</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-green-800 mb-1">
-                  Agricultural Subsidies
+                  {t('governmentSchemes.agriculturalSubsidies.title')}
                 </Text>
                 <Text className="text-sm text-green-700">
-                  Learn about fertilizer subsidies, seed subsidies, equipment purchase schemes, and irrigation support programs available in your region.
+                  {t('governmentSchemes.agriculturalSubsidies.description')}
                 </Text>
               </View>
             </View>
@@ -161,10 +163,10 @@ export const GovernmentSchemesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">👨‍🌾</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-blue-800 mb-1">
-                  Farmer Welfare Programs
+                  {t('governmentSchemes.farmerWelfare.title')}
                 </Text>
                 <Text className="text-sm text-blue-700">
-                  Get details about PM-KISAN, Pradhan Mantri Fasal Bima Yojana, pension schemes, and health insurance for farmers.
+                  {t('governmentSchemes.farmerWelfare.description')}
                 </Text>
               </View>
             </View>
@@ -174,10 +176,10 @@ export const GovernmentSchemesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">🆘</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-purple-800 mb-1">
-                  Relief & Emergency Support
+                  {t('governmentSchemes.reliefSupport.title')}
                 </Text>
                 <Text className="text-sm text-purple-700">
-                  Information about crop loss compensation, natural disaster relief, debt relief programs, and emergency financial assistance.
+                  {t('governmentSchemes.reliefSupport.description')}
                 </Text>
               </View>
             </View>
@@ -187,10 +189,10 @@ export const GovernmentSchemesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">💰</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-orange-800 mb-1">
-                  Credit & Loan Schemes
+                  {t('governmentSchemes.creditLoans.title')}
                 </Text>
                 <Text className="text-sm text-orange-700">
-                  Find out about KCC (Kisan Credit Card), agricultural loans, interest subsidies, and microfinance options for farmers.
+                  {t('governmentSchemes.creditLoans.description')}
                 </Text>
               </View>
             </View>
@@ -200,10 +202,10 @@ export const GovernmentSchemesScreen: React.FC = () => {
               <Text className="text-2xl mr-3">📚</Text>
               <View className="flex-1">
                 <Text className="text-base font-semibold text-teal-800 mb-1">
-                  Training & Skill Development
+                  {t('governmentSchemes.trainingDevelopment.title')}
                 </Text>
                 <Text className="text-sm text-teal-700">
-                  Learn about agricultural training programs, modern farming techniques, and skill development initiatives for farmers.
+                  {t('governmentSchemes.trainingDevelopment.description')}
                 </Text>
               </View>
             </View>
@@ -213,16 +215,16 @@ export const GovernmentSchemesScreen: React.FC = () => {
         {/* Sample Questions */}
         <View className="mb-8">
           <Text className="text-lg font-semibold text-foreground mb-4">
-            💬 Ask Questions Like:
+            {t('governmentSchemes.sampleQuestions.title')}
           </Text>
           <View className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <View className="space-y-3">
-              <Text className="text-sm text-gray-700">• "How can I apply for PM-KISAN scheme?"</Text>
-              <Text className="text-sm text-gray-700">• "What fertilizer subsidies are available?"</Text>
-              <Text className="text-sm text-gray-700">• "Tell me about crop insurance schemes"</Text>
-              <Text className="text-sm text-gray-700">• "How to get Kisan Credit Card?"</Text>
-              <Text className="text-sm text-gray-700">• "What relief is available for crop damage?"</Text>
-              <Text className="text-sm text-gray-700">• "Are there any schemes for organic farming?"</Text>
+              <Text className="text-sm text-gray-700">{t('governmentSchemes.sampleQuestions.question1')}</Text>
+              <Text className="text-sm text-gray-700">{t('governmentSchemes.sampleQuestions.question2')}</Text>
+              <Text className="text-sm text-gray-700">{t('governmentSchemes.sampleQuestions.question3')}</Text>
+              <Text className="text-sm text-gray-700">{t('governmentSchemes.sampleQuestions.question4')}</Text>
+              <Text className="text-sm text-gray-700">{t('governmentSchemes.sampleQuestions.question5')}</Text>
+              <Text className="text-sm text-gray-700">{t('governmentSchemes.sampleQuestions.question6')}</Text>
             </View>
           </View>
         </View>
@@ -231,12 +233,12 @@ export const GovernmentSchemesScreen: React.FC = () => {
         {audioBase64 && (
           <View className="mt-8">
             <Text className="text-lg font-semibold text-foreground mb-4">
-              📱 Recording Results
+              {t('marketPrices.recordingResults')}
             </Text>
             
             <View className="mb-4">
               <Text className="text-sm font-medium text-gray-700 mb-2 text-center">
-                Playback Recorded Audio
+                {t('marketPrices.playbackRecordedAudio')}
               </Text>
               <VoicePlayer
                 base64Audio={audioBase64}
@@ -244,11 +246,11 @@ export const GovernmentSchemesScreen: React.FC = () => {
                 onPause={() => console.log('Paused audio playback')}
                 onError={(error) => {
                   console.error('Audio playback error:', error);
-                  Alert.alert('Playback Error', 'Failed to play the recorded audio.');
+                  Alert.alert(t('marketPrices.playbackError'), t('marketPrices.playbackErrorMessage'));
                 }}
-                playButtonText="▶ Play Recording"
-                pauseButtonText="⏸ Pause"
-                replayButtonText="🔄 Replay"
+                playButtonText={t('marketPrices.playRecording')}
+                pauseButtonText={t('marketPrices.pause')}
+                replayButtonText={t('marketPrices.replay')}
                 customStyles={{
                   container: { marginVertical: 10 },
                   button: {
@@ -265,7 +267,7 @@ export const GovernmentSchemesScreen: React.FC = () => {
         {audioBase64 && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Recorded Audio (Base64):
+              {t('marketPrices.recordedAudioBase64')}
             </Text>
             <View className="bg-gray-100 p-4 rounded-lg">
               <Text className="text-xs font-mono text-gray-700 leading-5">
@@ -276,7 +278,7 @@ export const GovernmentSchemesScreen: React.FC = () => {
               </Text>
               {audioBase64.length > 200 && (
                 <Text className="text-xs text-gray-500 mt-2">
-                  Full length: {audioBase64.length} characters
+                  {t('marketPrices.fullLength')}: {audioBase64.length} {t('marketPrices.characters')}
                 </Text>
               )}
             </View>
@@ -286,7 +288,7 @@ export const GovernmentSchemesScreen: React.FC = () => {
         {transcription && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Transcription:
+              {t('marketPrices.transcription')}
             </Text>
             <View className="bg-blue-50 p-4 rounded-lg">
               <Text className="text-sm text-gray-700">
@@ -299,7 +301,7 @@ export const GovernmentSchemesScreen: React.FC = () => {
         {response && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Response:
+              {t('marketPrices.response')}
             </Text>
             <View className="bg-green-50 p-4 rounded-lg">
               <Text className="text-sm text-gray-700">
