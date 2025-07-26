@@ -15,6 +15,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   onRecordingStart,
   onRecordingStop,
   onError,
+  disabled = false,
   customStyles = {},
   buttonText = 'Start Recording',
   recordingText = 'Recording...',
@@ -210,7 +211,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       <TouchableOpacity
         style={buttonStyle}
         onPress={toggleRecording}
-        disabled={permissionStatus === 'denied'}
+        disabled={permissionStatus === 'denied' || disabled}
         activeOpacity={0.8}
       >
         <Text style={textStyle}>{displayText}</Text>

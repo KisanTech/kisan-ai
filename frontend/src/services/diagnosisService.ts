@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './baseApiService';
+import { DIAGNOSIS_API_BASE_URL } from './baseApiService';
 
 // Diagnosis API Endpoints
 const DIAGNOSIS_ENDPOINTS = {
@@ -59,7 +59,7 @@ class DiagnosisService {
       }
 
       // Construct full URL
-      const url = `${API_BASE_URL}${DIAGNOSIS_ENDPOINTS.CROP_DIAGNOSE}`;
+      const url = `${DIAGNOSIS_API_BASE_URL}${DIAGNOSIS_ENDPOINTS.CROP_DIAGNOSE}`;
 
       // @ts-ignore - FormData._parts is React Native specific
       if (formData._parts) {

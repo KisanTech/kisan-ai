@@ -25,7 +25,7 @@ export const API_ENDPOINTS = {
   CROP_DIAGNOSE: '/crop/diagnose',
 
   // Voice Interface
-  SPEECH_TO_TEXT: '/voice/speech-to-text',
+  SPEECH_TO_TEXT: '/speech/transcribe',
   TEXT_TO_SPEECH: '/voice/text-to-speech',
   VOICE_QUERY: '/voice/voice-query',
   TEXT_CHAT: '/voice/text-chat',

@@ -1,4 +1,4 @@
-import { baseApiClient } from './baseApiService';
+import { voiceChatApiClient } from './baseApiService';
 
 export interface ChatMessage {
   id: string;
@@ -36,7 +36,7 @@ export class VoiceChatService {
    */
   async sendTextMessage(message: string, language: string = 'en'): Promise<TextChatResponse> {
     try {
-      const response = await baseApiClient.post('/voice/text-chat', {
+      const response = await voiceChatApiClient.post('/voice/text-chat', {
         message,
         language,
       });
@@ -54,21 +54,14 @@ export class VoiceChatService {
   }
 
   /**
-   * Send audio file to voice interface API
+   * Send audio data to voice interface API using base64 encoding
    */
-  async sendVoiceMessage(audioUri: string): Promise<VoiceQueryResponse> {
+  async sendVoiceMessage(base64Audio: string, languageCode: string = 'kn-IN'): Promise<VoiceQueryResponse> {
     try {
-      const formData = new FormData();
-      formData.append('audio', {
-        uri: audioUri,
-        type: 'audio/pcm',
-        name: 'voice_message.pcm',
-      } as any);
-
-      const response = await baseApiClient.post('/voice/voice-query', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await voiceChatApiClient.post('/voice/voice-query', {
+        audio_data: base64Audio,
+        audio_encoding: 'MP3',
+        language_code: languageCode,
       });
 
       return response.data;
@@ -87,24 +80,23 @@ export class VoiceChatService {
   }
 
   /**
-   * Convert speech to text
+   * Convert speech to text using base64 audio data
    */
-  async speechToText(audioUri: string): Promise<SpeechToTextResponse> {
+  async speechToText(base64Audio: string, languageCode: string = 'hi-IN'): Promise<SpeechToTextResponse> {
     try {
-      const formData = new FormData();
-      formData.append('audio', {
-        uri: audioUri,
-        type: 'audio/pcm',
-        name: 'speech.pcm',
-      } as any);
-
-      const response = await baseApiClient.post('/voice/speech-to-text', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      console.log('Speech to text request received', base64Audio);
+      const response = await voiceChatApiClient.post('/speech/speech/transcribe', {
+        audio_data: base64Audio,
+        audio_encoding: 'MP3',
+        language_code: languageCode,
       });
-
-      return response.data;
+      console.log('Speech to text response:', response.data);
+      return {
+        transcription: response.data.transcription || '',
+        translation: response.data.translation || '',
+        confidence: response.data.confidence || 0,
+        language: response.data.detected_language || languageCode,
+      };
     } catch (error) {
       console.error('Speech to text error:', error);
       throw error;

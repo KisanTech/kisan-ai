@@ -39,6 +39,7 @@ export interface VoiceRecorderProps {
   onRecordingStart?: () => void;
   onRecordingStop?: () => void;
   onError?: (error: string) => void;
+  disabled?: boolean;
   customStyles?: {
     container?: object;
     button?: object;

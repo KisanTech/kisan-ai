@@ -2,8 +2,11 @@ import axios, { AxiosInstance } from 'axios';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
+// Service types
+export type ServiceType = 'diagnosis' | 'voiceChat' | 'default';
+
 // API Configuration
-const getApiUrl = (): string => {
+const getApiUrl = (serviceType: ServiceType = 'default'): string => {
   // Get API URL from app.json extra config or use default
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
 
@@ -11,25 +14,40 @@ const getApiUrl = (): string => {
     return apiUrl;
   }
 
-  // Fallback URLs for development
+  // Fallback URLs for development based on service type
   if (__DEV__) {
-    if (Platform.OS === 'android') {
-      return 'http://10.0.2.2:8000/api/v1'; // Android emulator localhost
-    } else {
-      return 'http://localhost:8000/api/v1'; // iOS simulator localhost
+    const baseUrl = Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1';
+    
+    switch (serviceType) {
+      case 'diagnosis':
+        return `http://${baseUrl}:8000/api/v1`;
+      case 'voiceChat':
+        return `http://${baseUrl}:8100/api/v1`;
+      default:
+        return `http://${baseUrl}:8100/api/v1`;
     }
   }
 
-  // Production URL (update this when deployed)
-  return 'https://your-production-api.com/api/v1';
+  // Production URLs (update these when deployed)
+  switch (serviceType) {
+    case 'diagnosis':
+      return 'http://127.0.0.1:8000/api/v1';
+    case 'voiceChat':
+      return 'http://127.0.0.1:8100/api/v1';
+    default:
+      return 'http://127.0.0.1:8100/api/v1';
+  }
 };
 
-export const API_BASE_URL = getApiUrl();
+// Export individual service URLs
+export const DIAGNOSIS_API_BASE_URL = getApiUrl('diagnosis');
+export const VOICE_CHAT_API_BASE_URL = getApiUrl('voiceChat');
+export const API_BASE_URL = getApiUrl('default'); // Keep for backward compatibility
 
 // Create base axios instance with shared configuration
-const createBaseApiClient = (): AxiosInstance => {
+const createBaseApiClient = (serviceType: ServiceType = 'default'): AxiosInstance => {
   const client = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: getApiUrl(serviceType),
     timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
@@ -44,6 +62,7 @@ const createBaseApiClient = (): AxiosInstance => {
       // if (token) {
       //   config.headers.Authorization = `Bearer ${token}`;
       // }
+      console.log(`${serviceType} service request config:`, config.baseURL);
       return config;
     },
     error => {
@@ -58,7 +77,7 @@ const createBaseApiClient = (): AxiosInstance => {
     },
     error => {
       // Handle common errors here
-      console.error('API Error:', error.response?.data || error.message);
+      console.error(`${serviceType} service API Error:`, error.response?.data || error.message);
       return Promise.reject(error);
     }
   );
@@ -66,7 +85,11 @@ const createBaseApiClient = (): AxiosInstance => {
   return client;
 };
 
-// Export the base API client instance
+// Create service-specific API clients
+export const diagnosisApiClient = createBaseApiClient('diagnosis');
+export const voiceChatApiClient = createBaseApiClient('voiceChat');
+
+// Export the base API client instance (default)
 export const baseApiClient = createBaseApiClient();
 
 // Export factory function for creating new instances if needed

@@ -2,45 +2,57 @@ import React, { useState } from 'react';
 import { SafeAreaView, Text, View, ScrollView, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { VoiceRecorder } from '../components/VoiceRecorder';
+import { voiceChatService } from '../services/voiceChatService';
 
 export const MarketPricesScreen: React.FC = () => {
   const [audioBase64, setAudioBase64] = useState<string>('');
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingStatus, setRecordingStatus] = useState<string>('Ready to record');
-  const [savedFilePath, setSavedFilePath] = useState<string>('');
+  const [transcription, setTranscription] = useState<string>('');
+  const [response, setResponse] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const handleAudioRecorded = async (base64Audio: string) => {
     setAudioBase64(base64Audio);
-    
-    setRecordingStatus('Processing and saving recording...');
+    setIsProcessing(true);
+    setRecordingStatus('Processing audio...');
 
     try {
-      // Create a unique filename with timestamp
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const fileName = `voice_recording_${timestamp}.wav`;
-      const filePath = `${FileSystem.documentDirectory}${fileName}`;
-
-      // Save the base64 audio data to a local file
-      await FileSystem.writeAsStringAsync(filePath, base64Audio, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      setSavedFilePath(filePath);
-      setRecordingStatus('Recording saved successfully!');
+      // Send audio to speech-to-text API
+      const speechResult = await voiceChatService.speechToText(base64Audio, 'hi-IN');
       
-      console.log('Audio file saved to:', filePath);
+      setTranscription(speechResult.transcription);
+      setRecordingStatus('Audio transcribed successfully!');
       
-      // Show success alert with file location
-      Alert.alert(
-        'Recording Saved', 
-        `Audio file saved to:\n${fileName}`,
-        [{ text: 'OK' }]
-      );
+      console.log('Transcription:', speechResult.transcription);
+      console.log('Translation:', speechResult.translation);
+      console.log('Confidence:', speechResult.confidence);
+      
+      // Optionally, send the transcribed text to get AI response
+      if (speechResult.transcription) {
+        setRecordingStatus('Getting AI response...');
+        const aiResponse = await voiceChatService.sendTextMessage(
+          speechResult.transcription, 
+          'kn-IN'
+        );
+        
+        setResponse(aiResponse.response_text);
+        setRecordingStatus('Response received!');
+        
+        // Show success alert with transcription and response
+        Alert.alert(
+          'Voice Processing Complete', 
+          `Transcription: ${speechResult.transcription}\n\nResponse: ${aiResponse.response_text}`,
+          [{ text: 'OK' }]
+        );
+      }
 
     } catch (error) {
-      console.error('Failed to save audio file:', error);
-      setRecordingStatus('Error: Failed to save recording');
-      Alert.alert('Save Error', 'Failed to save the audio file to device storage.');
+      console.error('Failed to process audio:', error);
+      setRecordingStatus('Error: Failed to process audio');
+      Alert.alert('Processing Error', 'Failed to process the audio. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -48,7 +60,6 @@ export const MarketPricesScreen: React.FC = () => {
     setIsRecording(true);
     setRecordingStatus('Recording in progress...');
     setAudioBase64(''); // Clear previous recording
-    setSavedFilePath(''); // Clear previous file path
   };
 
   const handleRecordingStop = () => {
@@ -80,7 +91,8 @@ export const MarketPricesScreen: React.FC = () => {
             onRecordingStart={handleRecordingStart}
             onRecordingStop={handleRecordingStop}
             onError={handleRecordingError}
-            buttonText="🎤 Start Recording"
+            disabled={isProcessing}
+            buttonText={isProcessing ? "🔄 Processing..." : "🎤 Start Recording"}
             recordingText="🔴 Recording..."
             customStyles={{
               container: { marginVertical: 20 },
@@ -88,6 +100,7 @@ export const MarketPricesScreen: React.FC = () => {
                 paddingHorizontal: 32,
                 paddingVertical: 16,
                 borderRadius: 30,
+                opacity: isProcessing ? 0.6 : 1,
               },
             }}
           />
@@ -97,9 +110,18 @@ export const MarketPricesScreen: React.FC = () => {
           <Text className="text-lg font-semibold text-foreground mb-2">
             Status:
           </Text>
-          <Text className={`text-sm ${isRecording ? 'text-red-600' : 'text-gray-600'}`}>
+          <Text className={`text-sm ${
+            isRecording ? 'text-red-600' : 
+            isProcessing ? 'text-blue-600' : 
+            'text-gray-600'
+          }`}>
             {recordingStatus}
           </Text>
+          {isProcessing && (
+            <Text className="text-xs text-blue-500 mt-1">
+              Please wait while we process your audio...
+            </Text>
+          )}
         </View>
 
         {audioBase64 && (
@@ -123,42 +145,27 @@ export const MarketPricesScreen: React.FC = () => {
           </View>
         )}
 
-        {audioBase64 && (
+        {transcription && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Audio Info:
+              Transcription:
             </Text>
             <View className="bg-blue-50 p-4 rounded-lg">
               <Text className="text-sm text-gray-700">
-                ✅ Audio recorded successfully
-              </Text>
-              <Text className="text-sm text-gray-700">
-                📊 Size: {Math.round(audioBase64.length * 0.75)} bytes (estimated)
-              </Text>
-              <Text className="text-sm text-gray-700">
-                🔢 Base64 length: {audioBase64.length} characters
+                {transcription}
               </Text>
             </View>
           </View>
         )}
 
-        {savedFilePath && (
+        {response && (
           <View className="mb-6">
             <Text className="text-lg font-semibold text-foreground mb-2">
-              Saved File:
+              Response:
             </Text>
             <View className="bg-green-50 p-4 rounded-lg">
               <Text className="text-sm text-gray-700">
-                💾 File saved to device storage
-              </Text>
-              <Text className="text-xs font-mono text-gray-600 mt-2">
-                {savedFilePath}
-              </Text>
-              <Text className="text-xs text-gray-500 mt-2">
-                📁 Location: Documents directory
-              </Text>
-              <Text className="text-xs text-gray-500">
-                🎵 Format: WAV audio file
+                {response}
               </Text>
             </View>
           </View>
