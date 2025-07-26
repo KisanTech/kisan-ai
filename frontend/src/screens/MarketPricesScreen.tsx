@@ -12,7 +12,6 @@ export const MarketPricesScreen: React.FC = () => {
   const { currentLanguage } = useLanguage();
   const [audioBase64, setAudioBase64] = useState<string>('');
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [recordingStatus, setRecordingStatus] = useState<string>(t('marketPrices.readyToRecord'));
   const [userQuestion, setUserQuestion] = useState<string>('');
   const [response, setResponse] = useState<string>('');
   const [responseAudioData, setResponseAudioData] = useState<string>('');
@@ -21,7 +20,6 @@ export const MarketPricesScreen: React.FC = () => {
   const handleAudioRecorded = async (base64Audio: string) => {
     setAudioBase64(base64Audio);
     setIsProcessing(true);
-    setRecordingStatus(t('marketPrices.processingAudio'));
 
     try {
       // Get language codes based on current language
@@ -35,27 +33,18 @@ export const MarketPricesScreen: React.FC = () => {
         setUserQuestion(speechResult.original_transcript);
         setResponse(speechResult.agent_response_translated);
         setResponseAudioData(speechResult.response_audio_data);
-        setRecordingStatus(t('marketPrices.responseReceived'));
         
         console.log('Original Transcript:', speechResult.original_transcript);
         console.log('Translated Text:', speechResult.translated_text);
         console.log('Agent Response:', speechResult.agent_response);
         console.log('Agent Response Translated:', speechResult.agent_response_translated);
         console.log('Confidence:', speechResult.transcription_confidence);
-        
-        // Show success alert with user question and response
-        Alert.alert(
-          t('marketPrices.voiceProcessingComplete'), 
-          `${t('marketPrices.userQuestion')} ${speechResult.original_transcript}\n\n${t('marketPrices.response')} ${speechResult.agent_response_translated}`,
-          [{ text: t('common.ok') }]
-        );
       } else {
         throw new Error(speechResult.error || 'Unknown error occurred');
       }
 
     } catch (error) {
       console.error('Failed to process audio:', error);
-      setRecordingStatus(t('marketPrices.errorProcessAudio'));
       Alert.alert(t('marketPrices.processingError'), t('marketPrices.processingErrorMessage'));
     } finally {
       setIsProcessing(false);
@@ -64,18 +53,15 @@ export const MarketPricesScreen: React.FC = () => {
 
   const handleRecordingStart = () => {
     setIsRecording(true);
-    setRecordingStatus(t('marketPrices.recordingInProgress'));
     setAudioBase64(''); // Clear previous recording
   };
 
   const handleRecordingStop = () => {
     setIsRecording(false);
-    setRecordingStatus(t('marketPrices.processingRecording'));
   };
 
   const handleRecordingError = (error: string) => {
     setIsRecording(false);
-    setRecordingStatus(`${t('marketPrices.errorProcessAudio')}: ${error}`);
     Alert.alert(t('marketPrices.recordingError'), error);
   };
 
@@ -97,9 +83,6 @@ export const MarketPricesScreen: React.FC = () => {
             <Text className="text-lg font-semibold text-foreground mb-2">
               {t('marketPrices.voiceAssistant')}
             </Text>
-            <Text className="text-sm text-gray-600 text-center">
-              {t('marketPrices.voiceSubtitle')}
-            </Text>
           </View>
 
           <View className="items-center">
@@ -109,7 +92,7 @@ export const MarketPricesScreen: React.FC = () => {
               onRecordingStop={handleRecordingStop}
               onError={handleRecordingError}
               disabled={isProcessing}
-              buttonText={isProcessing ? t('marketPrices.processing') : t('marketPrices.startRecording')}
+              buttonText={isProcessing ? t('marketPrices.processing') : t('marketPrices.pleaseAskQuery')}
               recordingText={t('marketPrices.recording')}
               customStyles={{
                 container: { marginVertical: 20 },
@@ -122,25 +105,68 @@ export const MarketPricesScreen: React.FC = () => {
               }}
             />
           </View>
-
-          <View className="mb-2">
-            <Text className="text-lg font-semibold text-foreground mb-2">
-              {t('marketPrices.status')}:
-            </Text>
-            <Text className={`text-sm ${
-              isRecording ? 'text-red-600' : 
-              isProcessing ? 'text-blue-600' : 
-              'text-gray-600'
-            }`}>
-              {recordingStatus}
-            </Text>
-            {isProcessing && (
-              <Text className="text-xs text-blue-500 mt-1">
-                {t('marketPrices.pleaseWait')}
-              </Text>
-            )}
-          </View>
         </View>
+
+        {/* Recording Results Section - Moved to top */}
+        {responseAudioData && (
+          <View className="mb-8">
+            <Text className="text-lg font-semibold text-foreground mb-4">
+              {t('marketPrices.recordingResults')}
+            </Text>
+            
+            <View className="mb-4">
+              <Text className="text-sm font-medium text-gray-700 mb-2 text-center">
+                {t('marketPrices.playResponseAudio')}
+              </Text>
+              <VoicePlayer
+                base64Audio={responseAudioData}
+                onPlay={() => console.log('Playing response audio')}
+                onPause={() => console.log('Paused response audio playback')}
+                onError={(error) => {
+                  console.error('Response audio playback error:', error);
+                  Alert.alert(t('marketPrices.playbackError'), t('marketPrices.playbackErrorMessage'));
+                }}
+                playButtonText={t('marketPrices.playResponse')}
+                pauseButtonText={t('marketPrices.pause')}
+                replayButtonText={t('marketPrices.replay')}
+                customStyles={{
+                  container: { marginVertical: 10 },
+                  button: {
+                    paddingHorizontal: 24,
+                    paddingVertical: 12,
+                    borderRadius: 25,
+                  },
+                }}
+              />
+            </View>
+          </View>
+        )}
+
+        {userQuestion && (
+          <View className="mb-6">
+            <Text className="text-lg font-semibold text-foreground mb-2">
+              {t('marketPrices.userQuestion')}
+            </Text>
+            <View className="bg-blue-50 p-4 rounded-lg">
+              <Text className="text-sm text-gray-700">
+                {userQuestion}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {response && (
+          <View className="mb-6">
+            <Text className="text-lg font-semibold text-foreground mb-2">
+              {t('marketPrices.response')}
+            </Text>
+            <View className="bg-green-50 p-4 rounded-lg">
+              <Text className="text-sm text-gray-700">
+                {response}
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Feature Information Cards */}
         <View className="mb-8">
@@ -218,88 +244,6 @@ export const MarketPricesScreen: React.FC = () => {
             </View>
           </View>
         </View>
-
-        {/* Recording Results Section */}
-        {responseAudioData && (
-          <View className="mt-8">
-            <Text className="text-lg font-semibold text-foreground mb-4">
-              {t('marketPrices.recordingResults')}
-            </Text>
-            
-            <View className="mb-4">
-              <Text className="text-sm font-medium text-gray-700 mb-2 text-center">
-                {t('marketPrices.playResponseAudio')}
-              </Text>
-              <VoicePlayer
-                base64Audio={responseAudioData}
-                onPlay={() => console.log('Playing response audio')}
-                onPause={() => console.log('Paused response audio playback')}
-                onError={(error) => {
-                  console.error('Response audio playback error:', error);
-                  Alert.alert(t('marketPrices.playbackError'), t('marketPrices.playbackErrorMessage'));
-                }}
-                playButtonText={t('marketPrices.playResponse')}
-                pauseButtonText={t('marketPrices.pause')}
-                replayButtonText={t('marketPrices.replay')}
-                customStyles={{
-                  container: { marginVertical: 10 },
-                  button: {
-                    paddingHorizontal: 24,
-                    paddingVertical: 12,
-                    borderRadius: 25,
-                  },
-                }}
-              />
-            </View>
-          </View>
-        )}
-
-        {audioBase64 && (
-          <View className="mb-6">
-            <Text className="text-lg font-semibold text-foreground mb-2">
-              {t('marketPrices.recordedAudioBase64')}
-            </Text>
-            <View className="bg-gray-100 p-4 rounded-lg">
-              <Text className="text-xs font-mono text-gray-700 leading-5">
-                {audioBase64.length > 200 
-                  ? `${audioBase64.substring(0, 200)}...` 
-                  : audioBase64
-                }
-              </Text>
-              {audioBase64.length > 200 && (
-                <Text className="text-xs text-gray-500 mt-2">
-                  {t('marketPrices.fullLength')}: {audioBase64.length} {t('marketPrices.characters')}
-                </Text>
-              )}
-            </View>
-          </View>
-        )}
-
-        {userQuestion && (
-          <View className="mb-6">
-            <Text className="text-lg font-semibold text-foreground mb-2">
-              {t('marketPrices.userQuestion')}
-            </Text>
-            <View className="bg-blue-50 p-4 rounded-lg">
-              <Text className="text-sm text-gray-700">
-                {userQuestion}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {response && (
-          <View className="mb-6">
-            <Text className="text-lg font-semibold text-foreground mb-2">
-              {t('marketPrices.response')}
-            </Text>
-            <View className="bg-green-50 p-4 rounded-lg">
-              <Text className="text-sm text-gray-700">
-                {response}
-              </Text>
-            </View>
-          </View>
-        )}
 
         {/* Bottom spacing */}
         <View className="h-8" />
