@@ -78,35 +78,149 @@ export const MarketPricesScreen: React.FC = () => {
       <ScrollView className="flex-1 p-4">
         <View className="items-center mb-8">
           <Text className="text-2xl font-bold text-foreground tracking-tighter mb-2">
-            Market Prices
+            📈 Market Prices
           </Text>
           <Text className="text-sm text-gray-600 text-center">
-            Record your voice to get market price information
+            Get real-time crop prices, market trends, and agricultural insights
           </Text>
         </View>
 
-        <View className="items-center mb-6">
-          <VoiceRecorder
-            onAudioRecorded={handleAudioRecorded}
-            onRecordingStart={handleRecordingStart}
-            onRecordingStop={handleRecordingStop}
-            onError={handleRecordingError}
-            disabled={isProcessing}
-            buttonText={isProcessing ? "🔄 Processing..." : "🎤 Start Recording"}
-            recordingText="🔴 Recording..."
-            customStyles={{
-              container: { marginVertical: 20 },
-              button: { 
-                paddingHorizontal: 32,
-                paddingVertical: 16,
-                borderRadius: 30,
-                opacity: isProcessing ? 0.6 : 1,
-              },
-            }}
-          />
+        {/* Voice Recording Section */}
+        <View className="bg-white border border-gray-200 rounded-lg p-4 mb-8">
+          <View className="items-center mb-4">
+            <Text className="text-lg font-semibold text-foreground mb-2">
+              🎤 Voice Assistant
+            </Text>
+            <Text className="text-sm text-gray-600 text-center">
+              Speak in Hindi or Kannada to get instant market information
+            </Text>
+          </View>
+
+          <View className="items-center">
+            <VoiceRecorder
+              onAudioRecorded={handleAudioRecorded}
+              onRecordingStart={handleRecordingStart}
+              onRecordingStop={handleRecordingStop}
+              onError={handleRecordingError}
+              disabled={isProcessing}
+              buttonText={isProcessing ? "🔄 Processing..." : "🎤 Start Recording"}
+              recordingText="🔴 Recording..."
+              customStyles={{
+                container: { marginVertical: 20 },
+                button: { 
+                  paddingHorizontal: 32,
+                  paddingVertical: 16,
+                  borderRadius: 30,
+                  opacity: isProcessing ? 0.6 : 1,
+                },
+              }}
+            />
+          </View>
+
+          <View className="mb-2">
+            <Text className="text-lg font-semibold text-foreground mb-2">
+              Status:
+            </Text>
+            <Text className={`text-sm ${
+              isRecording ? 'text-red-600' : 
+              isProcessing ? 'text-blue-600' : 
+              'text-gray-600'
+            }`}>
+              {recordingStatus}
+            </Text>
+            {isProcessing && (
+              <Text className="text-xs text-blue-500 mt-1">
+                Please wait while we process your audio...
+              </Text>
+            )}
+          </View>
+        </View>
+
+        {/* Feature Information Cards */}
+        <View className="mb-8">
+          <Text className="text-lg font-semibold text-foreground mb-4">
+            What You Can Get:
+          </Text>
           
-          {audioBase64 && (
-            <View className="mt-4">
+          <View className="space-y-4">
+            {/* Current Prices Card */}
+            <View className="bg-green-50 border border-green-200 rounded-lg p-4 flex-row items-start">
+              <Text className="text-2xl mr-3">💰</Text>
+              <View className="flex-1">
+                <Text className="text-base font-semibold text-green-800 mb-1">
+                  Current Crop Prices
+                </Text>
+                <Text className="text-sm text-green-700">
+                  Get today's market rates for rice, wheat, sugarcane, cotton, and other major crops across different mandis and regions.
+                </Text>
+              </View>
+            </View>
+
+            {/* Price Trends Card */}
+            <View className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex-row items-start">
+              <Text className="text-2xl mr-3">📊</Text>
+              <View className="flex-1">
+                <Text className="text-base font-semibold text-blue-800 mb-1">
+                  Price Trends & Analytics
+                </Text>
+                <Text className="text-sm text-blue-700">
+                  Understand price movements over weeks and months. Identify the best time to sell your harvest for maximum profit.
+                </Text>
+              </View>
+            </View>
+
+            {/* Market Insights Card */}
+            <View className="bg-purple-50 border border-purple-200 rounded-lg p-4 flex-row items-start">
+              <Text className="text-2xl mr-3">🎯</Text>
+              <View className="flex-1">
+                <Text className="text-base font-semibold text-purple-800 mb-1">
+                  Market Insights
+                </Text>
+                <Text className="text-sm text-purple-700">
+                  Get advice on which crops are in high demand, seasonal price patterns, and market conditions in your area.
+                </Text>
+              </View>
+            </View>
+
+            {/* Regional Comparison Card */}
+            <View className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex-row items-start">
+              <Text className="text-2xl mr-3">🗺️</Text>
+              <View className="flex-1">
+                <Text className="text-base font-semibold text-orange-800 mb-1">
+                  Regional Price Comparison
+                </Text>
+                <Text className="text-sm text-orange-700">
+                  Compare prices across different markets and find the best places to sell your produce for better returns.
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Sample Questions */}
+        <View className="mb-8">
+          <Text className="text-lg font-semibold text-foreground mb-4">
+            💬 Ask Questions Like:
+          </Text>
+          <View className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <View className="space-y-3">
+              <Text className="text-sm text-gray-700">• "What is today's rice price in Bangalore mandi?"</Text>
+              <Text className="text-sm text-gray-700">• "Show me cotton price trends for this month"</Text>
+              <Text className="text-sm text-gray-700">• "Which crops have the best prices right now?"</Text>
+              <Text className="text-sm text-gray-700">• "Compare wheat prices in different districts"</Text>
+              <Text className="text-sm text-gray-700">• "When is the best time to sell my sugarcane?"</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Recording Results Section */}
+        {audioBase64 && (
+          <View className="mt-8">
+            <Text className="text-lg font-semibold text-foreground mb-4">
+              📱 Recording Results
+            </Text>
+            
+            <View className="mb-4">
               <Text className="text-sm font-medium text-gray-700 mb-2 text-center">
                 Playback Recorded Audio
               </Text>
@@ -131,26 +245,8 @@ export const MarketPricesScreen: React.FC = () => {
                 }}
               />
             </View>
-          )}
-        </View>
-
-        <View className="mb-6">
-          <Text className="text-lg font-semibold text-foreground mb-2">
-            Status:
-          </Text>
-          <Text className={`text-sm ${
-            isRecording ? 'text-red-600' : 
-            isProcessing ? 'text-blue-600' : 
-            'text-gray-600'
-          }`}>
-            {recordingStatus}
-          </Text>
-          {isProcessing && (
-            <Text className="text-xs text-blue-500 mt-1">
-              Please wait while we process your audio...
-            </Text>
-          )}
-        </View>
+          </View>
+        )}
 
         {audioBase64 && (
           <View className="mb-6">
@@ -198,6 +294,9 @@ export const MarketPricesScreen: React.FC = () => {
             </View>
           </View>
         )}
+
+        {/* Bottom spacing */}
+        <View className="h-8" />
       </ScrollView>
     </SafeAreaView>
   );
