@@ -371,6 +371,38 @@ wheels = [
 ]
 
 [[package]]
+name = "google-cloud-texttospeech"
+version = "2.27.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "google-api-core", extra = ["grpc"] },
+    { name = "google-auth" },
+    { name = "proto-plus" },
+    { name = "protobuf" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3b/65/0873b430c2ad885bde9649bfcdc9e87dca0ad400da4ff1495f62911baa36/google_cloud_texttospeech-2.27.0.tar.gz", hash = "sha256:94a382c95b7cc58efd2505a24c2968e2614fc6bdf9d76fb9a819d4ed29ae188e", size = 182332, upload-time = "2025-05-08T20:46:42.116Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d8/40/1560257fb77b601c0801b370411e0b849b278a90e6232b46c5b84489fb67/google_cloud_texttospeech-2.27.0-py3-none-any.whl", hash = "sha256:0f7c5fe05281beb6d005ea191f61c913085e8439e5ffd2d5d21e29d106150b54", size = 189408, upload-time = "2025-05-08T20:46:40.733Z" },
+]
+
+[[package]]
+name = "google-cloud-translate"
+version = "3.21.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "google-api-core", extra = ["grpc"] },
+    { name = "google-auth" },
+    { name = "google-cloud-core" },
+    { name = "grpc-google-iam-v1" },
+    { name = "proto-plus" },
+    { name = "protobuf" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/67/b6/392db496e84cc21e51cf068e3e35e4bf90ca7e78b0340e3bea24156f1953/google_cloud_translate-3.21.1.tar.gz", hash = "sha256:760f25e1b979fea6a59dca44ffc8a8dc708693c50ae37a39568ff1284c534be2", size = 265893, upload-time = "2025-07-02T15:24:41.353Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dc/cc/7d867218b8389ff150847931a9b2415a25e642b8072c3fe57b310f1400d4/google_cloud_translate-3.21.1-py3-none-any.whl", hash = "sha256:f7d74592c3be41ce308a2b88eed6b76ff0ebbd9f87ddac4523324a64fce94e61", size = 204113, upload-time = "2025-07-02T15:24:24.77Z" },
+]
+
+[[package]]
 name = "google-crc32c"
 version = "1.7.1"
 source = { registry = "https://pypi.org/simple" }
@@ -690,6 +722,8 @@ dependencies = [
     { name = "google-cloud-firestore" },
     { name = "google-cloud-speech" },
     { name = "google-cloud-storage" },
+    { name = "google-cloud-texttospeech" },
+    { name = "google-cloud-translate" },
     { name = "pillow" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -713,6 +747,8 @@ requires-dist = [
     { name = "google-cloud-firestore", specifier = ">=2.14.0" },
     { name = "google-cloud-speech", specifier = ">=2.22.0" },
     { name = "google-cloud-storage", specifier = ">=2.10.0" },
+    { name = "google-cloud-texttospeech", specifier = ">=2.27.0" },
+    { name = "google-cloud-translate", specifier = ">=3.12.0" },
     { name = "pillow", specifier = ">=10.1.0" },
     { name = "pydantic", specifier = ">=2.5.0" },
     { name = "pydantic-settings", specifier = ">=2.0.0" },
