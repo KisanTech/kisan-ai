@@ -10,6 +10,7 @@ from app.api.v1.crop_diagnosis import router as crop_diagnosis_router
 from app.api.v1.market_prices import router as market_router
 from app.api.v1.speech import router as speech_router
 from app.api.v1.translation import router as translation_router
+from app.api.v1.government_schemes import router as government_schemes_router
 from app.core.config import settings
 from app.models.market import APIInfo, HealthCheckResponse
 from app.utils.gcp.gcp_manager import gcp_manager
@@ -117,6 +118,7 @@ app.include_router(market_router, prefix="/api/v1/market", tags=["market-data"])
 app.include_router(crop_diagnosis_router, prefix="/api/v1/crop", tags=["crop-diagnosis"])
 app.include_router(speech_router, prefix="/api/v1/speech", tags=["speech"])
 app.include_router(translation_router, prefix="/api/v1/translation", tags=["translation"])
+app.include_router(government_schemes_router, prefix="/api/v1/government-schemes", tags=["government-schemes"])
 
 if __name__ == "__main__":
     import uvicorn
