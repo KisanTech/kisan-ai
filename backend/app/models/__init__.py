@@ -9,6 +9,17 @@ from .speech import (
     WordInfo,
 )
 
+from .translation import (
+    TranslationRequest,
+    BatchTranslationRequest,
+    TranslationResponse,
+    BatchTranslationResponse,
+    LanguageDetectionRequest,
+    LanguageDetectionResponse,
+    SupportedLanguage,
+    SupportedLanguagesResponse as TranslationSupportedLanguagesResponse,
+)
+
 __all__ = [
     "SpeechToTextRequest",
     "SpeechToTextResponse",
@@ -16,4 +27,12 @@ __all__ = [
     "AudioValidationResponse",
     "TranscriptionResult",
     "WordInfo",
+    "TranslationRequest",
+    "BatchTranslationRequest",
+    "TranslationResponse",
+    "BatchTranslationResponse",
+    "LanguageDetectionRequest",
+    "LanguageDetectionResponse",
+    "SupportedLanguage",
+    "TranslationSupportedLanguagesResponse",
 ]
