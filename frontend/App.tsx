@@ -9,7 +9,6 @@ import {
   DiagnosisResultScreen,
   MarketPricesScreen,
   GovernmentSchemesScreen,
-  VoiceChatScreen,
 } from './src/screens';
 import { NavigateBackButton } from './src/components';
 import { RootStackParamList } from './src/types/navigation';
@@ -55,14 +54,6 @@ export default function App() {
           component={GovernmentSchemesScreen}
           options={({ navigation }) => ({
             title: 'Government Schemes',
-            headerLeft: () => <NavigateBackButton navigation={navigation} />,
-          })}
-        />
-        <Stack.Screen
-          name="VoiceChat"
-          component={VoiceChatScreen}
-          options={({ navigation }) => ({
-            title: 'Voice Chat Assistant',
             headerLeft: () => <NavigateBackButton navigation={navigation} />,
           })}
         />
