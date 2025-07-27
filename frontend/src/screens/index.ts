@@ -5,3 +5,4 @@ export { DiagnosisResultScreen } from './crop-health-diagnosis/DiagnosisResultSc
 export { MarketPricesScreen } from './MarketPricesScreen';
 export { GovernmentSchemesScreen } from './GovernmentSchemesScreen';
 export { VoiceChatScreen } from './VoiceChatScreen';
+export { InstructionsScreen } from './InstructionsScreen';

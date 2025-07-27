@@ -134,6 +134,10 @@ export const VoiceChatScreen: React.FC = () => {
     try {
       const speechLanguageCode = getSpeechRecognitionCode(currentLanguage);
 
+      // Debug log to verify speech language code for text
+      console.log('💬 Text Chat - Current Language:', currentLanguage);
+      console.log('💬 Text Chat - Speech Language Code:', speechLanguageCode);
+
       // Use the new text invoke API
       const response = await voiceChatService.sendTextInvoke(userMessage, speechLanguageCode);
 
@@ -157,6 +161,10 @@ export const VoiceChatScreen: React.FC = () => {
     try {
       // Get language codes based on current language
       const speechLanguageCode = getSpeechRecognitionCode(currentLanguage);
+
+      // Debug log to verify speech language code
+      console.log('🎤 Voice Chat - Current Language:', currentLanguage);
+      console.log('🎤 Voice Chat - Speech Language Code:', speechLanguageCode);
 
       // Send audio to speech-to-text API
       const speechResult = await voiceChatService.speechToText(base64Audio, speechLanguageCode);

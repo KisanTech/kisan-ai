@@ -41,13 +41,46 @@
         "title": "Voice Chat Assistant",
         "subtitle": "Ask questions via voice"
       },
-      "farmAnalytics": {
-        "title": "My Farm Analytics",
-        "subtitle": "Track your farm data"
+      "instructions": {
+        "title": "Instructions to Use",
+        "subtitle": "Learn how to use features"
       },
-      "alerts": {
-        "title": "Alerts & Reminders",
-        "subtitle": "Important notifications"
+      "instructions": {
+        "title": "Instructions to Use",
+        "subtitle": "Learn how to use each feature step by step",
+        "cropHealth": {
+          "title": "Crop Health Diagnosis",
+          "step1": "Take a clear photo of your affected crop showing disease symptoms",
+          "step2": "Ensure good lighting and focus on damaged leaves, stems, or fruits",
+          "step3": "Tap 'Check Crop Health' to upload and analyze the image",
+          "step4": "Wait for AI analysis and translation to your selected language",
+          "step5": "Review detailed diagnosis including disease name, severity, and confidence",
+          "step6": "Follow treatment recommendations and prevention measures provided"
+        },
+        "marketPrices": {
+          "title": "Market Prices",
+          "step1": "Use voice recording to ask about crop prices in your preferred language",
+          "step2": "Speak clearly about specific crops like 'tomato price in Bangalore today'",
+          "step3": "Wait for speech recognition and AI agent response",
+          "step4": "Listen to the audio response or read the translated text",
+          "step5": "Get real-time pricing information and market insights"
+        },
+        "govSchemes": {
+          "title": "Government Schemes",
+          "step1": "Ask questions about agricultural government schemes using voice",
+          "step2": "Inquire about eligibility, benefits, or application processes",
+          "step3": "Get detailed information about various schemes available",
+          "step4": "Receive guidance on documentation and application steps",
+          "step5": "Access comprehensive scheme information in your language"
+        },
+        "voiceChat": {
+          "title": "Voice Chat Assistant",
+          "step1": "Start a conversation by tapping the voice chat feature",
+          "step2": "Either type your question or hold the mic button to record",
+          "step3": "Ask any agricultural questions in your preferred language",
+          "step4": "Receive AI-powered responses both in text and audio format",
+          "step5": "Continue the conversation for follow-up questions or clarifications"
+        }
       }
     },
     "quickActions": {
@@ -253,5 +286,42 @@
     "processingErrorMessage": "Failed to process your request. Please try again.",
     "recordingError": "Recording Error",
     "playbackError": "Playback Error"
+  },
+  "instructions": {
+    "title": "Instructions to Use",
+    "subtitle": "Learn how to use each feature step by step",
+    "cropHealth": {
+      "title": "Crop Health Diagnosis",
+      "step1": "Take a clear photo of your affected crop showing disease symptoms",
+      "step2": "Ensure good lighting and focus on damaged leaves, stems, or fruits",
+      "step3": "Tap 'Check Crop Health' to upload and analyze the image",
+      "step4": "Wait for AI analysis and translation to your selected language",
+      "step5": "Review detailed diagnosis including disease name, severity, and confidence",
+      "step6": "Follow treatment recommendations and prevention measures provided"
+    },
+    "marketPrices": {
+      "title": "Market Prices",
+      "step1": "Use voice recording to ask about crop prices in your preferred language",
+      "step2": "Speak clearly about specific crops like 'tomato price in Bangalore today'",
+      "step3": "Wait for speech recognition and AI agent response",
+      "step4": "Listen to the audio response or read the translated text",
+      "step5": "Get real-time pricing information and market insights"
+    },
+    "govSchemes": {
+      "title": "Government Schemes",
+      "step1": "Ask questions about agricultural government schemes using voice",
+      "step2": "Inquire about eligibility, benefits, or application processes",
+      "step3": "Get detailed information about various schemes available",
+      "step4": "Receive guidance on documentation and application steps",
+      "step5": "Access comprehensive scheme information in your language"
+    },
+    "voiceChat": {
+      "title": "Voice Chat Assistant",
+      "step1": "Start a conversation by tapping the voice chat feature",
+      "step2": "Either type your question or hold the mic button to record",
+      "step3": "Ask any agricultural questions in your preferred language",
+      "step4": "Receive AI-powered responses both in text and audio format",
+      "step5": "Continue the conversation for follow-up questions or clarifications"
+    }
   }
 }

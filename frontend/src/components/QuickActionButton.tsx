@@ -19,10 +19,10 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`w-full py-4 px-6 rounded-xl mb-3 ${buttonStyles}`}
+      className={`w-full py-4 px-4 rounded-xl ${buttonStyles}`}
       activeOpacity={0.8}
     >
-      <Text className={`text-center ${textStyles}`}>{title}</Text>
+      <Text className={`text-center text-sm ${textStyles}`}>{title}</Text>
     </TouchableOpacity>
   );
 };

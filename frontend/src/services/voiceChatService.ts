@@ -112,19 +112,16 @@ export class VoiceChatService {
   /**
    * Send text message to new text invoke API
    */
-  async sendTextInvoke(
-    textData: string,
-    userId: string = 'user123',
-    sessionId: string = 'session456',
-    languageCode: string = 'en-IN'
-  ): Promise<TextInvokeResponse> {
+  async sendTextInvoke(textData: string, languageCode: string): Promise<TextInvokeResponse> {
     try {
       console.log('Text invoke request received', textData);
 
       // Get session and user IDs from session service
       const userId = await sessionService.getUserId();
       const sessionId = await sessionService.getSessionId();
-
+      console.log('userId', userId);
+      console.log('sessionId', sessionId);
+      console.log('languageCode', languageCode);
       const response = await voiceChatApiClient.post('/invoke/text', {
         user_id: userId,
         session_id: sessionId,

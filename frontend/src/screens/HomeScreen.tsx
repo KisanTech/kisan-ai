@@ -48,18 +48,11 @@ const FEATURES: FeatureConfig[] = [
     screen: 'VoiceChat',
   },
   {
-    id: 'farm-analytics',
-    titleKey: 'home.features.farmAnalytics.title',
-    subtitleKey: 'home.features.farmAnalytics.subtitle',
-    iconName: 'chart-box',
-    screen: 'Home', // Placeholder
-  },
-  {
-    id: 'alerts',
-    titleKey: 'home.features.alerts.title',
-    subtitleKey: 'home.features.alerts.subtitle',
-    iconName: 'bell',
-    screen: 'Home', // Placeholder
+    id: 'instructions',
+    titleKey: 'home.features.instructions.title',
+    subtitleKey: 'home.features.instructions.subtitle',
+    iconName: 'help-circle',
+    screen: 'Instructions',
   },
 ];
 
@@ -138,34 +131,37 @@ export const HomeScreen: React.FC = () => {
             {t('home.sections.features')}
           </Text>
 
-          {/* Features Grid */}
-          <View className="flex-row flex-wrap justify-between">
+          {/* Features List - Single Column */}
+          <View style={{ gap: 20 }}>
             {FEATURES.map(feature => (
-              <View key={feature.id} style={{ width: '48%' }} className="mb-3">
-                <FeatureCard
-                  title={t(feature.titleKey)}
-                  subtitle={t(feature.subtitleKey)}
-                  iconName={feature.iconName}
-                  onPress={() => handleFeaturePress(feature)}
-                />
-              </View>
+              <FeatureCard
+                key={feature.id}
+                title={t(feature.titleKey)}
+                subtitle={t(feature.subtitleKey)}
+                iconName={feature.iconName}
+                onPress={() => handleFeaturePress(feature)}
+              />
             ))}
           </View>
         </View>
 
         {/* Quick Actions Section */}
-        <View className="px-6">
-          <Text className="text-lg font-bold text-foreground mb-4 tracking-tighter">
+        <View className="px-6 mt-6">
+          <Text className="text-lg font-bold text-foreground mb-6 tracking-tighter">
             {t('home.sections.quickActions')}
           </Text>
 
-          {QUICK_ACTIONS.map(action => (
-            <QuickActionButton
-              key={action.id}
-              title={t(action.titleKey)}
-              onPress={() => handleQuickAction(action.id)}
-            />
-          ))}
+          {/* Quick Actions - 2 Buttons Per Row */}
+          <View className="flex-row" style={{ gap: 24 }}>
+            {QUICK_ACTIONS.map(action => (
+              <View key={action.id} className="flex-1">
+                <QuickActionButton
+                  title={t(action.titleKey)}
+                  onPress={() => handleQuickAction(action.id)}
+                />
+              </View>
+            ))}
+          </View>
         </View>
       </ScrollView>
 

@@ -12,7 +12,7 @@ export const SUPPORTED_LANGUAGES: Language[] = [
     id: 'en',
     name: 'English',
     nativeName: 'English',
-    speechRecognitionCode: 'en-US',
+    speechRecognitionCode: 'en-IN',
     textApiCode: 'en',
   },
   {
