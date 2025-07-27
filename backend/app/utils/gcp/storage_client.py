@@ -6,14 +6,11 @@ Note: Typically accessed via GCPManager for singleton behavior.
 Direct instantiation is possible for testing or special cases.
 """
 
-from google.cloud import storage
-from google.cloud.storage import (
-    Bucket,
-    Client as StorageClient,
-)
-
 from app.core.config import settings
 from app.utils.logger import logger
+from google.cloud import storage
+from google.cloud.storage import Bucket
+from google.cloud.storage import Client as StorageClient
 
 
 class CloudStorageClient:
@@ -78,9 +75,11 @@ class CloudStorageClient:
         """Upload data to a blob"""
         try:
             blob = self.bucket.blob(destination_blob_name)
+            # Set content type properly before upload
             if content_type:
                 blob.content_type = content_type
-            blob.upload_from_string(source_data)
+            # Upload the data
+            blob.upload_from_string(source_data, content_type=content_type)
             logger.info("Uploaded blob", blob_name=destination_blob_name, bucket=self._bucket_name)
             return blob
         except Exception as e:

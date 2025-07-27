@@ -1,10 +1,10 @@
-import vertexai
 import os
-from google.genai import types
+
+import vertexai
+from app.agents.crop_diagnosis_agent.prompt import CROP_HEALTH_ANALYSIS_PROMPT
 from google.adk.agents import Agent
 from google.adk.tools import google_search
-from vertexai.preview.reasoning_engines import AdkApp
-from app.agents.crop_diagnosis_agent.prompt import CROP_HEALTH_ANALYSIS_PROMPT, INDIAN_AGRICULTURE_CONTEXT
+from google.genai import types
 
 vertexai.init(
     project=os.getenv("GOOGLE_CLOUD_PROJECT"),
@@ -19,16 +19,17 @@ safety_settings = [
     ),
 ]
 generate_content_config = types.GenerateContentConfig(
+    temperature=0.4,
+    top_p=0.95,
+    max_output_tokens=65535,
     safety_settings=safety_settings,
 )
 
 root_agent = Agent(
     name="crop_diagnosis_agent",
-    model="gemini-2.0-flash",
-    description="Advanced AI agronomist specializing in crop disease diagnosis with localized treatment recommendations",
-    instruction=CROP_HEALTH_ANALYSIS_PROMPT + "\n\n" + INDIAN_AGRICULTURE_CONTEXT,
+    model="gemini-2.5-flash",
+    description="Advanced AI assistant specializing in crop disease diagnosis with localized treatment recommendations",
+    instruction=CROP_HEALTH_ANALYSIS_PROMPT,
     generate_content_config=generate_content_config,
     tools=[google_search],
 )
-
-app = AdkApp(agent=root_agent)
