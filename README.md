@@ -1,159 +1,217 @@
 # Kisan AI 🌾 - AI-Powered Agricultural Assistant
 
-## Overview
-Kisan AI is a mono-repo for an AI-powered agricultural assistant designed for Indian farmers. Built for a 30-hour hackathon with Google Cloud Vertex AI, focusing on crop disease diagnosis, Kannada voice interface, and real-time market intelligence.
+## 🚀 Demo & Overview
 
-## Architecture
+**Kisan AI** is an AI-powered agricultural assistant designed specifically for Indian farmers. Our mobile application provides crop disease diagnosis, Kannada voice interface, market intelligence, and government scheme information - all powered by Google Cloud Vertex AI and Gemini 2.0.
 
-- **backend/**: FastAPI (Python 3.13) + Multi-Agent AI System
-- **frontend/**: React Native (Expo + NativeWind/Tailwind CSS)
-- **docs/**: Project documentation and specifications
+### 📱 Live Demo
+🔗 **[Watch Mobile App Demo](DEMO_LINK_HERE)** *(Add your demo link here)*
 
-## Folder Structure
+### 🎯 Key Features
+- **🔍 Crop Disease Diagnosis** - AI-powered image analysis using Gemini 2.0 Flash
+- **🗣️ Voice Interface** - Hindi speech-to-text and text-to-speech
+- **📈 Real-time Market Prices** - Live commodity pricing data
+- **🏛️ Government Schemes** - Information about agricultural schemes and subsidies
+
+## 🏗️ Architecture
 
 ```
-codekheti.ai/
-├── backend/         # FastAPI + AI Agents (Vertex AI + Gemini 2.0)
-├── frontend/        # React Native Mobile App (Expo + NativeWind)
-├── docs/            # Project specs and documentation
-└── README.md        # This file
+Kisan AI/
+├── 📱 frontend/     # React Native Mobile App (Expo + NativeWind)
+├── ⚡ backend/      # FastAPI + Multi-Agent AI System (Python 3.13)
+└── 📚 docs/         # Project documentation
 ```
 
-## Setup Instructions
+- **Mobile App**: React Native with Expo for cross-platform development
+- **Backend API**: FastAPI with Python 3.13 and Google Cloud Vertex AI
+- **AI Engine**: Multi-agent system powered by Gemini 2.0 Flash
+- **Cloud**: Google Cloud Platform (Vertex AI, Speech APIs, Firestore, Cloud storage)
+
+## 🛠️ Quick Setup Guide
 
 ### Prerequisites
-- **Node.js** (v22+ required for husky)
-- **Python 3.13** (auto-managed via uv)
-- **uv** (modern Python package manager)
+- **Node.js** (v22+)
+- **Python 3.13** 
+- **uv** (Python package manager)
+- **Expo CLI** for mobile development
 - **Google Cloud Account** with Vertex AI enabled
 
-### Initial Setup
+### 📦 Step 1: Clone & Install Dependencies
 
-1. **Clone the repository:**
-   ```sh
-   git clone <repo-url>
-   cd codekheti.ai
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/KisanTech/kisan-ai.git
+cd kisan-ai
 
-2. **Install uv (if not already installed):**
-   ```sh
-   # macOS/Linux
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   
-   # Or via Homebrew
-   brew install uv
-   ```
-
-3. **Root setup (husky pre-commit hooks):**
-   ```sh
-   npm install
-   ```
-   After installing dependencies, ensure hooks are executable:
-   ```sh
-   chmod +x .husky/pre-commit
-   ```
-
-4. **Backend:**
-   ```sh
-   cd backend
-   # Install Python 3.13 and dependencies (uv handles everything)
-   uv sync
-   # Copy environment variables
-   cp .env.example .env
-   ```
-
-## Development Tools
-
-### Backend (Python)
-- **📦 uv**: Ultra-fast package manager (10-100x faster than pip)
-- **🦀 Ruff**: Ultra-fast linter and formatter 
-- **🐍 Python 3.13**: Latest Python with enhanced performance
-- **🧠 Vertex AI**: Google Cloud AI platform with Gemini 2.0 Flash
-
-## Pre-commit Hooks (Formatting & Linting)
-
-Husky automatically runs on every commit:
-- **Backend**: Ruff formatting and linting for Python code
-- **Standards**: 100 char line length, isort imports, type hints
-
-## Quick Start Commands
-
-### Backend
-```sh
-cd backend
-
-# Run development server
-uv run uvicorn app.main:app --reload
-# API docs: http://localhost:8000/docs
-
-# Code quality
-uv run ruff check --fix     # Fix linting issues
-uv run ruff format          # Format code
-
-# Add dependencies
-uv add google-cloud-speech
-```
-
-### Frontend
-```sh
-cd frontend
-
-# Run development server
-npm start
-# Scan QR code with Expo Go app
-
-# Run on specific platforms
-npm run android    # Android emulator/device
-npm run ios        # iOS simulator/device
-npm run web        # Web browser
-
-# Install dependencies
+# Install root dependencies (for pre-commit hooks)
 npm install
 ```
 
+### 🐍 Step 2: Backend Setup
+
+```bash
+cd backend
+
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install Python dependencies
+uv sync
+
+# Setup environment variables
+cp env.template .env
+# Edit .env with your Google Cloud credentials and API keys
+
+# Run the backend server
+uv run python -m uvicorn app.main:app --reload
+```
+
+**Backend will be running at**: `http://127.0.0.1:8000`  
+**API Documentation**: `http://127.0.0.1:8000/doc`
+
+### 📱 Step 3: Frontend Setup
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run ios --clear
+```
+
+**Mobile App Options**:
+- **📱 Physical Device**: Scan QR code with Expo Go app
+- **🤖 Android**: `npm run android` (requires Android Studio)
+- **🍎 iOS**: `npm run ios` (requires Xcode on macOS)
+
+### ⚙️ Step 4: Environment Configuration
+
+#### Backend Environment (.env)
+```bash
+# Google Cloud Configuration
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_APPLICATION_CREDENTIALS=path/to/your/credentials.json
+
+# API Configuration
+FASTAPI_ENV=development
+LOG_LEVEL=INFO
+```
+
+#### Frontend Configuration
+Update `frontend/src/config/app.ts` with your backend URL:
+```typescript
+export const API_BASE_URL = 'http://localhost:8000'; // For local development
+```
+
+## 🚀 Development Commands
+
 ### Root Commands
-```sh
-# Development servers
+```bash
 npm run dev:backend     # Start FastAPI server
 npm run dev:frontend    # Start Expo development server
-
-# Installation
 npm run install:all     # Install all dependencies
-npm run install:backend # Install backend dependencies only
-npm run install:frontend# Install frontend dependencies only
-
-# Code quality
 npm run format          # Format entire codebase
 npm run lint            # Lint entire codebase
 ```
 
-## MVP Features
+### Backend Commands
+```bash
+cd backend
+uv run uvicorn app.main:app --reload  # Development server
+uv run ruff check --fix               # Fix linting issues
+uv run ruff format                    # Format code
+uv add package-name                   # Add new dependency
+```
 
-### ✅ Core Features
-1. **Crop Disease Identification** - Gemini 2.0 Flash image analysis
-2. **Voice Interface (Kannada)** - Vertex AI Speech APIs
-3. **Market Price Display** - Real-time commodity prices
+### Frontend Commands
+```bash
+cd frontend
+npm start              # Start development server
+npm run android        # Run on Android
+npm run ios           # Run on iOS
+npm run web           # Run on web
+npm test              # Run tests
+```
 
-### 🔧 Tech Stack
-- **AI**: Google Cloud Vertex AI + Gemini 2.0 Flash
-- **Speech**: Vertex AI Speech APIs (Kannada)
-- **Backend**: FastAPI + Python 3.13 + uv
-- **Data**: Firestore + BigQuery + Cloud Storage
+## 📋 API Endpoints
 
-## API Documentation
+### Core Endpoints
+- `POST /api/v1/voice/speech-to-text` - Kannada speech recognition
+- `POST /api/v1/voice/text-to-speech` - Kannada text-to-speech
+- `POST /api/v1/crop-diagnosis/analyze` - Crop disease diagnosis
+- `GET /api/v1/market/current` - Current market prices
+- `GET /api/v1/government-schemes` - Available schemes
 
-- **Development Server**: http://localhost:8000
-- **Interactive Docs**: http://localhost:8000/docs
-- **Key Endpoints**:
-  - `POST /api/v1/voice/speech-to-text` - Kannada speech
-  - `GET /api/v1/market/current` - Market prices
+### Health Check
+- `GET /health` - API health status
 
-## Component Documentation
 
-- **Backend Development**: [backend/README.md](./backend/README.md)
-- **Frontend Development**: [frontend/README.md](./frontend/README.md)
-- **Project Specification**: [docs/project_kisan_specification.md](./docs/project_kisan_specification.md)
+
+## 🏗️ Tech Stack
+
+### Frontend
+- **React Native** with Expo
+- **NativeWind** (Tailwind CSS for React Native)
+- **TypeScript**
+- **Expo Router** for navigation
+
+### Backend
+- **FastAPI** (Python 3.13)
+- **Google Cloud Vertex AI** 
+- **Gemini 2.0 Flash** for AI processing
+- **uv** for dependency management
+- **Ruff** for linting and formatting
+
+### Cloud & AI
+- **Google Cloud Platform**
+- **Vertex AI Speech APIs** (Multilingual support)
+- **Firestore** for data storage
+- **Cloud Storage** for file management
+
+## 📁 Project Structure
+
+```
+kisan-ai/
+├── backend/
+│   ├── app/
+│   │   ├── api/          # FastAPI routes
+│   │   ├── agents/       # AI agents
+│   │   ├── models/       # Pydantic models
+│   │   ├── services/     # Business logic
+│   │   └── utils/        # Utilities
+│   └── tests/            # Backend tests
+├── frontend/
+│   ├── src/
+│   │   ├── components/   # Reusable components
+│   │   ├── screens/      # App screens
+│   │   ├── services/     # API services
+│   │   └── types/        # TypeScript types
+│   └── assets/           # Images and icons
+└── docs/                 # Documentation
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Built with Google Cloud Vertex AI and Gemini 2.0
+- Designed for Indian farmers with multilingual support
+- Developed during a 30-hour hackathon challenge
 
 ---
 
-**"Your Personal Agronomist in Your Pocket" 🚀🌾** 
+**"Your Personal Agronomist in Your Pocket" 🚀🌾**
+
+*Empowering Indian farmers with AI-driven agricultural intelligence* 
