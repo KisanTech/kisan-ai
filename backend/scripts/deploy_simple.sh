@@ -150,7 +150,7 @@ deploy_service() {
         --source . \
         --region ${REGION} \
         --allow-unauthenticated \
-        --memory 2Gi \
+        --memory 8Gi \
         --cpu 4 \
         --timeout 600 \
         --concurrency 100 \
