@@ -1,217 +1,259 @@
-# Kisan AI 🌾 - AI-Powered Agricultural Assistant
+# Kisan AI - Backend API
 
-## 🚀 Demo & Overview
+AI-Powered Agricultural Assistant for Google Agentic AI Day Hackathon
 
-**Kisan AI** is an AI-powered agricultural assistant designed specifically for Indian farmers. Our mobile application provides crop disease diagnosis, Kannada voice interface, market intelligence, and government scheme information - all powered by Google Cloud Vertex AI and Gemini 2.0.
+## DEMO Video
+- [DEMO Video](https://drive.google.com/file/d/1rusxMNTvu3lcugK1KyeqOd-ykMpKpL3I/view?usp=sharing)
 
-### 📱 Live Demo
-🔗 **[Watch Mobile App Demo](DEMO_LINK_HERE)** *(Add your demo link here)*
-
-### 🎯 Key Features
-- **🔍 Crop Disease Diagnosis** - AI-powered image analysis using Gemini 2.0 Flash
-- **🗣️ Voice Interface** - Hindi speech-to-text and text-to-speech
-- **📈 Real-time Market Prices** - Live commodity pricing data
-- **🏛️ Government Schemes** - Information about agricultural schemes and subsidies
-
-## 🏗️ Architecture
-
-```
-Kisan AI/
-├── 📱 frontend/     # React Native Mobile App (Expo + NativeWind)
-├── ⚡ backend/      # FastAPI + Multi-Agent AI System (Python 3.13)
-└── 📚 docs/         # Project documentation
-```
-
-- **Mobile App**: React Native with Expo for cross-platform development
-- **Backend API**: FastAPI with Python 3.13 and Google Cloud Vertex AI
-- **AI Engine**: Multi-agent system powered by Gemini 2.0 Flash
-- **Cloud**: Google Cloud Platform (Vertex AI, Speech APIs, Firestore, Cloud storage)
-
-## 🛠️ Quick Setup Guide
+## Quick Start
 
 ### Prerequisites
-- **Node.js** (v22+)
-- **Python 3.13** 
-- **uv** (Python package manager)
-- **Expo CLI** for mobile development
-- **Google Cloud Account** with Vertex AI enabled
+- uv package manager (will auto-install Python 3.13)
+- Google Cloud Account with Vertex AI enabled
 
-### 📦 Step 1: Clone & Install Dependencies
+> **Note**: The `.python-version` file ensures everyone uses Python 3.13 automatically!
 
+### Setup
+
+1. **Install uv** (if not already installed)
 ```bash
-# Clone the repository
-git clone https://github.com/KisanTech/kisan-ai.git
-cd kisan-ai
-
-# Install root dependencies (for pre-commit hooks)
-npm install
-```
-
-### 🐍 Step 2: Backend Setup
-
-```bash
-cd backend
-
-# Install uv if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install Python dependencies
-uv sync
-
-# Setup environment variables
-cp env.template .env
-# Edit .env with your Google Cloud credentials and API keys
-
-# Run the backend server
-uv run python -m uvicorn app.main:app --reload
 ```
 
-**Backend will be running at**: `http://127.0.0.1:8000`  
-**API Documentation**: `http://127.0.0.1:8000/doc`
-
-### 📱 Step 3: Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run ios --clear
-```
-
-**Mobile App Options**:
-- **📱 Physical Device**: Scan QR code with Expo Go app
-- **🤖 Android**: `npm run android` (requires Android Studio)
-- **🍎 iOS**: `npm run ios` (requires Xcode on macOS)
-
-### ⚙️ Step 4: Environment Configuration
-
-#### Backend Environment (.env)
-```bash
-# Google Cloud Configuration
-GOOGLE_CLOUD_PROJECT=your-project-id
-GOOGLE_APPLICATION_CREDENTIALS=path/to/your/credentials.json
-
-# API Configuration
-FASTAPI_ENV=development
-LOG_LEVEL=INFO
-```
-
-#### Frontend Configuration
-Update `frontend/src/config/app.ts` with your backend URL:
-```typescript
-export const API_BASE_URL = 'http://localhost:8000'; // For local development
-```
-
-## 🚀 Development Commands
-
-### Root Commands
-```bash
-npm run dev:backend     # Start FastAPI server
-npm run dev:frontend    # Start Expo development server
-npm run install:all     # Install all dependencies
-npm run format          # Format entire codebase
-npm run lint            # Lint entire codebase
-```
-
-### Backend Commands
+2. **Install dependencies** (uv will auto-install Python 3.13)
 ```bash
 cd backend
-uv run uvicorn app.main:app --reload  # Development server
-uv run ruff check --fix               # Fix linting issues
-uv run ruff format                    # Format code
-uv add package-name                   # Add new dependency
+uv sync  # Automatically uses Python 3.13 from .python-version file
 ```
 
-### Frontend Commands
+3. **Environment Configuration**
+
+**Quick Setup (Recommended):**
 ```bash
-cd frontend
-npm start              # Start development server
-npm run android        # Run on Android
-npm run ios           # Run on iOS
-npm run web           # Run on web
-npm test              # Run tests
+# Copy the template file and customize it
+cp env.template .env
+# Edit .env with your actual API keys and credentials
 ```
 
-## 📋 API Endpoints
+**Manual Setup:**
+Create a `.env` file with your actual credentials:
+```bash
+DEBUG=true
+ENVIRONMENT=dev
 
-### Core Endpoints
-- `POST /api/v1/voice/speech-to-text` - Kannada speech recognition
-- `POST /api/v1/voice/text-to-speech` - Kannada text-to-speech
-- `POST /api/v1/crop-diagnosis/analyze` - Crop disease diagnosis
-- `GET /api/v1/market/current` - Current market prices
-- `GET /api/v1/government-schemes` - Available schemes
+GOOGLE_CLOUD_PROJECT=<your-gcp-project-id>
+GOOGLE_APPLICATION_CREDENTIALS=<path-to-service-account-key.json>
 
-### Health Check
-- `GET /health` - API health status
+# Google Cloud Services
+FIRESTORE_DATABASE=<your-firestore-database-name>
+CLOUD_STORAGE_BUCKET=<your-cloud-storage-bucket-name>
 
+# Vertex AI Configuration
+VERTEX_AI_REGION=<your-vertex-ai-region>
+GEMINI_MODEL=gemini-2.5-flash
+GOOGLE_GENAI_USE_VERTEXAI=1
 
+# Vertex Backend Config
+GOOGLE_CLOUD_PROJECT=<your-gcp-project-id>
+GOOGLE_CLOUD_LOCATION=<your-gcp-location>
+GOOGLE_CLOUD_STAGING_BUCKET=<your-gcp-staging-bucket-name>
 
-## 🏗️ Tech Stack
-
-### Frontend
-- **React Native** with Expo
-- **NativeWind** (Tailwind CSS for React Native)
-- **TypeScript**
-- **Expo Router** for navigation
-
-### Backend
-- **FastAPI** (Python 3.13)
-- **Google Cloud Vertex AI** 
-- **Gemini 2.0 Flash** for AI processing
-- **uv** for dependency management
-- **Ruff** for linting and formatting
-
-### Cloud & AI
-- **Google Cloud Platform**
-- **Vertex AI Speech APIs** (Multilingual support)
-- **Firestore** for data storage
-- **Cloud Storage** for file management
-
-## 📁 Project Structure
-
-```
-kisan-ai/
-├── backend/
-│   ├── app/
-│   │   ├── api/          # FastAPI routes
-│   │   ├── agents/       # AI agents
-│   │   ├── models/       # Pydantic models
-│   │   ├── services/     # Business logic
-│   │   └── utils/        # Utilities
-│   └── tests/            # Backend tests
-├── frontend/
-│   ├── src/
-│   │   ├── components/   # Reusable components
-│   │   ├── screens/      # App screens
-│   │   ├── services/     # API services
-│   │   └── types/        # TypeScript types
-│   └── assets/           # Images and icons
-└── docs/                 # Documentation
+DATA_GOV_API_KEY=<your-data-gov-api-key>
 ```
 
-## 🤝 Contributing
+4. **Run the development server**
+```bash
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Submit a pull request
+5. **Access API Documentation**
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
-## 📄 License
+## API Keys Setup
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### Google Cloud Setup (Required for AI Features)
+1. **Create Google Cloud Project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com)
+   - Create new project or select existing one
+   - Note the Project ID
 
-## 🙏 Acknowledgments
+2. **Enable APIs**
+   ```bash
+   # Enable required APIs
+   gcloud services enable aiplatform.googleapis.com
+   gcloud services enable speech.googleapis.com
+   gcloud services enable storage.googleapis.com
+   ```
 
-- Built with Google Cloud Vertex AI and Gemini 2.0
-- Designed for Indian farmers with multilingual support
-- Developed during a 30-hour hackathon challenge
+3. **Create Service Account**
+   - Go to IAM & Admin > Service Accounts
+   - Create new service account
+   - Download JSON key file
+   - Set `GOOGLE_APPLICATION_CREDENTIALS` to the file path
 
----
+### Indian Government APIs (Optional for Real Data)
 
-**"Your Personal Agronomist in Your Pocket" 🚀🌾**
+#### Data.gov.in API
+1. Register at [data.gov.in](https://data.gov.in/user/register)
+2. Apply for API access for agriculture data
+3. Add your API key to `DATA_GOV_API_KEY`
 
-*Empowering Indian farmers with AI-driven agricultural intelligence* 
+#### e-NAM API (Optional)
+1. Contact [e-NAM support](https://enam.gov.in) for API access
+2. Add your API key to `ENAM_API_KEY`
+
+> **🚀 For Hackathon**: Skip API keys setup! The app works with mock data for demo purposes.
+
+## Environment Variables Security
+
+### ⚠️ Important Security Notes
+- **NEVER commit `.env` files** to version control
+- The `.env` file is already in `.gitignore`
+- Use `env.template` as reference for required variables
+- Use different API keys for development/staging/production
+
+### For New Team Members
+```bash
+# 1. Copy the template
+cp env.template .env
+
+# 2. Ask team lead for actual API keys
+# 3. Update .env with real credentials
+# 4. Verify .env is NOT tracked by git
+git status  # Should not show .env file
+```
+
+## Code Quality & Formatting
+
+### Linting and Formatting with uv + ruff
+
+We use **ruff** for both linting and formatting to maintain consistent code quality across the team.
+
+#### Quick Commands
+```bash
+# Check code style and lint issues
+uv run ruff check
+
+# Auto-fix linting issues where possible
+uv run ruff check --fix
+
+# Format code automatically
+uv run ruff format
+
+# Check formatting without making changes
+uv run ruff format --check
+
+# Run both linting and formatting together
+uv run ruff check --fix && uv run ruff format
+```
+
+#### Pre-Commit Workflow (Recommended)
+Before committing code during the hackathon:
+```bash
+# 1. Fix any linting issues
+uv run ruff check --fix
+
+# 2. Format all code
+uv run ruff format
+
+# 3. Verify everything is clean
+uv run ruff check && uv run ruff format --check
+```
+
+#### One-Command Clean (Super Quick!)
+```bash
+# Fix everything in one go
+uv run ruff check --fix && uv run ruff format
+```
+
+#### Configuration
+Ruff is configured in `pyproject.toml` with:
+- Line length: 100 characters
+- Python 3.13 compatibility
+- Import sorting (isort style)
+- Selected linting rules for code quality
+- Excludes `app/ai/prompts/` (contains template files)
+
+## AI Architecture
+
+### Multi-Agent System 🧠
+```
+app/agents/
+├── coordinator_agent/       # Main Router & Intent Classifier
+│   ├── agent.py            # Coordinator with 4 specialized agents
+│   └── __init__.py
+├── crop_diagnosis_agent/    # Disease Identification (Gemini 2.5 Flash)
+│   ├── agent.py            # Crop health analysis with Google Search
+│   ├── prompt.py           # Specialized crop diagnosis prompts
+│   └── __init__.py
+├── market_agent/           # Market Data & Price Analysis
+│   ├── agent.py            # Market intelligence with API tools
+│   ├── prompt.py           # Market analysis prompts
+│   ├── tools.py            # Smart API integration tools
+│   └── __init__.py
+├── rag_agent/              # Government Policies & Schemes
+│   ├── agent.py            # RAG-based policy information
+│   ├── prompt.py           # Government schemes prompts
+│   └── __init__.py
+└── general_query_agent/     # General Agricultural Guidance
+    ├── agent.py            # General farming advice
+    └── __init__.py
+```
+
+### Agent Capabilities
+- **🎯 Coordinator Agent**: Routes queries to specialized agents with intelligent intent classification
+- **🔬 Crop Diagnosis Agent**: AI-powered disease identification with treatment recommendations
+- **🌾 Market Agent**: Real-time price analysis, trends, and revenue calculations
+- **🏛️ RAG Agent**: Government schemes, subsidies, and agricultural policies
+- **💬 General Query Agent**: Best practices, cultivation tips, and seasonal advice
+
+## Core Features (Implemented)
+
+### 1. AI Agent Invocation APIs ✅
+- **Endpoints**: 
+  - `POST /api/v1/invoke/voice` - Voice-to-voice AI interaction
+  - `POST /api/v1/invoke/text` - Text-based AI interaction
+- **Features**: Multilingual support, session management, intelligent routing
+- **Status**: ✅ Fully Implemented
+
+### 2. Crop Disease Diagnosis ✅
+- **Endpoints**:
+  - `POST /api/v1/crop-diagnosis/analyze-image` - Analyze from GCS URL
+  - `POST /api/v1/crop-diagnosis/analyze-upload` - Upload & analyze
+- **Features**: Image upload to GCS, structured diagnosis, treatment recommendations
+- **Status**: ✅ Fully Implemented
+
+### 3. Supporting APIs ✅
+- **Speech Processing**: `/api/v1/speech/transcribe`, `/api/v1/speech/synthesize`
+- **Translation**: `/api/v1/translation/translate`, `/api/v1/translation/detect`
+- **Market Data**: `/api/v1/market/*` endpoints
+- **Status**: ✅ Fully Implemented
+
+## Project Structure
+
+```
+backend/
+├── app/
+│   ├── main.py              # FastAPI app entry point ✅
+│   ├── agents/              # Multi-Agent System ✅
+│   │   ├── coordinator_agent/   # Main router ✅
+│   │   ├── crop_diagnosis_agent/ # Disease analysis ✅
+│   │   ├── market_agent/        # Market intelligence ✅
+│   │   ├── rag_agent/           # Government policies ✅
+│   │   └── general_query_agent/ # General advice ✅
+│   ├── api/v1/              # REST API Endpoints
+│   │   ├── agent_invocation.py  # AI agent APIs ✅
+│   │   ├── crop_diagnosis.py    # Crop analysis APIs ✅
+│   │   ├── speech.py           # Speech processing ✅
+│   │   ├── translation.py      # Translation APIs ✅
+│   │   └── market_prices.py    # Market data APIs ✅
+│   ├── models/              # Pydantic models ✅
+│   ├── services/            # Business logic ✅
+│   ├── core/                # Configuration ✅
+│   └── utils/               # Utilities ✅
+├── scripts/
+│   └── deploy_simple.sh     # Cloud Run deployment ✅
+├── pyproject.toml           # uv configuration ✅
+└── README.md               # This file ✅
+```
