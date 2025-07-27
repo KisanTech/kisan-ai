@@ -112,18 +112,24 @@ export class VoiceChatService {
   /**
    * Send text message to new text invoke API
    */
-  async sendTextInvoke(textData: string): Promise<TextInvokeResponse> {
+  async sendTextInvoke(
+    textData: string,
+    userId: string = 'user123',
+    sessionId: string = 'session456',
+    languageCode: string = 'en-IN'
+  ): Promise<TextInvokeResponse> {
     try {
       console.log('Text invoke request received', textData);
-      
+
       // Get session and user IDs from session service
       const userId = await sessionService.getUserId();
       const sessionId = await sessionService.getSessionId();
-      
+
       const response = await voiceChatApiClient.post('/invoke/text', {
         user_id: userId,
         session_id: sessionId,
         text_data: textData,
+        language_code: languageCode,
       });
       console.log('Text invoke response:', response.data);
 
@@ -155,11 +161,11 @@ export class VoiceChatService {
   ): Promise<SpeechToTextResponse> {
     try {
       console.log('Speech to text request received', base64Audio);
-      
+
       // Get session and user IDs from session service
       const userId = await sessionService.getUserId();
       const sessionId = await sessionService.getSessionId();
-      
+
       const response = await voiceChatApiClient.post('/invoke/voice', {
         audio_data: base64Audio,
         audio_encoding: 'MP3',

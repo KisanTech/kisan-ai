@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
+import { DiagnosisResponse, ParsedAgentResponse } from '../../services/diagnosisService';
 
 interface RouteParams {
-  diagnosis: any; // Agent API response (parsed JSON)
+  diagnosis: DiagnosisResponse & { translatedDiagnosis?: ParsedAgentResponse };
   imageUri: string;
 }
 
@@ -18,6 +19,9 @@ export const DiagnosisResultScreen: React.FC = () => {
   const route = useRoute();
   const { diagnosis, imageUri } = route.params as RouteParams;
   const { t } = useTranslation();
+
+  // Use the translated diagnosis passed from CropHealthScreen
+  const displayDiagnosis = diagnosis.translatedDiagnosis;
 
   const handleCallExpert = () => {
     console.log('Call expert');
@@ -31,14 +35,14 @@ export const DiagnosisResultScreen: React.FC = () => {
     console.log('Save report');
   };
 
-  // Check if diagnosis is already parsed JSON or needs error handling
-  if (!diagnosis || diagnosis.error) {
+  // Check if diagnosis is valid and parseable
+  if (!diagnosis || !diagnosis.success || diagnosis.error || !displayDiagnosis) {
     return (
       <SafeAreaView className="flex-1 bg-background font-sans">
         <View className="flex-1 justify-center items-center p-4">
           <Text className="text-xl text-gray-800 mb-4">{t('diagnosisResult.unableToProcess')}</Text>
           <Text className="text-gray-600 mb-4 text-center">
-            {diagnosis?.message || t('diagnosisResult.errorMessage')}
+            {diagnosis?.error || 'Unable to parse diagnosis data'}
           </Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -72,106 +76,89 @@ export const DiagnosisResultScreen: React.FC = () => {
         )}
 
         <View className="p-4">
-          {/* Language Detection */}
-          {diagnosis.language_detected && (
-            <View className="bg-blue-50 p-3 rounded-lg mb-4">
-              <Text className="text-sm text-blue-700 font-medium">
-                {t('language.currentLanguage')}: {diagnosis.language_detected}
-              </Text>
-            </View>
-          )}
-
-          {/* Image Assessment */}
-          {diagnosis.image_assessment && (
-            <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">
-                {t('diagnosisResult.imageQuality')}
-              </Text>
-              <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.quality')}:{' '}
-                <Text className="font-medium">{diagnosis.image_assessment.quality}</Text>
-              </Text>
-              <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.confidence')}:{' '}
-                <Text className="font-medium">
-                  {diagnosis.image_assessment.diagnostic_confidence}%
-                </Text>
-              </Text>
-              {diagnosis.image_assessment.limitations && (
-                <Text className="text-gray-600 text-sm">
-                  {t('diagnosisResult.note')}: {diagnosis.image_assessment.limitations}
-                </Text>
-              )}
-            </View>
-          )}
-
           {/* Crop Identification */}
-          {diagnosis.crop_identification && (
+          {displayDiagnosis?.crop_identification && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
               <Text className="text-lg font-bold text-gray-800 mb-2">
                 {t('diagnosisResult.cropIdentification')}
               </Text>
               <Text className="text-xl font-semibold text-green-700 mb-1">
-                {diagnosis.crop_identification.crop_name}
+                {displayDiagnosis.crop_identification.crop_name}
               </Text>
-              <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.confidence')}:{' '}
-                <Text className="font-medium">
-                  {diagnosis.crop_identification.confidence_percentage}%
+              {displayDiagnosis.crop_identification.confidence_percentage && (
+                <Text className="text-gray-600 mb-1">
+                  {t('diagnosisResult.confidence')}:{' '}
+                  <Text className="font-medium">
+                    {displayDiagnosis.crop_identification.confidence_percentage}%
+                  </Text>
                 </Text>
-              </Text>
-              <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.growthStage')}:{' '}
-                <Text className="font-medium">{diagnosis.crop_identification.growth_stage}</Text>
-              </Text>
-              {diagnosis.crop_identification.variety_hints && (
+              )}
+              {displayDiagnosis.crop_identification.growth_stage && (
+                <Text className="text-gray-600 mb-1">
+                  {t('diagnosisResult.growthStage')}:{' '}
+                  <Text className="font-medium">
+                    {displayDiagnosis.crop_identification.growth_stage}
+                  </Text>
+                </Text>
+              )}
+              {displayDiagnosis.crop_identification.variety_hints && (
                 <Text className="text-gray-600 text-sm">
-                  {diagnosis.crop_identification.variety_hints}
+                  {displayDiagnosis.crop_identification.variety_hints}
                 </Text>
               )}
             </View>
           )}
 
           {/* Disease Analysis */}
-          {diagnosis.disease_analysis?.disease_detected && (
+          {displayDiagnosis?.disease_analysis?.disease_detected && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
               <Text className="text-lg font-bold text-gray-800 mb-2">
                 {t('diagnosisResult.diseaseDetected')}
               </Text>
-              <Text className="text-xl font-semibold text-red-600 mb-1">
-                {diagnosis.disease_analysis.primary_diagnosis?.disease_name}
-              </Text>
-              <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.scientificName')}:{' '}
-                <Text className="italic">
-                  {diagnosis.disease_analysis.primary_diagnosis?.scientific_name}
+              {displayDiagnosis.disease_analysis.primary_diagnosis?.disease_name && (
+                <Text className="text-xl font-semibold text-red-600 mb-1">
+                  {displayDiagnosis.disease_analysis.primary_diagnosis.disease_name}
                 </Text>
-              </Text>
-              <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.confidence')}:{' '}
-                <Text className="font-medium">
-                  {diagnosis.disease_analysis.primary_diagnosis?.confidence_percentage}%
+              )}
+              {displayDiagnosis.disease_analysis.primary_diagnosis?.scientific_name && (
+                <Text className="text-gray-600 mb-1">
+                  {t('diagnosisResult.scientificName')}:{' '}
+                  <Text className="italic">
+                    {displayDiagnosis.disease_analysis.primary_diagnosis.scientific_name}
+                  </Text>
                 </Text>
-              </Text>
-              <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.severity')}:{' '}
-                <Text className="font-medium capitalize">
-                  {diagnosis.disease_analysis.primary_diagnosis?.severity_level}
+              )}
+              {displayDiagnosis.disease_analysis.primary_diagnosis?.confidence_percentage && (
+                <Text className="text-gray-600 mb-1">
+                  {t('diagnosisResult.confidence')}:{' '}
+                  <Text className="font-medium">
+                    {displayDiagnosis.disease_analysis.primary_diagnosis.confidence_percentage}%
+                  </Text>
                 </Text>
-              </Text>
-              <Text className="text-gray-600 mb-2">
-                {t('diagnosisResult.affectedArea')}:{' '}
-                <Text className="font-medium">
-                  {diagnosis.disease_analysis.primary_diagnosis?.affected_area_percentage}%
+              )}
+              {displayDiagnosis.disease_analysis.primary_diagnosis?.severity_level && (
+                <Text className="text-gray-600 mb-1">
+                  {t('diagnosisResult.severity')}:{' '}
+                  <Text className="font-medium capitalize">
+                    {displayDiagnosis.disease_analysis.primary_diagnosis.severity_level}
+                  </Text>
                 </Text>
-              </Text>
+              )}
+              {displayDiagnosis.disease_analysis.primary_diagnosis?.affected_area_percentage && (
+                <Text className="text-gray-600 mb-2">
+                  {t('diagnosisResult.affectedArea')}:{' '}
+                  <Text className="font-medium">
+                    {displayDiagnosis.disease_analysis.primary_diagnosis.affected_area_percentage}%
+                  </Text>
+                </Text>
+              )}
 
-              {diagnosis.disease_analysis.symptoms_observed?.length > 0 && (
+              {displayDiagnosis.disease_analysis.symptoms_observed?.length > 0 && (
                 <View className="mt-2">
                   <Text className="font-semibold text-gray-700 mb-1">
                     {t('diagnosisResult.symptomsObserved')}:
                   </Text>
-                  {diagnosis.disease_analysis.symptoms_observed.map(
+                  {displayDiagnosis.disease_analysis.symptoms_observed.map(
                     (symptom: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
                         • {symptom}
@@ -181,12 +168,12 @@ export const DiagnosisResultScreen: React.FC = () => {
                 </View>
               )}
 
-              {diagnosis.disease_analysis.differential_diagnosis?.length > 0 && (
+              {displayDiagnosis.disease_analysis.differential_diagnosis?.length > 0 && (
                 <View className="mt-2">
                   <Text className="font-semibold text-gray-700 mb-1">
                     {t('diagnosisResult.otherPossibilities')}:
                   </Text>
-                  {diagnosis.disease_analysis.differential_diagnosis.map(
+                  {displayDiagnosis.disease_analysis.differential_diagnosis.map(
                     (disease: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
                         • {disease}
@@ -199,21 +186,26 @@ export const DiagnosisResultScreen: React.FC = () => {
           )}
 
           {/* Treatment Recommendations */}
-          {diagnosis.treatment_recommendations && (
+          {displayDiagnosis?.treatment_recommendations && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
               <Text className="text-lg font-bold text-gray-800 mb-3">
                 {t('diagnosisResult.treatmentRecommendations')}
               </Text>
 
               {/* Immediate Action */}
-              {diagnosis.treatment_recommendations.immediate_action && (
+              {displayDiagnosis.treatment_recommendations.immediate_action && (
                 <View className="mb-4 bg-orange-50 p-3 rounded-lg">
                   <Text className="font-semibold text-orange-700 mb-2">
-                    {t('diagnosisResult.immediateAction')} (
-                    {diagnosis.treatment_recommendations.immediate_action.urgency}{' '}
-                    {t('diagnosisResult.urgency')})
+                    {t('diagnosisResult.immediateAction')}
+                    {displayDiagnosis.treatment_recommendations.immediate_action.urgency && (
+                      <Text>
+                        {' '}
+                        ({displayDiagnosis.treatment_recommendations.immediate_action.urgency}{' '}
+                        {t('diagnosisResult.urgency')})
+                      </Text>
+                    )}
                   </Text>
-                  {diagnosis.treatment_recommendations.immediate_action.steps?.map(
+                  {displayDiagnosis.treatment_recommendations.immediate_action.steps?.map(
                     (step: string, index: number) => (
                       <Text key={index} className="text-gray-700 ml-2 mb-1">
                         • {step}
@@ -224,56 +216,86 @@ export const DiagnosisResultScreen: React.FC = () => {
               )}
 
               {/* Organic Treatment */}
-              {diagnosis.treatment_recommendations.organic_treatment && (
+              {displayDiagnosis.treatment_recommendations.organic_treatment && (
                 <View className="mb-4 bg-green-50 p-3 rounded-lg">
                   <Text className="font-semibold text-green-700 mb-2">
                     {t('diagnosisResult.organicTreatment')}
                   </Text>
-                  <Text className="text-gray-700 mb-1">
-                    <Text className="font-medium">{t('diagnosisResult.treatment')}:</Text>{' '}
-                    {diagnosis.treatment_recommendations.organic_treatment.primary_recommendation}
-                  </Text>
-                  <Text className="text-gray-700 mb-1">
-                    <Text className="font-medium">{t('diagnosisResult.method')}:</Text>{' '}
-                    {diagnosis.treatment_recommendations.organic_treatment.application_method}
-                  </Text>
-                  <Text className="text-gray-700 mb-1">
-                    <Text className="font-medium">{t('diagnosisResult.frequency')}:</Text>{' '}
-                    {diagnosis.treatment_recommendations.organic_treatment.frequency}
-                  </Text>
-                  <Text className="text-green-600 font-medium">
-                    {t('diagnosisResult.cost')}:{' '}
-                    {diagnosis.treatment_recommendations.cost_analysis?.organic_cost_per_acre}
-                  </Text>
+                  {displayDiagnosis.treatment_recommendations.organic_treatment
+                    .primary_recommendation && (
+                    <Text className="text-gray-700 mb-1">
+                      <Text className="font-medium">{t('diagnosisResult.treatment')}:</Text>{' '}
+                      {
+                        displayDiagnosis.treatment_recommendations.organic_treatment
+                          .primary_recommendation
+                      }
+                    </Text>
+                  )}
+                  {displayDiagnosis.treatment_recommendations.organic_treatment
+                    .application_method && (
+                    <Text className="text-gray-700 mb-1">
+                      <Text className="font-medium">{t('diagnosisResult.method')}:</Text>{' '}
+                      {
+                        displayDiagnosis.treatment_recommendations.organic_treatment
+                          .application_method
+                      }
+                    </Text>
+                  )}
+                  {displayDiagnosis.treatment_recommendations.organic_treatment.frequency && (
+                    <Text className="text-gray-700 mb-1">
+                      <Text className="font-medium">{t('diagnosisResult.frequency')}:</Text>{' '}
+                      {displayDiagnosis.treatment_recommendations.organic_treatment.frequency}
+                    </Text>
+                  )}
+                  {displayDiagnosis.treatment_recommendations.cost_analysis
+                    ?.organic_cost_per_acre && (
+                    <Text className="text-green-600 font-medium">
+                      {t('diagnosisResult.cost')}:{' '}
+                      {
+                        displayDiagnosis.treatment_recommendations.cost_analysis
+                          .organic_cost_per_acre
+                      }
+                    </Text>
+                  )}
                 </View>
               )}
 
               {/* Chemical Treatment */}
-              {diagnosis.treatment_recommendations.chemical_treatment && (
+              {displayDiagnosis.treatment_recommendations.chemical_treatment && (
                 <View className="mb-4 bg-blue-50 p-3 rounded-lg">
                   <Text className="font-semibold text-blue-700 mb-2">
                     {t('diagnosisResult.chemicalTreatment')}
                   </Text>
-                  <Text className="text-gray-700 mb-1">
-                    <Text className="font-medium">{t('diagnosisResult.treatment')}:</Text>{' '}
-                    {diagnosis.treatment_recommendations.chemical_treatment.primary_recommendation}
-                  </Text>
-                  <Text className="text-gray-700 mb-1">
-                    <Text className="font-medium">{t('diagnosisResult.dosage')}:</Text>{' '}
-                    {diagnosis.treatment_recommendations.chemical_treatment.dosage}
-                  </Text>
-                  <Text className="text-gray-700 mb-1">
-                    <Text className="font-medium">{t('diagnosisResult.frequency')}:</Text>{' '}
-                    {diagnosis.treatment_recommendations.chemical_treatment.frequency}
-                  </Text>
+                  {displayDiagnosis.treatment_recommendations.chemical_treatment
+                    .primary_recommendation && (
+                    <Text className="text-gray-700 mb-1">
+                      <Text className="font-medium">{t('diagnosisResult.treatment')}:</Text>{' '}
+                      {
+                        displayDiagnosis.treatment_recommendations.chemical_treatment
+                          .primary_recommendation
+                      }
+                    </Text>
+                  )}
+                  {displayDiagnosis.treatment_recommendations.chemical_treatment.dosage && (
+                    <Text className="text-gray-700 mb-1">
+                      <Text className="font-medium">{t('diagnosisResult.dosage')}:</Text>{' '}
+                      {displayDiagnosis.treatment_recommendations.chemical_treatment.dosage}
+                    </Text>
+                  )}
+                  {displayDiagnosis.treatment_recommendations.chemical_treatment.frequency && (
+                    <Text className="text-gray-700 mb-1">
+                      <Text className="font-medium">{t('diagnosisResult.frequency')}:</Text>{' '}
+                      {displayDiagnosis.treatment_recommendations.chemical_treatment.frequency}
+                    </Text>
+                  )}
 
-                  {diagnosis.treatment_recommendations.chemical_treatment.indian_brands?.length >
-                    0 && (
+                  {displayDiagnosis.treatment_recommendations.chemical_treatment.indian_brands
+                    ?.length > 0 && (
                     <View className="mt-2">
                       <Text className="font-medium text-gray-700 mb-1">
                         {t('diagnosisResult.availableBrands')}:
                       </Text>
-                      {diagnosis.treatment_recommendations.chemical_treatment.indian_brands.map(
+                      {displayDiagnosis.treatment_recommendations.chemical_treatment.indian_brands.map(
                         (brand: string, index: number) => (
                           <Text key={index} className="text-gray-600 ml-2">
                             • {brand}
@@ -283,15 +305,21 @@ export const DiagnosisResultScreen: React.FC = () => {
                     </View>
                   )}
 
-                  <Text className="text-blue-600 font-medium mt-2">
-                    {t('diagnosisResult.cost')}:{' '}
-                    {diagnosis.treatment_recommendations.cost_analysis?.chemical_cost_per_acre}
-                  </Text>
+                  {displayDiagnosis.treatment_recommendations.cost_analysis
+                    ?.chemical_cost_per_acre && (
+                    <Text className="text-blue-600 font-medium mt-2">
+                      {t('diagnosisResult.cost')}:{' '}
+                      {
+                        displayDiagnosis.treatment_recommendations.cost_analysis
+                          .chemical_cost_per_acre
+                      }
+                    </Text>
+                  )}
 
-                  {diagnosis.treatment_recommendations.chemical_treatment.precautions && (
+                  {displayDiagnosis.treatment_recommendations.chemical_treatment.precautions && (
                     <Text className="text-red-600 text-sm mt-2 font-medium">
                       {t('diagnosisResult.precautions')}{' '}
-                      {diagnosis.treatment_recommendations.chemical_treatment.precautions}
+                      {displayDiagnosis.treatment_recommendations.chemical_treatment.precautions}
                     </Text>
                   )}
                 </View>
@@ -300,18 +328,18 @@ export const DiagnosisResultScreen: React.FC = () => {
           )}
 
           {/* Prevention Measures */}
-          {diagnosis.prevention_measures && (
+          {displayDiagnosis?.prevention_measures && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
               <Text className="text-lg font-bold text-gray-800 mb-2">
                 {t('diagnosisResult.prevention')}
               </Text>
 
-              {diagnosis.prevention_measures.cultural_practices?.length > 0 && (
+              {displayDiagnosis.prevention_measures.cultural_practices?.length > 0 && (
                 <View className="mb-3">
                   <Text className="font-semibold text-gray-700 mb-1">
                     {t('diagnosisResult.culturalPractices')}:
                   </Text>
-                  {diagnosis.prevention_measures.cultural_practices.map(
+                  {displayDiagnosis.prevention_measures.cultural_practices.map(
                     (practice: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
                         • {practice}
@@ -321,60 +349,35 @@ export const DiagnosisResultScreen: React.FC = () => {
                 </View>
               )}
 
-              {diagnosis.prevention_measures.seasonal_timing && (
+              {displayDiagnosis.prevention_measures.seasonal_timing && (
                 <Text className="text-gray-600">
                   <Text className="font-medium">{t('diagnosisResult.seasonalTiming')}:</Text>{' '}
-                  {diagnosis.prevention_measures.seasonal_timing}
+                  {displayDiagnosis.prevention_measures.seasonal_timing}
                 </Text>
-              )}
-            </View>
-          )}
-
-          {/* Regional Context */}
-          {diagnosis.regional_context && (
-            <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">
-                {t('diagnosisResult.regionalContext')}
-              </Text>
-              <Text className="text-gray-600 mb-1">
-                <Text className="font-medium">{t('diagnosisResult.prevalence')}:</Text>{' '}
-                {diagnosis.regional_context.karnataka_prevalence}
-              </Text>
-              <Text className="text-gray-600 mb-2">
-                <Text className="font-medium">{t('diagnosisResult.season')}:</Text>{' '}
-                {diagnosis.regional_context.season_correlation}
-              </Text>
-
-              {diagnosis.regional_context.local_support?.helpline && (
-                <TouchableOpacity className="bg-green-100 p-3 rounded-lg">
-                  <Text className="text-green-700 font-medium text-center">
-                    📞 {diagnosis.regional_context.local_support.helpline}
-                  </Text>
-                </TouchableOpacity>
               )}
             </View>
           )}
 
           {/* Follow-up */}
-          {diagnosis.follow_up && (
+          {displayDiagnosis?.follow_up && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
               <Text className="text-lg font-bold text-gray-800 mb-2">
                 {t('diagnosisResult.followUp')}
               </Text>
 
-              {diagnosis.follow_up.monitoring_schedule && (
+              {displayDiagnosis.follow_up.monitoring_schedule && (
                 <Text className="text-gray-600 mb-2">
                   <Text className="font-medium">{t('diagnosisResult.monitoring')}:</Text>{' '}
-                  {diagnosis.follow_up.monitoring_schedule}
+                  {displayDiagnosis.follow_up.monitoring_schedule}
                 </Text>
               )}
 
-              {diagnosis.follow_up.success_indicators?.length > 0 && (
+              {displayDiagnosis.follow_up.success_indicators?.length > 0 && (
                 <View className="mb-2">
                   <Text className="font-semibold text-green-600 mb-1">
                     {t('diagnosisResult.successIndicators')}:
                   </Text>
-                  {diagnosis.follow_up.success_indicators.map(
+                  {displayDiagnosis.follow_up.success_indicators.map(
                     (indicator: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
                         • {indicator}
@@ -384,27 +387,29 @@ export const DiagnosisResultScreen: React.FC = () => {
                 </View>
               )}
 
-              {diagnosis.follow_up.escalation_triggers?.length > 0 && (
+              {displayDiagnosis.follow_up.escalation_triggers?.length > 0 && (
                 <View>
                   <Text className="font-semibold text-red-600 mb-1">
                     {t('diagnosisResult.contactExpertIf')}:
                   </Text>
-                  {diagnosis.follow_up.escalation_triggers.map((trigger: string, index: number) => (
-                    <Text key={index} className="text-gray-600 ml-2">
-                      • {trigger}
-                    </Text>
-                  ))}
+                  {displayDiagnosis.follow_up.escalation_triggers.map(
+                    (trigger: string, index: number) => (
+                      <Text key={index} className="text-gray-600 ml-2">
+                        • {trigger}
+                      </Text>
+                    )
+                  )}
                 </View>
               )}
             </View>
           )}
 
           {/* Disclaimer */}
-          {diagnosis.disclaimer && (
+          {(displayDiagnosis?.disclaimer || diagnosis.disclaimer) && (
             <View className="bg-yellow-50 p-4 rounded-lg mb-4">
               <Text className="text-yellow-800 text-sm leading-5">
                 <Text className="font-medium">{t('diagnosisResult.disclaimer')}:</Text>{' '}
-                {diagnosis.disclaimer}
+                {displayDiagnosis?.disclaimer || diagnosis.disclaimer}
               </Text>
             </View>
           )}

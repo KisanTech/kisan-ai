@@ -55,7 +55,7 @@ export class SessionService {
     if (!this.sessionId) {
       // Try to get from storage first
       this.sessionId = await AsyncStorage.getItem(SESSION_ID_KEY);
-      
+
       // If still null, initialize session
       if (!this.sessionId) {
         await this.initializeSession();
@@ -71,7 +71,7 @@ export class SessionService {
     if (!this.userId) {
       // Try to get from storage first
       this.userId = await AsyncStorage.getItem(USER_ID_KEY);
-      
+
       // If still null, initialize session
       if (!this.userId) {
         await this.initializeSession();
@@ -100,4 +100,4 @@ export class SessionService {
   }
 }
 
-export const sessionService = SessionService.getInstance(); 
+export const sessionService = SessionService.getInstance();

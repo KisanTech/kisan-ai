@@ -20,8 +20,9 @@ import {
   diagnosisService,
   DiagnosisRequest,
   DiagnosisResponse,
+  ParsedAgentResponse,
 } from '../../services/diagnosisService';
-import aiService from '../../services/aiService';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -29,8 +30,10 @@ export const CropHealthScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [diagnosis, setDiagnosis] = useState<DiagnosisResponse | null>(null);
   const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
 
   // Animation value for rotating icon
   const spinValue = useRef(new Animated.Value(0)).current;
@@ -115,27 +118,174 @@ export const CropHealthScreen: React.FC = () => {
     }
   };
 
-  // Convert image URI to base64
-  const convertImageToBase64 = async (imageUri: string): Promise<string> => {
+  // Parse the raw agent response JSON safely
+  const parseAgentResponse = (rawResponse: string): ParsedAgentResponse | null => {
     try {
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
+      // Extract JSON from the raw response (remove ```json and ``` wrapper if present)
+      let jsonString = rawResponse.trim();
+      if (jsonString.startsWith('```json')) {
+        jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      }
 
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64 = reader.result as string;
-          // Remove data URL prefix (data:image/jpeg;base64,)
-          const base64Data = base64.split(',')[1];
-          resolve(base64Data);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
+      const parsed = JSON.parse(jsonString);
+      console.log('Parsed diagnosis:', parsed);
+      return parsed;
     } catch (error) {
-      console.error('Error converting image to base64:', error);
-      throw new Error('Failed to process image');
+      console.error('Error parsing agent response:', error);
+      console.log('Raw response:', rawResponse);
+      return null;
     }
+  };
+
+  // Translate diagnosis content to current language
+  const translateDiagnosis = async (
+    parsedDiagnosis: ParsedAgentResponse
+  ): Promise<ParsedAgentResponse> => {
+    const translated: ParsedAgentResponse = { ...parsedDiagnosis };
+
+    // Helper function to translate text
+    const translateText = async (text: string | undefined): Promise<string | undefined> => {
+      if (!text) return text;
+      return await diagnosisService.translateText(text, currentLanguage);
+    };
+
+    // Helper function to translate array of strings
+    const translateArray = async (arr: string[] | undefined): Promise<string[] | undefined> => {
+      if (!arr) return arr;
+      const translatedArray = await Promise.all(arr.map(item => translateText(item)));
+      return translatedArray.filter(item => item !== undefined) as string[];
+    };
+
+    // Translate crop identification
+    if (translated.crop_identification) {
+      translated.crop_identification.crop_name = await translateText(
+        translated.crop_identification.crop_name
+      );
+      translated.crop_identification.variety_hints = await translateText(
+        translated.crop_identification.variety_hints
+      );
+      translated.crop_identification.growth_stage = await translateText(
+        translated.crop_identification.growth_stage
+      );
+    }
+
+    // Translate disease analysis
+    if (translated.disease_analysis?.primary_diagnosis) {
+      translated.disease_analysis.primary_diagnosis.disease_name = await translateText(
+        translated.disease_analysis.primary_diagnosis.disease_name
+      );
+      translated.disease_analysis.primary_diagnosis.scientific_name = await translateText(
+        translated.disease_analysis.primary_diagnosis.scientific_name
+      );
+      translated.disease_analysis.primary_diagnosis.severity_level = await translateText(
+        translated.disease_analysis.primary_diagnosis.severity_level
+      );
+    }
+
+    if (translated.disease_analysis) {
+      translated.disease_analysis.symptoms_observed = await translateArray(
+        translated.disease_analysis.symptoms_observed
+      );
+      translated.disease_analysis.differential_diagnosis = await translateArray(
+        translated.disease_analysis.differential_diagnosis
+      );
+    }
+
+    // Translate treatment recommendations
+    if (translated.treatment_recommendations?.immediate_action) {
+      translated.treatment_recommendations.immediate_action.urgency = await translateText(
+        translated.treatment_recommendations.immediate_action.urgency
+      );
+      translated.treatment_recommendations.immediate_action.steps = await translateArray(
+        translated.treatment_recommendations.immediate_action.steps
+      );
+    }
+
+    if (translated.treatment_recommendations?.organic_treatment) {
+      translated.treatment_recommendations.organic_treatment.primary_recommendation =
+        await translateText(
+          translated.treatment_recommendations.organic_treatment.primary_recommendation
+        );
+      translated.treatment_recommendations.organic_treatment.application_method =
+        await translateText(
+          translated.treatment_recommendations.organic_treatment.application_method
+        );
+      translated.treatment_recommendations.organic_treatment.frequency = await translateText(
+        translated.treatment_recommendations.organic_treatment.frequency
+      );
+      translated.treatment_recommendations.organic_treatment.local_availability =
+        await translateText(
+          translated.treatment_recommendations.organic_treatment.local_availability
+        );
+    }
+
+    if (translated.treatment_recommendations?.chemical_treatment) {
+      translated.treatment_recommendations.chemical_treatment.primary_recommendation =
+        await translateText(
+          translated.treatment_recommendations.chemical_treatment.primary_recommendation
+        );
+      translated.treatment_recommendations.chemical_treatment.dosage = await translateText(
+        translated.treatment_recommendations.chemical_treatment.dosage
+      );
+      translated.treatment_recommendations.chemical_treatment.application_method =
+        await translateText(
+          translated.treatment_recommendations.chemical_treatment.application_method
+        );
+      translated.treatment_recommendations.chemical_treatment.frequency = await translateText(
+        translated.treatment_recommendations.chemical_treatment.frequency
+      );
+      translated.treatment_recommendations.chemical_treatment.precautions = await translateText(
+        translated.treatment_recommendations.chemical_treatment.precautions
+      );
+      translated.treatment_recommendations.chemical_treatment.indian_brands = await translateArray(
+        translated.treatment_recommendations.chemical_treatment.indian_brands
+      );
+    }
+
+    if (translated.treatment_recommendations?.cost_analysis) {
+      translated.treatment_recommendations.cost_analysis.organic_cost_per_acre =
+        await translateText(
+          translated.treatment_recommendations.cost_analysis.organic_cost_per_acre
+        );
+      translated.treatment_recommendations.cost_analysis.chemical_cost_per_acre =
+        await translateText(
+          translated.treatment_recommendations.cost_analysis.chemical_cost_per_acre
+        );
+      translated.treatment_recommendations.cost_analysis.recommendation = await translateText(
+        translated.treatment_recommendations.cost_analysis.recommendation
+      );
+    }
+
+    // Translate prevention measures
+    if (translated.prevention_measures) {
+      translated.prevention_measures.cultural_practices = await translateArray(
+        translated.prevention_measures.cultural_practices
+      );
+      translated.prevention_measures.resistant_varieties = await translateArray(
+        translated.prevention_measures.resistant_varieties
+      );
+      translated.prevention_measures.seasonal_timing = await translateText(
+        translated.prevention_measures.seasonal_timing
+      );
+    }
+
+    // Translate follow-up
+    if (translated.follow_up) {
+      translated.follow_up.monitoring_schedule = await translateText(
+        translated.follow_up.monitoring_schedule
+      );
+      translated.follow_up.success_indicators = await translateArray(
+        translated.follow_up.success_indicators
+      );
+      translated.follow_up.escalation_triggers = await translateArray(
+        translated.follow_up.escalation_triggers
+      );
+    }
+
+    // Translate disclaimer
+    translated.disclaimer = await translateText(translated.disclaimer);
+
+    return translated;
   };
 
   // Handle crop health diagnosis
@@ -147,18 +297,36 @@ export const CropHealthScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Convert image to base64 first
-      const base64Image = await convertImageToBase64(selectedImage);
+      // Call the diagnosis service with multipart form-data
+      const response = await diagnosisService.diagnoseCrop({
+        imageUri: selectedImage,
+        description: 'Image of the crop - to be processed for analysis',
+      });
 
-      // Call the AI service with base64 image and description
-      const response = await aiService.diagnoseCrop(
-        base64Image,
-        'Image of the crop - to be processed for analysis'
-      );
+      // Parse the agent response
+      const parsedDiagnosis = parseAgentResponse(response.raw_agent_response);
+      if (!parsedDiagnosis) {
+        throw new Error('Failed to parse agent response');
+      }
 
-      // Navigate to results screen with the AI agent response
+      // Check if translation is needed (skip for English)
+      let translatedDiagnosis = parsedDiagnosis;
+
+      if (currentLanguage && currentLanguage !== 'en') {
+        // Start translation process only for non-English languages
+        setIsTranslating(true);
+        translatedDiagnosis = await translateDiagnosis(parsedDiagnosis);
+      }
+
+      // Create updated response with translated data
+      const updatedResponse = {
+        ...response,
+        translatedDiagnosis,
+      };
+
+      // Navigate to results screen with the translated diagnosis response
       navigation.navigate('DiagnosisResult', {
-        diagnosis: response,
+        diagnosis: updatedResponse,
         imageUri: selectedImage,
       });
     } catch (error) {
@@ -166,6 +334,7 @@ export const CropHealthScreen: React.FC = () => {
       Alert.alert(t('cropHealth.diagnosisFailed'), t('cropHealth.diagnosisFailedMessage'));
     } finally {
       setIsLoading(false);
+      setIsTranslating(false);
     }
   };
 
@@ -253,19 +422,19 @@ export const CropHealthScreen: React.FC = () => {
       <View className="px-4 pb-4 bg-gray-50">
         <TouchableOpacity
           onPress={handleDiagnosis}
-          disabled={!selectedImage || isLoading}
+          disabled={!selectedImage || isLoading || isTranslating}
           className={`py-4 rounded-xl flex-row justify-center items-center ${
-            selectedImage && !isLoading ? 'bg-primary' : 'bg-accent'
+            selectedImage && !isLoading && !isTranslating ? 'bg-primary' : 'bg-accent'
           }`}
         >
           <View className="flex-row items-center justify-center">
-            {isLoading ? (
+            {isLoading || isTranslating ? (
               <>
                 <Animated.View style={{ transform: [{ rotate: spin }] }}>
                   <Ionicons name="hourglass-outline" size={24} color="black" />
                 </Animated.View>
                 <Text className="text-black font-bold text-lg ml-3">
-                  {t('cropHealth.analyzing')}
+                  {isTranslating ? t('cropHealth.translating') : t('cropHealth.analyzing')}
                 </Text>
               </>
             ) : (
