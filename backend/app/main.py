@@ -3,6 +3,9 @@
 import os
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.v1.agent_invocation import router as agent_invocation_router
 from app.api.v1.crop_diagnosis import router as crop_diagnosis_router
 from app.api.v1.market_prices import router as market_router
@@ -12,8 +15,6 @@ from app.core.config import settings
 from app.models.market import APIInfo, HealthCheckResponse
 from app.utils.gcp.gcp_manager import gcp_manager
 from app.utils.logger import logger
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 # Environment variables and credentials are loaded in app/__init__.py
 

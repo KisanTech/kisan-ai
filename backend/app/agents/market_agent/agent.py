@@ -2,6 +2,7 @@ import os
 
 import vertexai
 from google.adk.agents import Agent
+
 # Import market agent components
 from app.agents.market_agent.prompt import MARKET_ANALYSIS_PROMPT_V3
 from app.agents.market_agent.tools import get_market_data_smart

@@ -1,9 +1,9 @@
 from google.adk.agents import Agent
 from google.adk.tools.retrieval import VertexAiRagRetrieval
-from vertexai.preview.rag import RagResource
-from app.agents.rag_agent.prompt import GOVERNMENT_SCHEMES_SYSTEM_PROMPT
 from google.genai import types
+from vertexai.preview.rag import RagResource
 
+from app.agents.rag_agent.prompt import GOVERNMENT_SCHEMES_SYSTEM_PROMPT
 
 rag_tool = VertexAiRagRetrieval(name="Government Policies Knowledge Base",
  description="India government schemas for agricultural policies",

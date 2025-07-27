@@ -8,7 +8,11 @@ Google Cloud Storage image URLs or file uploads with AI agent processing.
 import datetime
 import json
 import uuid
-from typing import Optional
+
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai import types
 
 from app.agents.crop_diagnosis_agent.agent import root_agent
 from app.models.crop_diagnosis import (
@@ -20,10 +24,6 @@ from app.models.crop_diagnosis import (
 )
 from app.utils.gcp.gcp_manager import gcp_manager
 from app.utils.logger import logger
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
-from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
-from google.genai import types
 
 router = APIRouter(tags=["crop-diagnosis"])
 
@@ -311,7 +311,7 @@ async def analyze_crop_image(request: CropDiagnosisImageRequest) -> CropDiagnosi
 )
 async def analyze_uploaded_image(
     image: UploadFile = File(..., description="Crop image file to analyze"),
-    description: Optional[str] = Form(None, description="Optional description of the crop/issue"),
+    description: str | None = Form(None, description="Optional description of the crop/issue"),
 ) -> CropDiagnosisImageResponse:
     """
     Upload and analyze crop image using AI agent

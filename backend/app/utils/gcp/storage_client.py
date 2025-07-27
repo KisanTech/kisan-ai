@@ -6,11 +6,14 @@ Note: Typically accessed via GCPManager for singleton behavior.
 Direct instantiation is possible for testing or special cases.
 """
 
+from google.cloud import storage
+from google.cloud.storage import (
+    Bucket,
+    Client as StorageClient,
+)
+
 from app.core.config import settings
 from app.utils.logger import logger
-from google.cloud import storage
-from google.cloud.storage import Bucket
-from google.cloud.storage import Client as StorageClient
 
 
 class CloudStorageClient:

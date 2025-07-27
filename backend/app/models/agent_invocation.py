@@ -2,7 +2,7 @@
 Pydantic models for Agent Invocation API
 """
 
-from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.models.speech import SpeechToTextRequest
@@ -10,11 +10,11 @@ from app.models.speech import SpeechToTextRequest
 
 class TextAgentRequest(BaseModel):
     """Request model for text agent invocation"""
-    
+
     user_id: str = Field(..., description="Unique user identifier")
     session_id: str = Field(..., description="Session identifier for conversation continuity")
     text_data: str = Field(..., description="Text input from user", min_length=1, max_length=5000)
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -27,17 +27,17 @@ class TextAgentRequest(BaseModel):
 
 class TextAgentResponse(BaseModel):
     """Response model for text agent invocation"""
-    
+
     success: bool = Field(..., description="Whether the request was successful")
-    original_text: Optional[str] = Field(None, description="Original text input from user")
-    translated_text: Optional[str] = Field(None, description="User text translated to English")
-    detected_language: Optional[str] = Field(None, description="Detected source language")
-    agent_response: Optional[str] = Field(None, description="Response from the AI agent in English")
-    agent_response_translated: Optional[str] = Field(None, description="Agent response translated to user's language")
+    original_text: str | None = Field(None, description="Original text input from user")
+    translated_text: str | None = Field(None, description="User text translated to English")
+    detected_language: str | None = Field(None, description="Detected source language")
+    agent_response: str | None = Field(None, description="Response from the AI agent in English")
+    agent_response_translated: str | None = Field(None, description="Agent response translated to user's language")
     user_id: str = Field(..., description="User identifier")
     session_id: str = Field(..., description="Session identifier")
-    error: Optional[str] = Field(None, description="Error message if request failed")
-    
+    error: str | None = Field(None, description="Error message if request failed")
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -56,10 +56,10 @@ class TextAgentResponse(BaseModel):
 
 class VoiceAgentRequest(SpeechToTextRequest):
     """Request model for voice agent invocation that extends SpeechToTextRequest"""
-    
+
     user_id: str = Field(..., description="Unique user identifier")
     session_id: str = Field(..., description="Session identifier for conversation continuity")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -76,21 +76,21 @@ class VoiceAgentRequest(SpeechToTextRequest):
 
 class VoiceAgentResponse(BaseModel):
     """Response model for voice agent invocation"""
-    
+
     success: bool = Field(..., description="Whether the request was successful")
-    translated_text: Optional[str] = Field(None, description="Translated text from audio")
-    original_transcript: Optional[str] = Field(None, description="Original transcribed text")
-    detected_language: Optional[str] = Field(None, description="Detected source language")
-    transcription_confidence: Optional[float] = Field(None, description="Transcription confidence score")
-    agent_response: Optional[str] = Field(None, description="Response from the AI agent in English")
-    agent_response_translated: Optional[str] = Field(None, description="Agent response translated to user's language")
-    response_audio_data: Optional[str] = Field(None, description="Base64 encoded audio of translated agent response")
-    response_audio_encoding: Optional[str] = Field(None, description="Audio encoding format used")
-    response_audio_size_bytes: Optional[int] = Field(None, description="Audio size in bytes")
+    translated_text: str | None = Field(None, description="Translated text from audio")
+    original_transcript: str | None = Field(None, description="Original transcribed text")
+    detected_language: str | None = Field(None, description="Detected source language")
+    transcription_confidence: float | None = Field(None, description="Transcription confidence score")
+    agent_response: str | None = Field(None, description="Response from the AI agent in English")
+    agent_response_translated: str | None = Field(None, description="Agent response translated to user's language")
+    response_audio_data: str | None = Field(None, description="Base64 encoded audio of translated agent response")
+    response_audio_encoding: str | None = Field(None, description="Audio encoding format used")
+    response_audio_size_bytes: int | None = Field(None, description="Audio size in bytes")
     user_id: str = Field(..., description="User identifier")
     session_id: str = Field(..., description="Session identifier")
-    error: Optional[str] = Field(None, description="Error message if request failed")
-    
+    error: str | None = Field(None, description="Error message if request failed")
+
     class Config:
         json_schema_extra = {
             "example": {
