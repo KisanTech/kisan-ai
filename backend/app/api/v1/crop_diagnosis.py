@@ -9,11 +9,6 @@ import datetime
 import json
 import uuid
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
-from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
-from google.genai import types
-
 from app.agents.crop_diagnosis_agent.agent import root_agent
 from app.models.crop_diagnosis import (
     CropDiagnosisImageRequest,
@@ -24,6 +19,10 @@ from app.models.crop_diagnosis import (
 )
 from app.utils.gcp.gcp_manager import gcp_manager
 from app.utils.logger import logger
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai import types
 
 router = APIRouter(tags=["crop-diagnosis"])
 
@@ -151,17 +150,29 @@ async def upload_image_to_gcs(image: UploadFile) -> str:
             content_type=image.content_type,
         )
 
-        # Generate GCS URL
+        # Generate URLs using the blob object
         gcs_url = f"gs://{storage_client._bucket_name}/{unique_filename}"
+
+        # Try to get the public URL from the blob
+        try:
+            # Ensure the blob is public
+            blob.make_public()
+            public_url = blob.public_url
+        except Exception as e:
+            logger.warning(f"Failed to make blob public: {e}, using direct URL")
+            public_url = (
+                f"https://storage.googleapis.com/{storage_client._bucket_name}/{unique_filename}"
+            )
 
         logger.info(
             "Image uploaded to GCS successfully",
             original_filename=image.filename,
             gcs_url=gcs_url,
+            public_url=public_url,
             file_size_kb=len(image_data) / 1024,
         )
 
-        return gcs_url
+        return public_url
 
     except HTTPException:
         raise
@@ -181,14 +192,21 @@ async def upload_image_to_gcs(image: UploadFile) -> str:
 async def call_crop_diagnosis_agent(image_url: str, description: str) -> str:
     """Call the crop diagnosis agent with image URL and description"""
     try:
-        # Prepare the query with image URL and description
-        query_parts = [f"Please analyze this crop image: {image_url}"]
+        # Prepare the query parts
+        query_parts = ["Please analyze this crop image for disease diagnosis."]
         if description:
             query_parts.append(f"Additional context: {description}")
 
         query = "\n".join(query_parts)
 
-        content = types.Content(role="user", parts=[types.Part(text=query)])
+        # Create content with both text and image URL as separate parts
+        content = types.Content(
+            role="user",
+            parts=[
+                types.Part(text=query),
+                types.Part(file_data=types.FileData(file_uri=image_url, mime_type="image/jpeg")),
+            ],
+        )
         session, runner, user_id, session_id = await setup_session_and_runner()
         events = runner.run_async(user_id=user_id, session_id=session_id, new_message=content)
 
@@ -222,7 +240,8 @@ async def call_crop_diagnosis_agent(image_url: str, description: str) -> str:
     "/analyze-image",
     response_model=CropDiagnosisImageResponse,
     summary="Analyze crop image from GCS URL using AI agent",
-    description="Analyze crop disease/health from Google Cloud Storage image URL using specialized crop diagnosis AI agent",
+    description="Analyze crop disease/health from Google Cloud Storage image URL using "
+    "specialized crop diagnosis AI agent",
 )
 async def analyze_crop_image(request: CropDiagnosisImageRequest) -> CropDiagnosisImageResponse:
     """
@@ -260,9 +279,16 @@ async def analyze_crop_image(request: CropDiagnosisImageRequest) -> CropDiagnosi
                 detail="Image URL must be a valid Google Cloud Storage URL (gs:// or https://storage.googleapis.com/)",
             )
 
+        # Convert GCS URL to public HTTP URL if needed
+        image_url_for_agent = request.image_url
+        if request.image_url.startswith("gs://"):
+            # Convert gs://bucket/path to https://storage.googleapis.com/bucket/path
+            bucket_and_path = request.image_url.replace("gs://", "")
+            image_url_for_agent = f"https://storage.googleapis.com/{bucket_and_path}"
+
         # Call crop diagnosis agent
         agent_response = await call_crop_diagnosis_agent(
-            image_url=request.image_url, description=request.description or ""
+            image_url=image_url_for_agent, description=request.description or ""
         )
 
         logger.info(
@@ -307,7 +333,8 @@ async def analyze_crop_image(request: CropDiagnosisImageRequest) -> CropDiagnosi
     "/analyze-upload",
     response_model=CropDiagnosisImageResponse,
     summary="Upload and analyze crop image using AI agent",
-    description="Upload crop image, store in GCS, and analyze using specialized crop diagnosis AI agent",
+    description="Upload crop image, store in GCS, and analyze using specialized "
+    "crop diagnosis AI agent",
 )
 async def analyze_uploaded_image(
     image: UploadFile = File(..., description="Crop image file to analyze"),
