@@ -1,4 +1,5 @@
 import { voiceChatApiClient } from './baseApiService';
+import { sessionService } from './sessionService';
 
 export interface ChatMessage {
   id: string;
@@ -111,13 +112,14 @@ export class VoiceChatService {
   /**
    * Send text message to new text invoke API
    */
-  async sendTextInvoke(
-    textData: string,
-    userId: string = 'user123',
-    sessionId: string = 'session456'
-  ): Promise<TextInvokeResponse> {
+  async sendTextInvoke(textData: string): Promise<TextInvokeResponse> {
     try {
       console.log('Text invoke request received', textData);
+      
+      // Get session and user IDs from session service
+      const userId = await sessionService.getUserId();
+      const sessionId = await sessionService.getSessionId();
+      
       const response = await voiceChatApiClient.post('/invoke/text', {
         user_id: userId,
         session_id: sessionId,
@@ -153,12 +155,17 @@ export class VoiceChatService {
   ): Promise<SpeechToTextResponse> {
     try {
       console.log('Speech to text request received', base64Audio);
+      
+      // Get session and user IDs from session service
+      const userId = await sessionService.getUserId();
+      const sessionId = await sessionService.getSessionId();
+      
       const response = await voiceChatApiClient.post('/invoke/voice', {
         audio_data: base64Audio,
         audio_encoding: 'MP3',
         language_code: languageCode,
-        user_id: '123',
-        session_id: '123',
+        user_id: userId,
+        session_id: sessionId,
       });
       console.log('Speech to text response:', response.data);
 
@@ -175,8 +182,8 @@ export class VoiceChatService {
         response_audio_data: apiResponse.response_audio_data || '',
         response_audio_encoding: apiResponse.response_audio_encoding || 'MP3',
         response_audio_size_bytes: apiResponse.response_audio_size_bytes || 0,
-        user_id: apiResponse.user_id || '123',
-        session_id: apiResponse.session_id || '123',
+        user_id: apiResponse.user_id || userId,
+        session_id: apiResponse.session_id || sessionId,
         error: apiResponse.error || null,
         // Legacy properties for backward compatibility
         transcription: apiResponse.original_transcript || apiResponse.transcription || '',

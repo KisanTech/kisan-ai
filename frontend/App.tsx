@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import './global.css'; // Import global CSS for NativeWind
 import './src/i18n'; // Initialize i18n
 import { LanguageProvider } from './src/i18n/LanguageContext';
+import { sessionService } from './src/services/sessionService';
 import {
   HomeScreen,
   CropHealthScreen,
@@ -82,6 +83,19 @@ const AppNavigator: React.FC = () => {
 };
 
 export default function App() {
+  useEffect(() => {
+    // Initialize session on app startup
+    const initializeAppSession = async () => {
+      try {
+        await sessionService.initializeSession();
+      } catch (error) {
+        console.error('Failed to initialize app session:', error);
+      }
+    };
+
+    initializeAppSession();
+  }, []);
+
   return (
     <LanguageProvider>
       <AppNavigator />
