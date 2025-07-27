@@ -2,6 +2,9 @@
 
 AI-Powered Agricultural Assistant for Google Agentic AI Day Hackathon
 
+## DEMO Video
+- [DEMO Video](https://drive.google.com/file/d/1rusxMNTvu3lcugK1KyeqOd-ykMpKpL3I/view?usp=sharing)
+
 ## Quick Start
 
 ### Prerequisites
