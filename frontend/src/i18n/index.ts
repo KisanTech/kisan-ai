@@ -25,7 +25,7 @@ const languageDetector = {
     } catch (error) {
       console.log('Error reading language from storage:', error);
     }
-    
+
     // Default to English
     callback('en');
   },
@@ -57,10 +57,7 @@ const initOptions = {
   compatibilityJSON: 'v4' as const, // For React Native compatibility
 };
 
-i18n
-  .use(languageDetector)
-  .use(initReactI18next)
-  .init(initOptions);
+i18n.use(languageDetector).use(initReactI18next).init(initOptions);
 
 export default i18n;
 
@@ -78,4 +75,4 @@ export const changeLanguage = async (languageCode: string) => {
 export const getCurrentLanguage = () => i18n.language;
 
 // Helper function to get all available languages
-export const getAvailableLanguages = () => Object.keys(i18n.services.resourceStore.data); 
+export const getAvailableLanguages = () => Object.keys(i18n.services.resourceStore.data);

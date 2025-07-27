@@ -12,6 +12,7 @@ import {
   DiagnosisResultScreen,
   MarketPricesScreen,
   GovernmentSchemesScreen,
+  VoiceChatScreen,
 } from './src/screens';
 import { NavigateBackButton } from './src/components';
 import { RootStackParamList } from './src/types/navigation';
@@ -69,6 +70,11 @@ const AppNavigator: React.FC = () => {
             title: t('diagnosisResult.title'),
             headerLeft: () => <NavigateBackButton navigation={navigation} />,
           })}
+        />
+        <Stack.Screen
+          name="VoiceChat"
+          component={VoiceChatScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

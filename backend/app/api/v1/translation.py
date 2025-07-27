@@ -5,7 +5,6 @@ This module provides REST API endpoints for text translation, language detection
 and supported languages using Google Cloud Translation API v3.
 """
 
-
 import structlog
 from fastapi import APIRouter, HTTPException, status
 

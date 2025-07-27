@@ -2,7 +2,6 @@
 Pydantic models for Google Cloud Translation API.
 """
 
-
 from pydantic import BaseModel, Field
 
 

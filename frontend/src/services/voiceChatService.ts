@@ -23,6 +23,18 @@ export interface TextChatResponse {
   audio_response_url?: string;
 }
 
+export interface TextInvokeResponse {
+  success: boolean;
+  original_text: string;
+  translated_text: string;
+  detected_language: string;
+  agent_response: string;
+  agent_response_translated: string;
+  user_id: string;
+  session_id: string;
+  error: string | null;
+}
+
 export interface SpeechToTextResponse {
   success: boolean;
   translated_text: string;
@@ -70,7 +82,10 @@ export class VoiceChatService {
   /**
    * Send audio data to voice interface API using base64 encoding
    */
-  async sendVoiceMessage(base64Audio: string, languageCode: string = 'kn-IN'): Promise<VoiceQueryResponse> {
+  async sendVoiceMessage(
+    base64Audio: string,
+    languageCode: string = 'kn-IN'
+  ): Promise<VoiceQueryResponse> {
     try {
       const response = await voiceChatApiClient.post('/voice/voice-query', {
         audio_data: base64Audio,
@@ -94,9 +109,48 @@ export class VoiceChatService {
   }
 
   /**
+   * Send text message to new text invoke API
+   */
+  async sendTextInvoke(
+    textData: string,
+    userId: string = 'user123',
+    sessionId: string = 'session456'
+  ): Promise<TextInvokeResponse> {
+    try {
+      console.log('Text invoke request received', textData);
+      const response = await voiceChatApiClient.post('/invoke/text', {
+        user_id: userId,
+        session_id: sessionId,
+        text_data: textData,
+      });
+      console.log('Text invoke response:', response.data);
+
+      // Return the full response from the API
+      const apiResponse = response.data;
+      return {
+        success: apiResponse.success || false,
+        original_text: apiResponse.original_text || textData,
+        translated_text: apiResponse.translated_text || '',
+        detected_language: apiResponse.detected_language || 'en',
+        agent_response: apiResponse.agent_response || '',
+        agent_response_translated: apiResponse.agent_response_translated || '',
+        user_id: apiResponse.user_id || userId,
+        session_id: apiResponse.session_id || sessionId,
+        error: apiResponse.error || null,
+      };
+    } catch (error) {
+      console.error('Text invoke error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Convert speech to text using base64 audio data
    */
-  async speechToText(base64Audio: string, languageCode: string = 'hi-IN'): Promise<SpeechToTextResponse> {
+  async speechToText(
+    base64Audio: string,
+    languageCode: string = 'hi-IN'
+  ): Promise<SpeechToTextResponse> {
     try {
       console.log('Speech to text request received', base64Audio);
       const response = await voiceChatApiClient.post('/invoke/voice', {
@@ -107,7 +161,7 @@ export class VoiceChatService {
         session_id: '123',
       });
       console.log('Speech to text response:', response.data);
-      
+
       // Return the full response from the API
       const apiResponse = response.data;
       return {

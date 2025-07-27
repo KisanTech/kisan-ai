@@ -31,28 +31,18 @@ async def setup_session_and_runner(user_id: str, session_id: str):
     """Setup session and runner for agent interaction"""
     session_service = InMemorySessionService()
     session = await session_service.create_session(
-        app_name=APP_NAME,
-        user_id=user_id,
-        session_id=session_id
+        app_name=APP_NAME, user_id=user_id, session_id=session_id
     )
-    runner = Runner(
-        agent=root_agent,
-        app_name=APP_NAME,
-        session_service=session_service
-    )
+    runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_service)
     return session, runner
 
 
 async def call_agent_async(query: str, user_id: str, session_id: str) -> str:
     """Call the agent with a query and return the response"""
     try:
-        content = types.Content(role='user', parts=[types.Part(text=query)])
+        content = types.Content(role="user", parts=[types.Part(text=query)])
         session, runner = await setup_session_and_runner(user_id, session_id)
-        events = runner.run_async(
-            user_id=user_id,
-            session_id=session_id,
-            new_message=content
-        )
+        events = runner.run_async(user_id=user_id, session_id=session_id, new_message=content)
 
         async for event in events:
             if event.is_final_response():
@@ -61,7 +51,7 @@ async def call_agent_async(query: str, user_id: str, session_id: str) -> str:
                     "Agent response received",
                     user_id=user_id,
                     session_id=session_id,
-                    response_length=len(final_response)
+                    response_length=len(final_response),
                 )
                 return final_response
 
@@ -74,11 +64,11 @@ async def call_agent_async(query: str, user_id: str, session_id: str) -> str:
             error=str(e),
             error_type=type(e).__name__,
             user_id=user_id,
-            session_id=session_id
+            session_id=session_id,
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Agent processing failed: {str(e)}"
+            detail=f"Agent processing failed: {str(e)}",
         )
 
 
@@ -143,7 +133,7 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
         if not transcribed_text:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No text was transcribed from the audio"
+                detail="No text was transcribed from the audio",
             )
 
         logger.info(
@@ -156,7 +146,7 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
         translation_result = await translation_service.translate_text(
             text=transcribed_text,
             target_language="en",
-            source_language=None  # Auto-detect source language
+            source_language=None,  # Auto-detect source language
         )
 
         # Get the translated text
@@ -165,7 +155,7 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
         if not translated_text:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Translation failed: No translated text received"
+                detail="Translation failed: No translated text received",
             )
 
         logger.info(
@@ -177,16 +167,14 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
 
         # Process through AI agent
         agent_response = await call_agent_async(
-            query=translated_text,
-            user_id=request.user_id,
-            session_id=request.session_id
+            query=translated_text, user_id=request.user_id, session_id=request.session_id
         )
 
         logger.info(
             "Agent processing completed successfully",
             user_id=request.user_id,
             session_id=request.session_id,
-            agent_response_length=len(agent_response)
+            agent_response_length=len(agent_response),
         )
 
         # Translate agent response back to user's original language
@@ -196,25 +184,25 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
         if detected_language != "en" and detected_language != "unknown":
             try:
                 translation_back_result = await translation_service.translate_text(
-                    text=agent_response,
-                    target_language=detected_language,
-                    source_language="en"
+                    text=agent_response, target_language=detected_language, source_language="en"
                 )
-                agent_response_translated = translation_back_result.get("translated_text", agent_response)
+                agent_response_translated = translation_back_result.get(
+                    "translated_text", agent_response
+                )
 
                 logger.info(
                     "Agent response translation completed",
                     user_id=request.user_id,
                     session_id=request.session_id,
                     target_language=detected_language,
-                    translated_length=len(agent_response_translated)
+                    translated_length=len(agent_response_translated),
                 )
             except Exception as e:
                 logger.warning(
                     "Failed to translate agent response back to user language",
                     error=str(e),
                     user_id=request.user_id,
-                    session_id=request.session_id
+                    session_id=request.session_id,
                 )
                 agent_response_translated = agent_response
         else:
@@ -237,7 +225,7 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
                 speaking_rate=1.0,
                 pitch=0.0,
                 volume_gain_db=0.0,
-                use_latest_model=True
+                use_latest_model=True,
             )
 
             if tts_result.get("success"):
@@ -250,21 +238,21 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
                     user_id=request.user_id,
                     session_id=request.session_id,
                     audio_size_bytes=response_audio_size_bytes,
-                    language_code=tts_language_code
+                    language_code=tts_language_code,
                 )
             else:
                 logger.warning(
                     "Text-to-speech conversion failed",
                     error=tts_result.get("error", "Unknown TTS error"),
                     user_id=request.user_id,
-                    session_id=request.session_id
+                    session_id=request.session_id,
                 )
         except Exception as e:
             logger.warning(
                 "Failed to convert agent response to speech",
                 error=str(e),
                 user_id=request.user_id,
-                session_id=request.session_id
+                session_id=request.session_id,
             )
 
         # Return the complete response
@@ -280,7 +268,7 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
             response_audio_encoding=response_audio_encoding,
             response_audio_size_bytes=response_audio_size_bytes,
             user_id=request.user_id,
-            session_id=request.session_id
+            session_id=request.session_id,
         )
 
     except HTTPException:
@@ -290,15 +278,15 @@ async def invoke_voice(request: VoiceAgentRequest) -> VoiceAgentResponse:
             "Unexpected error in voice invoke",
             error=str(e),
             error_type=type(e).__name__,
-            user_id=getattr(request, 'user_id', 'unknown'),
-            session_id=getattr(request, 'session_id', 'unknown'),
+            user_id=getattr(request, "user_id", "unknown"),
+            session_id=getattr(request, "session_id", "unknown"),
         )
         # Return error response instead of raising exception
         return VoiceAgentResponse(
             success=False,
-            user_id=getattr(request, 'user_id', 'unknown'),
-            session_id=getattr(request, 'session_id', 'unknown'),
-            error=f"Internal server error during voice processing: {str(e)}"
+            user_id=getattr(request, "user_id", "unknown"),
+            session_id=getattr(request, "session_id", "unknown"),
+            error=f"Internal server error during voice processing: {str(e)}",
         )
 
 
@@ -326,21 +314,20 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
             "Text invoke request received",
             user_id=request.user_id,
             session_id=request.session_id,
-            text_length=len(request.text_data)
+            text_length=len(request.text_data),
         )
 
         # Validate text input
         if not request.text_data.strip():
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Text data cannot be empty"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Text data cannot be empty"
             )
 
         # Translate user text to English
         translation_result = await translation_service.translate_text(
             text=request.text_data,
             target_language="en",
-            source_language=None  # Auto-detect source language
+            source_language=None,  # Auto-detect source language
         )
 
         # Get the translated text
@@ -350,7 +337,7 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
         if not translated_text:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Translation to English failed: No translated text received"
+                detail="Translation to English failed: No translated text received",
             )
 
         logger.info(
@@ -359,21 +346,19 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
             session_id=request.session_id,
             original_length=len(request.text_data),
             translated_length=len(translated_text),
-            detected_language=detected_language
+            detected_language=detected_language,
         )
 
         # Process through AI agent
         agent_response = await call_agent_async(
-            query=translated_text,
-            user_id=request.user_id,
-            session_id=request.session_id
+            query=translated_text, user_id=request.user_id, session_id=request.session_id
         )
 
         logger.info(
             "Agent processing completed successfully",
             user_id=request.user_id,
             session_id=request.session_id,
-            agent_response_length=len(agent_response)
+            agent_response_length=len(agent_response),
         )
 
         # Translate agent response back to user's language
@@ -383,25 +368,25 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
         if target_language != "en" and target_language != "unknown":
             try:
                 translation_back_result = await translation_service.translate_text(
-                    text=agent_response,
-                    target_language=target_language,
-                    source_language="en"
+                    text=agent_response, target_language=target_language, source_language="en"
                 )
-                agent_response_translated = translation_back_result.get("translated_text", agent_response)
+                agent_response_translated = translation_back_result.get(
+                    "translated_text", agent_response
+                )
 
                 logger.info(
                     "Agent response translation completed",
                     user_id=request.user_id,
                     session_id=request.session_id,
                     target_language=target_language,
-                    translated_length=len(agent_response_translated)
+                    translated_length=len(agent_response_translated),
                 )
             except Exception as e:
                 logger.warning(
                     "Failed to translate agent response back to user language",
                     error=str(e),
                     user_id=request.user_id,
-                    session_id=request.session_id
+                    session_id=request.session_id,
                 )
                 agent_response_translated = agent_response
         else:
@@ -416,7 +401,7 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
             agent_response=agent_response,
             agent_response_translated=agent_response_translated,
             user_id=request.user_id,
-            session_id=request.session_id
+            session_id=request.session_id,
         )
 
     except HTTPException:
@@ -426,13 +411,13 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
             "Unexpected error in text invoke",
             error=str(e),
             error_type=type(e).__name__,
-            user_id=getattr(request, 'user_id', 'unknown'),
-            session_id=getattr(request, 'session_id', 'unknown'),
+            user_id=getattr(request, "user_id", "unknown"),
+            session_id=getattr(request, "session_id", "unknown"),
         )
         # Return error response instead of raising exception
         return TextAgentResponse(
             success=False,
-            user_id=getattr(request, 'user_id', 'unknown'),
-            session_id=getattr(request, 'session_id', 'unknown'),
-            error=f"Internal server error during text processing: {str(e)}"
+            user_id=getattr(request, "user_id", "unknown"),
+            session_id=getattr(request, "session_id", "unknown"),
+            error=f"Internal server error during text processing: {str(e)}",
         )

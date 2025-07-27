@@ -63,11 +63,9 @@ export const CropHealthScreen: React.FC = () => {
     const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (cameraStatus !== 'granted' || mediaStatus !== 'granted') {
-      Alert.alert(
-        t('cropHealth.permissionsRequired'),
-        t('cropHealth.permissionsMessage'),
-        [{ text: t('common.ok') }]
-      );
+      Alert.alert(t('cropHealth.permissionsRequired'), t('cropHealth.permissionsMessage'), [
+        { text: t('common.ok') },
+      ]);
       return false;
     }
     return true;
@@ -165,10 +163,7 @@ export const CropHealthScreen: React.FC = () => {
       });
     } catch (error) {
       console.error('Diagnosis error:', error);
-      Alert.alert(
-        t('cropHealth.diagnosisFailed'),
-        t('cropHealth.diagnosisFailedMessage')
-      );
+      Alert.alert(t('cropHealth.diagnosisFailed'), t('cropHealth.diagnosisFailedMessage'));
     } finally {
       setIsLoading(false);
     }
@@ -195,9 +190,7 @@ export const CropHealthScreen: React.FC = () => {
           <Text className="text-lg font-bold text-gray-800 text-center mb-2">
             {t('cropHealth.diagnosePlantDisease')}
           </Text>
-          <Text className="text-gray-600 text-center">
-            {t('cropHealth.subtitle')}
-          </Text>
+          <Text className="text-gray-600 text-center">{t('cropHealth.subtitle')}</Text>
         </View>
 
         {/* Image Display Area */}
@@ -245,7 +238,9 @@ export const CropHealthScreen: React.FC = () => {
 
         {/* Photo Tips */}
         <View className="bg-white rounded-2xl p-4 mb-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">{t('cropHealth.photoTips.title')}</Text>
+          <Text className="text-lg font-semibold text-gray-800 mb-3">
+            {t('cropHealth.photoTips.title')}
+          </Text>
           {photoTips.map((tip, index) => (
             <Text key={index} className="text-gray-600 mb-2 leading-5">
               {tip}
@@ -269,12 +264,16 @@ export const CropHealthScreen: React.FC = () => {
                 <Animated.View style={{ transform: [{ rotate: spin }] }}>
                   <Ionicons name="hourglass-outline" size={24} color="black" />
                 </Animated.View>
-                <Text className="text-black font-bold text-lg ml-3">{t('cropHealth.analyzing')}</Text>
+                <Text className="text-black font-bold text-lg ml-3">
+                  {t('cropHealth.analyzing')}
+                </Text>
               </>
             ) : (
               <>
                 <Ionicons name="leaf" size={24} color="white" />
-                <Text className="text-white font-bold text-lg ml-3">{t('cropHealth.checkCropHealth')}</Text>
+                <Text className="text-white font-bold text-lg ml-3">
+                  {t('cropHealth.checkCropHealth')}
+                </Text>
               </>
             )}
           </View>

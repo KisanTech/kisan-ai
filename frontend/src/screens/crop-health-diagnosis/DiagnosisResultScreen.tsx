@@ -84,9 +84,12 @@ export const DiagnosisResultScreen: React.FC = () => {
           {/* Image Assessment */}
           {diagnosis.image_assessment && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">{t('diagnosisResult.imageQuality')}</Text>
+              <Text className="text-lg font-bold text-gray-800 mb-2">
+                {t('diagnosisResult.imageQuality')}
+              </Text>
               <Text className="text-gray-600 mb-1">
-                {t('diagnosisResult.quality')}: <Text className="font-medium">{diagnosis.image_assessment.quality}</Text>
+                {t('diagnosisResult.quality')}:{' '}
+                <Text className="font-medium">{diagnosis.image_assessment.quality}</Text>
               </Text>
               <Text className="text-gray-600 mb-1">
                 {t('diagnosisResult.confidence')}:{' '}
@@ -105,7 +108,9 @@ export const DiagnosisResultScreen: React.FC = () => {
           {/* Crop Identification */}
           {diagnosis.crop_identification && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">{t('diagnosisResult.cropIdentification')}</Text>
+              <Text className="text-lg font-bold text-gray-800 mb-2">
+                {t('diagnosisResult.cropIdentification')}
+              </Text>
               <Text className="text-xl font-semibold text-green-700 mb-1">
                 {diagnosis.crop_identification.crop_name}
               </Text>
@@ -130,7 +135,9 @@ export const DiagnosisResultScreen: React.FC = () => {
           {/* Disease Analysis */}
           {diagnosis.disease_analysis?.disease_detected && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">{t('diagnosisResult.diseaseDetected')}</Text>
+              <Text className="text-lg font-bold text-gray-800 mb-2">
+                {t('diagnosisResult.diseaseDetected')}
+              </Text>
               <Text className="text-xl font-semibold text-red-600 mb-1">
                 {diagnosis.disease_analysis.primary_diagnosis?.disease_name}
               </Text>
@@ -161,7 +168,9 @@ export const DiagnosisResultScreen: React.FC = () => {
 
               {diagnosis.disease_analysis.symptoms_observed?.length > 0 && (
                 <View className="mt-2">
-                  <Text className="font-semibold text-gray-700 mb-1">{t('diagnosisResult.symptomsObserved')}:</Text>
+                  <Text className="font-semibold text-gray-700 mb-1">
+                    {t('diagnosisResult.symptomsObserved')}:
+                  </Text>
                   {diagnosis.disease_analysis.symptoms_observed.map(
                     (symptom: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
@@ -174,7 +183,9 @@ export const DiagnosisResultScreen: React.FC = () => {
 
               {diagnosis.disease_analysis.differential_diagnosis?.length > 0 && (
                 <View className="mt-2">
-                  <Text className="font-semibold text-gray-700 mb-1">{t('diagnosisResult.otherPossibilities')}:</Text>
+                  <Text className="font-semibold text-gray-700 mb-1">
+                    {t('diagnosisResult.otherPossibilities')}:
+                  </Text>
                   {diagnosis.disease_analysis.differential_diagnosis.map(
                     (disease: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
@@ -199,7 +210,8 @@ export const DiagnosisResultScreen: React.FC = () => {
                 <View className="mb-4 bg-orange-50 p-3 rounded-lg">
                   <Text className="font-semibold text-orange-700 mb-2">
                     {t('diagnosisResult.immediateAction')} (
-                    {diagnosis.treatment_recommendations.immediate_action.urgency} {t('diagnosisResult.urgency')})
+                    {diagnosis.treatment_recommendations.immediate_action.urgency}{' '}
+                    {t('diagnosisResult.urgency')})
                   </Text>
                   {diagnosis.treatment_recommendations.immediate_action.steps?.map(
                     (step: string, index: number) => (
@@ -214,7 +226,9 @@ export const DiagnosisResultScreen: React.FC = () => {
               {/* Organic Treatment */}
               {diagnosis.treatment_recommendations.organic_treatment && (
                 <View className="mb-4 bg-green-50 p-3 rounded-lg">
-                  <Text className="font-semibold text-green-700 mb-2">{t('diagnosisResult.organicTreatment')}</Text>
+                  <Text className="font-semibold text-green-700 mb-2">
+                    {t('diagnosisResult.organicTreatment')}
+                  </Text>
                   <Text className="text-gray-700 mb-1">
                     <Text className="font-medium">{t('diagnosisResult.treatment')}:</Text>{' '}
                     {diagnosis.treatment_recommendations.organic_treatment.primary_recommendation}
@@ -228,7 +242,8 @@ export const DiagnosisResultScreen: React.FC = () => {
                     {diagnosis.treatment_recommendations.organic_treatment.frequency}
                   </Text>
                   <Text className="text-green-600 font-medium">
-                    {t('diagnosisResult.cost')}: {diagnosis.treatment_recommendations.cost_analysis?.organic_cost_per_acre}
+                    {t('diagnosisResult.cost')}:{' '}
+                    {diagnosis.treatment_recommendations.cost_analysis?.organic_cost_per_acre}
                   </Text>
                 </View>
               )}
@@ -236,7 +251,9 @@ export const DiagnosisResultScreen: React.FC = () => {
               {/* Chemical Treatment */}
               {diagnosis.treatment_recommendations.chemical_treatment && (
                 <View className="mb-4 bg-blue-50 p-3 rounded-lg">
-                  <Text className="font-semibold text-blue-700 mb-2">{t('diagnosisResult.chemicalTreatment')}</Text>
+                  <Text className="font-semibold text-blue-700 mb-2">
+                    {t('diagnosisResult.chemicalTreatment')}
+                  </Text>
                   <Text className="text-gray-700 mb-1">
                     <Text className="font-medium">{t('diagnosisResult.treatment')}:</Text>{' '}
                     {diagnosis.treatment_recommendations.chemical_treatment.primary_recommendation}
@@ -253,7 +270,9 @@ export const DiagnosisResultScreen: React.FC = () => {
                   {diagnosis.treatment_recommendations.chemical_treatment.indian_brands?.length >
                     0 && (
                     <View className="mt-2">
-                      <Text className="font-medium text-gray-700 mb-1">{t('diagnosisResult.availableBrands')}:</Text>
+                      <Text className="font-medium text-gray-700 mb-1">
+                        {t('diagnosisResult.availableBrands')}:
+                      </Text>
                       {diagnosis.treatment_recommendations.chemical_treatment.indian_brands.map(
                         (brand: string, index: number) => (
                           <Text key={index} className="text-gray-600 ml-2">
@@ -271,7 +290,8 @@ export const DiagnosisResultScreen: React.FC = () => {
 
                   {diagnosis.treatment_recommendations.chemical_treatment.precautions && (
                     <Text className="text-red-600 text-sm mt-2 font-medium">
-                      {t('diagnosisResult.precautions')} {diagnosis.treatment_recommendations.chemical_treatment.precautions}
+                      {t('diagnosisResult.precautions')}{' '}
+                      {diagnosis.treatment_recommendations.chemical_treatment.precautions}
                     </Text>
                   )}
                 </View>
@@ -282,11 +302,15 @@ export const DiagnosisResultScreen: React.FC = () => {
           {/* Prevention Measures */}
           {diagnosis.prevention_measures && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">{t('diagnosisResult.prevention')}</Text>
+              <Text className="text-lg font-bold text-gray-800 mb-2">
+                {t('diagnosisResult.prevention')}
+              </Text>
 
               {diagnosis.prevention_measures.cultural_practices?.length > 0 && (
                 <View className="mb-3">
-                  <Text className="font-semibold text-gray-700 mb-1">{t('diagnosisResult.culturalPractices')}:</Text>
+                  <Text className="font-semibold text-gray-700 mb-1">
+                    {t('diagnosisResult.culturalPractices')}:
+                  </Text>
                   {diagnosis.prevention_measures.cultural_practices.map(
                     (practice: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
@@ -309,7 +333,9 @@ export const DiagnosisResultScreen: React.FC = () => {
           {/* Regional Context */}
           {diagnosis.regional_context && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">{t('diagnosisResult.regionalContext')}</Text>
+              <Text className="text-lg font-bold text-gray-800 mb-2">
+                {t('diagnosisResult.regionalContext')}
+              </Text>
               <Text className="text-gray-600 mb-1">
                 <Text className="font-medium">{t('diagnosisResult.prevalence')}:</Text>{' '}
                 {diagnosis.regional_context.karnataka_prevalence}
@@ -332,7 +358,9 @@ export const DiagnosisResultScreen: React.FC = () => {
           {/* Follow-up */}
           {diagnosis.follow_up && (
             <View className="bg-white rounded-lg p-4 mb-4 shadow-sm">
-              <Text className="text-lg font-bold text-gray-800 mb-2">{t('diagnosisResult.followUp')}</Text>
+              <Text className="text-lg font-bold text-gray-800 mb-2">
+                {t('diagnosisResult.followUp')}
+              </Text>
 
               {diagnosis.follow_up.monitoring_schedule && (
                 <Text className="text-gray-600 mb-2">
@@ -343,7 +371,9 @@ export const DiagnosisResultScreen: React.FC = () => {
 
               {diagnosis.follow_up.success_indicators?.length > 0 && (
                 <View className="mb-2">
-                  <Text className="font-semibold text-green-600 mb-1">{t('diagnosisResult.successIndicators')}:</Text>
+                  <Text className="font-semibold text-green-600 mb-1">
+                    {t('diagnosisResult.successIndicators')}:
+                  </Text>
                   {diagnosis.follow_up.success_indicators.map(
                     (indicator: string, index: number) => (
                       <Text key={index} className="text-gray-600 ml-2">
@@ -356,7 +386,9 @@ export const DiagnosisResultScreen: React.FC = () => {
 
               {diagnosis.follow_up.escalation_triggers?.length > 0 && (
                 <View>
-                  <Text className="font-semibold text-red-600 mb-1">{t('diagnosisResult.contactExpertIf')}:</Text>
+                  <Text className="font-semibold text-red-600 mb-1">
+                    {t('diagnosisResult.contactExpertIf')}:
+                  </Text>
                   {diagnosis.follow_up.escalation_triggers.map((trigger: string, index: number) => (
                     <Text key={index} className="text-gray-600 ml-2">
                       • {trigger}
@@ -371,7 +403,8 @@ export const DiagnosisResultScreen: React.FC = () => {
           {diagnosis.disclaimer && (
             <View className="bg-yellow-50 p-4 rounded-lg mb-4">
               <Text className="text-yellow-800 text-sm leading-5">
-                <Text className="font-medium">{t('diagnosisResult.disclaimer')}:</Text> {diagnosis.disclaimer}
+                <Text className="font-medium">{t('diagnosisResult.disclaimer')}:</Text>{' '}
+                {diagnosis.disclaimer}
               </Text>
             </View>
           )}
@@ -385,18 +418,24 @@ export const DiagnosisResultScreen: React.FC = () => {
             onPress={handleCallExpert}
             className="bg-white py-3 px-6 rounded-lg border border-gray-200 flex-1 mr-2"
           >
-            <Text className="font-medium text-gray-700 text-center">{t('diagnosisResult.callExpert')}</Text>
+            <Text className="font-medium text-gray-700 text-center">
+              {t('diagnosisResult.callExpert')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleGetSecondOpinion}
             className="bg-white py-3 px-6 rounded-lg border border-gray-200 flex-1 ml-2"
           >
-            <Text className="font-medium text-gray-700 text-center">{t('diagnosisResult.secondOpinion')}</Text>
+            <Text className="font-medium text-gray-700 text-center">
+              {t('diagnosisResult.secondOpinion')}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity onPress={handleSaveReport} className="bg-primary py-4 rounded-xl">
-          <Text className="text-white font-bold text-center text-lg">{t('diagnosisResult.saveReport')}</Text>
+          <Text className="text-white font-bold text-center text-lg">
+            {t('diagnosisResult.saveReport')}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

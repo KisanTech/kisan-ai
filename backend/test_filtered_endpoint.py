@@ -15,6 +15,7 @@ import aiohttp
 # Load environment variables
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     print("⚠️  python-dotenv not available")
@@ -25,6 +26,7 @@ print("=" * 45)
 # Backend configuration
 BACKEND_URL = os.getenv("BACKEND_API_URL") or "http://localhost:8000"
 ENDPOINT = f"{BACKEND_URL}/api/v1/market/filtered-data"
+
 
 async def test_filtered_endpoint():
     """Test various filtering scenarios"""
@@ -37,26 +39,26 @@ async def test_filtered_endpoint():
         {
             "name": "Basic State Filter - Karnataka",
             "params": {"state": "Karnataka"},
-            "description": "Get all data for Karnataka (default 60 days)"
+            "description": "Get all data for Karnataka (default 60 days)",
         },
         {
             "name": "State + Commodity Filter",
             "params": {"state": "Karnataka", "commodity": "tomato"},
-            "description": "Get tomato data for Karnataka"
+            "description": "Get tomato data for Karnataka",
         },
         {
             "name": "State + Market Filter",
             "params": {"state": "Karnataka", "market": "bangalore"},
-            "description": "Get Bangalore market data for Karnataka"
+            "description": "Get Bangalore market data for Karnataka",
         },
         {
             "name": "Date Range Filter",
             "params": {
                 "state": "Karnataka",
                 "start_date": (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d"),
-                "end_date": datetime.now().strftime("%Y-%m-%d")
+                "end_date": datetime.now().strftime("%Y-%m-%d"),
             },
-            "description": "Get Karnataka data for last 30 days"
+            "description": "Get Karnataka data for last 30 days",
         },
         {
             "name": "Multi-Filter Scenario",
@@ -64,20 +66,20 @@ async def test_filtered_endpoint():
                 "state": "Karnataka",
                 "commodity": "onion",
                 "start_date": (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d"),
-                "end_date": datetime.now().strftime("%Y-%m-%d")
+                "end_date": datetime.now().strftime("%Y-%m-%d"),
             },
-            "description": "Get onion data for Karnataka in last week"
+            "description": "Get onion data for Karnataka in last week",
         },
         {
             "name": "Tamil Nadu State",
             "params": {"state": "Tamil Nadu", "commodity": "tomato"},
-            "description": "Get tomato data for Tamil Nadu"
+            "description": "Get tomato data for Tamil Nadu",
         },
         {
             "name": "High Limit Test",
             "params": {"state": "Karnataka", "limit": 2000},
-            "description": "Test higher limit for bulk data retrieval"
-        }
+            "description": "Test higher limit for bulk data retrieval",
+        },
     ]
 
     results = []
@@ -89,15 +91,15 @@ async def test_filtered_endpoint():
             print(f"   Parameters: {test_case['params']}")
 
             try:
-                async with session.get(ENDPOINT, params=test_case['params']) as response:
+                async with session.get(ENDPOINT, params=test_case["params"]) as response:
                     status = response.status
                     data = await response.json()
 
                     if status == 200:
-                        success = data.get('success', False)
-                        total_records = data.get('total_records', 0)
-                        filters_applied = data.get('filters_applied', {})
-                        date_range = data.get('date_range', {})
+                        success = data.get("success", False)
+                        total_records = data.get("total_records", 0)
+                        filters_applied = data.get("filters_applied", {})
+                        date_range = data.get("date_range", {})
 
                         print(f"   ✅ SUCCESS: {total_records} records found")
                         print(f"   📊 Filters applied: {filters_applied}")
@@ -106,41 +108,44 @@ async def test_filtered_endpoint():
 
                         # Sample a few records if available
                         if total_records > 0:
-                            sample_records = data.get('data', [])[:3]
+                            sample_records = data.get("data", [])[:3]
                             print("   📝 Sample records:")
                             for j, record in enumerate(sample_records, 1):
-                                commodity = record.get('commodity', 'N/A')
-                                market = record.get('market', 'N/A')
-                                price = record.get('modal_price', 0)
-                                date = record.get('date', 'N/A')
-                                print(f"      {j}. {commodity} in {market}: ₹{price}/tonne ({date})")
+                                commodity = record.get("commodity", "N/A")
+                                market = record.get("market", "N/A")
+                                price = record.get("modal_price", 0)
+                                date = record.get("date", "N/A")
+                                print(
+                                    f"      {j}. {commodity} in {market}: ₹{price}/tonne ({date})"
+                                )
 
-                        results.append({
-                            "test": test_case['name'],
-                            "status": "PASS",
-                            "records": total_records,
-                            "filters": filters_applied
-                        })
+                        results.append(
+                            {
+                                "test": test_case["name"],
+                                "status": "PASS",
+                                "records": total_records,
+                                "filters": filters_applied,
+                            }
+                        )
                     else:
-                        error = data.get('detail', 'Unknown error')
+                        error = data.get("detail", "Unknown error")
                         print(f"   ❌ FAILED: HTTP {status} - {error}")
-                        results.append({
-                            "test": test_case['name'],
-                            "status": "FAIL",
-                            "error": f"HTTP {status}: {error}"
-                        })
+                        results.append(
+                            {
+                                "test": test_case["name"],
+                                "status": "FAIL",
+                                "error": f"HTTP {status}: {error}",
+                            }
+                        )
 
             except Exception as e:
                 print(f"   💥 EXCEPTION: {str(e)}")
-                results.append({
-                    "test": test_case['name'],
-                    "status": "ERROR",
-                    "error": str(e)
-                })
+                results.append({"test": test_case["name"], "status": "ERROR", "error": str(e)})
 
             print()
 
     return results
+
 
 async def test_error_scenarios():
     """Test error handling scenarios"""
@@ -153,30 +158,26 @@ async def test_error_scenarios():
             "name": "Missing State Parameter",
             "params": {"commodity": "tomato"},
             "expected_status": 422,
-            "description": "Should fail without required state parameter"
+            "description": "Should fail without required state parameter",
         },
         {
             "name": "Invalid Date Format",
             "params": {"state": "Karnataka", "start_date": "invalid-date"},
             "expected_status": 400,
-            "description": "Should fail with invalid date format"
+            "description": "Should fail with invalid date format",
         },
         {
             "name": "Start Date After End Date",
-            "params": {
-                "state": "Karnataka",
-                "start_date": "2025-01-28",
-                "end_date": "2025-01-27"
-            },
+            "params": {"state": "Karnataka", "start_date": "2025-01-28", "end_date": "2025-01-27"},
             "expected_status": 400,
-            "description": "Should fail when start_date > end_date"
+            "description": "Should fail when start_date > end_date",
         },
         {
             "name": "Excessive Limit",
             "params": {"state": "Karnataka", "limit": 10000},
             "expected_status": 400,
-            "description": "Should fail with limit > 5000"
-        }
+            "description": "Should fail with limit > 5000",
+        },
     ]
 
     error_results = []
@@ -188,24 +189,27 @@ async def test_error_scenarios():
             print(f"   Parameters: {test_case['params']}")
 
             try:
-                async with session.get(ENDPOINT, params=test_case['params']) as response:
+                async with session.get(ENDPOINT, params=test_case["params"]) as response:
                     status = response.status
                     data = await response.json()
 
-                    if status == test_case['expected_status']:
+                    if status == test_case["expected_status"]:
                         print(f"   ✅ EXPECTED ERROR: HTTP {status}")
-                        error_results.append({"test": test_case['name'], "status": "PASS"})
+                        error_results.append({"test": test_case["name"], "status": "PASS"})
                     else:
-                        print(f"   ❌ UNEXPECTED: Expected {test_case['expected_status']}, got {status}")
-                        error_results.append({"test": test_case['name'], "status": "FAIL"})
+                        print(
+                            f"   ❌ UNEXPECTED: Expected {test_case['expected_status']}, got {status}"
+                        )
+                        error_results.append({"test": test_case["name"], "status": "FAIL"})
 
             except Exception as e:
                 print(f"   💥 EXCEPTION: {str(e)}")
-                error_results.append({"test": test_case['name'], "status": "ERROR"})
+                error_results.append({"test": test_case["name"], "status": "ERROR"})
 
             print()
 
     return error_results
+
 
 async def main():
     """Run comprehensive endpoint tests"""
@@ -269,6 +273,7 @@ async def main():
         print("\n⏹️  Test interrupted by user")
     except Exception as e:
         print(f"\n❌ Test suite error: {str(e)}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

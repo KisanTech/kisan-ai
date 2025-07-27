@@ -131,14 +131,14 @@
     "saveReport": "💾 Save Report"
   },
   "marketPrices": {
-    "title": "📈 Market Prices",
+    "title": "Market Prices",
     "subtitle": "Get real-time crop prices, market trends, and agricultural insights",
-    "voiceAssistant": "🎤 Voice Assistant",
+    "voiceAssistant": "Voice Assistant",
     "voiceSubtitle": "Speak in Hindi or Kannada to get instant market information",
-    "startRecording": "🎤 Start Recording",
-    "pleaseAskQuery": "🎤 Please ask your query",
-    "recording": "🔴 Recording...",
-    "processing": "🔄 Processing...",
+    "startRecording": "Start Recording",
+    "pleaseAskQuery": "Please ask your query",
+    "recording": "Recording...",
+    "processing": "Processing...",
     "status": "Status",
     "readyToRecord": "Ready to record",
     "recordingInProgress": "Recording in progress...",
@@ -170,18 +170,18 @@
       "description": "Compare prices across different markets and find the best places to sell your produce for better returns."
     },
     "sampleQuestions": {
-      "title": "💬 Ask Questions Like:",
-      "question1": "• \"What is today's rice price in Bangalore mandi?\"",
-      "question2": "• \"Show me cotton price trends for this month\"",
-      "question3": "• \"Which crops have the best prices right now?\"",
-      "question4": "• \"Compare wheat prices in different districts\"",
-      "question5": "• \"When is the best time to sell my sugarcane?\""
+      "title": "Ask Questions Like:",
+      "question1": "\"What is today's rice price in Bangalore mandi?\"",
+      "question2": "\"Show me cotton price trends for this month\"",
+      "question3": "\"Which crops have the best prices right now?\"",
+      "question4": "\"Compare wheat prices in different districts\"",
+      "question5": "\"When is the best time to sell my sugarcane?\""
     },
     "recordingResults": "📱 Recording Results",
     "playbackRecordedAudio": "Playback Recorded Audio",
     "playRecording": "▶ Play Recording",
-    "pause": "⏸ Pause",
-    "replay": "🔄 Replay",
+    "pause": "Pause",
+    "replay": "Replay",
     "playbackError": "Playback Error",
     "playbackErrorMessage": "Failed to play the recorded audio.",
     "recordedAudioBase64": "Recorded Audio (Base64):",
@@ -195,9 +195,9 @@
     "voiceProcessingComplete": "Voice Processing Complete"
   },
   "governmentSchemes": {
-    "title": "🏛️ Government Schemes",
+    "title": "Government Schemes",
     "subtitle": "Get information about agricultural schemes, farmer welfare, and relief programs",
-    "voiceAssistant": "🎤 Voice Assistant",
+    "voiceAssistant": "Voice Assistant",
     "voiceSubtitle": "Speak in Hindi or Kannada to get instant scheme information",
     "whatYouCanGet": "What You Can Get:",
     "agriculturalSubsidies": {
@@ -221,13 +221,13 @@
       "description": "Learn about agricultural training programs, modern farming techniques, and skill development initiatives for farmers."
     },
     "sampleQuestions": {
-      "title": "💬 Ask Questions Like:",
-      "question1": "• \"How can I apply for PM-KISAN scheme?\"",
-      "question2": "• \"What fertilizer subsidies are available?\"",
-      "question3": "• \"Tell me about crop insurance schemes\"",
-      "question4": "• \"How to get Kisan Credit Card?\"",
-      "question5": "• \"What relief is available for crop damage?\"",
-      "question6": "• \"Are there any schemes for organic farming?\""
+      "title": "Ask Questions Like:",
+      "question1": "\"How can I apply for PM-KISAN scheme?\"",
+      "question2": "\"What fertilizer subsidies are available?\"",
+      "question3": "\"Tell me about crop insurance schemes\"",
+      "question4": "\"How to get Kisan Credit Card?\"",
+      "question5": "\"What relief is available for crop damage?\"",
+      "question6": "\"Are there any schemes for organic farming?\""
     }
   },
   "language": {
@@ -236,6 +236,22 @@
   },
   "voiceChat": {
     "title": "Voice Chat Assistant",
-    "subtitle": "Ask questions about farming, crops, and agriculture"
+    "subtitle": "Ask questions about farming, crops, and agriculture",
+    "welcomeMessage": "Hello! I'm your agricultural assistant. You can ask me questions about farming, crop prices, diseases, government schemes, and more. How can I help you today?",
+    "typeMessage": "Type your message...",
+    "send": "Send",
+    "orUseVoice": "Or use voice input",
+    "holdToRecord": "Hold to Record",
+    "recording": "Recording",
+    "processing": "Processing",
+    "sending": "Sending",
+    "playAudio": "Play",
+    "pause": "Pause",
+    "replay": "Replay",
+    "errorMessage": "Sorry, I encountered an error. Please try again.",
+    "processingError": "Processing Error",
+    "processingErrorMessage": "Failed to process your request. Please try again.",
+    "recordingError": "Recording Error",
+    "playbackError": "Playback Error"
   }
-} 
+}

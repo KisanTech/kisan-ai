@@ -2,7 +2,6 @@
 Pydantic models for Agent Invocation API
 """
 
-
 from pydantic import BaseModel, Field
 
 from app.models.speech import SpeechToTextRequest
@@ -20,7 +19,7 @@ class TextAgentRequest(BaseModel):
             "example": {
                 "user_id": "user123",
                 "session_id": "session456",
-                "text_data": "मेरी टमाटर की फसल में कुछ समस्या है"
+                "text_data": "मेरी टमाटर की फसल में कुछ समस्या है",
             }
         }
 
@@ -33,7 +32,9 @@ class TextAgentResponse(BaseModel):
     translated_text: str | None = Field(None, description="User text translated to English")
     detected_language: str | None = Field(None, description="Detected source language")
     agent_response: str | None = Field(None, description="Response from the AI agent in English")
-    agent_response_translated: str | None = Field(None, description="Agent response translated to user's language")
+    agent_response_translated: str | None = Field(
+        None, description="Agent response translated to user's language"
+    )
     user_id: str = Field(..., description="User identifier")
     session_id: str = Field(..., description="Session identifier")
     error: str | None = Field(None, description="Error message if request failed")
@@ -49,7 +50,7 @@ class TextAgentResponse(BaseModel):
                 "agent_response_translated": "मैं आपकी टमाटर की फसल की समस्या का निदान करने में आपकी मदद कर सकता हूं। क्या आप उन विशिष्ट लक्षणों का वर्णन कर सकते हैं जो आप देख रहे हैं?",
                 "user_id": "user123",
                 "session_id": "session456",
-                "error": None
+                "error": None,
             }
         }
 
@@ -69,7 +70,7 @@ class VoiceAgentRequest(SpeechToTextRequest):
                 "sample_rate": 48000,
                 "use_latest_model": True,
                 "user_id": "user123",
-                "session_id": "session456"
+                "session_id": "session456",
             }
         }
 
@@ -81,10 +82,16 @@ class VoiceAgentResponse(BaseModel):
     translated_text: str | None = Field(None, description="Translated text from audio")
     original_transcript: str | None = Field(None, description="Original transcribed text")
     detected_language: str | None = Field(None, description="Detected source language")
-    transcription_confidence: float | None = Field(None, description="Transcription confidence score")
+    transcription_confidence: float | None = Field(
+        None, description="Transcription confidence score"
+    )
     agent_response: str | None = Field(None, description="Response from the AI agent in English")
-    agent_response_translated: str | None = Field(None, description="Agent response translated to user's language")
-    response_audio_data: str | None = Field(None, description="Base64 encoded audio of translated agent response")
+    agent_response_translated: str | None = Field(
+        None, description="Agent response translated to user's language"
+    )
+    response_audio_data: str | None = Field(
+        None, description="Base64 encoded audio of translated agent response"
+    )
     response_audio_encoding: str | None = Field(None, description="Audio encoding format used")
     response_audio_size_bytes: int | None = Field(None, description="Audio size in bytes")
     user_id: str = Field(..., description="User identifier")
@@ -106,6 +113,6 @@ class VoiceAgentResponse(BaseModel):
                 "response_audio_size_bytes": 15420,
                 "user_id": "user123",
                 "session_id": "session456",
-                "error": None
+                "error": None,
             }
         }
