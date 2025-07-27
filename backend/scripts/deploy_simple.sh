@@ -7,7 +7,7 @@ set -e  # Exit on any error
 
 # Configuration
 PROJECT_ID="kisanai-466809"
-SERVICE_NAME="kisan-ai-api"
+SERVICE_NAME="kisan-ai-api-v2"
 REGION="us-central1"  
 SERVICE_ACCOUNT="kisan-ai-service-account@${PROJECT_ID}.iam.gserviceaccount.com"
 

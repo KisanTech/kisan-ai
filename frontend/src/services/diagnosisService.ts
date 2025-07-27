@@ -1,4 +1,3 @@
-import { DIAGNOSIS_API_BASE_URL } from './baseApiService';
 
 // Use the new backend URL
 const API_BASE_URL = 'https://kisan-ai-api-v2-556613941388.us-central1.run.app';

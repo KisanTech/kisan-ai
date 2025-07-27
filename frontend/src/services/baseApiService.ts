@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
-import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 // Service types
 export type ServiceType = 'diagnosis' | 'voiceChat' | 'default';
