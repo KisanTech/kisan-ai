@@ -35,22 +35,27 @@ cp env.template .env
 **Manual Setup:**
 Create a `.env` file with your actual credentials:
 ```bash
-# Basic Settings
 DEBUG=true
-ENVIRONMENT=development
+ENVIRONMENT=dev
 
-# Google Cloud (Required for AI features)
-GOOGLE_CLOUD_PROJECT=your-project-id
-GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account-key.json
+GOOGLE_CLOUD_PROJECT=<your-gcp-project-id>
+GOOGLE_APPLICATION_CREDENTIALS=<path-to-service-account-key.json>
 
-# Indian Government APIs (For real market data)
-DATA_GOV_API_KEY=your-data-gov-api-key
-ENAM_API_KEY=your-enam-api-key
+# Google Cloud Services
+FIRESTORE_DATABASE=<your-firestore-database-name>
+CLOUD_STORAGE_BUCKET=<your-cloud-storage-bucket-name>
 
-# Optional overrides (defaults work fine)
-VERTEX_AI_REGION=us-central1
-GEMINI_MODEL=gemini-2.0-flash-exp
-SPEECH_LANGUAGE_CODE=kn-IN
+# Vertex AI Configuration
+VERTEX_AI_REGION=<your-vertex-ai-region>
+GEMINI_MODEL=gemini-2.5-flash
+GOOGLE_GENAI_USE_VERTEXAI=1
+
+# Vertex Backend Config
+GOOGLE_CLOUD_PROJECT=<your-gcp-project-id>
+GOOGLE_CLOUD_LOCATION=<your-gcp-location>
+GOOGLE_CLOUD_STAGING_BUCKET=<your-gcp-staging-bucket-name>
+
+DATA_GOV_API_KEY=<your-data-gov-api-key>
 ```
 
 4. **Run the development server**
@@ -156,7 +161,7 @@ uv run ruff check && uv run ruff format --check
 #### One-Command Clean (Super Quick!)
 ```bash
 # Fix everything in one go
-uv run ruff check --fix && uv run ruff format && echo "✅ Code is clean!"
+uv run ruff check --fix && uv run ruff format
 ```
 
 #### Configuration
@@ -169,47 +174,58 @@ Ruff is configured in `pyproject.toml` with:
 
 ## AI Architecture
 
-### New Organized Structure 🧠
+### Multi-Agent System 🧠
 ```
-app/ai/
-├── agents/          # Multi-Agent System
-│   ├── orchestrator.py     # Routes queries to specialized agents
-│   ├── crop_agent.py       # Disease identification (Gemini 2.0 Flash)
-│   ├── voice_agent.py      # Kannada speech processing
-│   └── market_agent.py     # Real-time price analysis
-└── prompts/         # Prompt Engineering
-    ├── crop_diagnosis/     # Disease identification prompts
-    ├── voice_processing/   # Speech-to-text prompts
-    └── market_analysis/    # Price analysis prompts
+app/agents/
+├── coordinator_agent/       # Main Router & Intent Classifier
+│   ├── agent.py            # Coordinator with 4 specialized agents
+│   └── __init__.py
+├── crop_diagnosis_agent/    # Disease Identification (Gemini 2.5 Flash)
+│   ├── agent.py            # Crop health analysis with Google Search
+│   ├── prompt.py           # Specialized crop diagnosis prompts
+│   └── __init__.py
+├── market_agent/           # Market Data & Price Analysis
+│   ├── agent.py            # Market intelligence with API tools
+│   ├── prompt.py           # Market analysis prompts
+│   ├── tools.py            # Smart API integration tools
+│   └── __init__.py
+├── rag_agent/              # Government Policies & Schemes
+│   ├── agent.py            # RAG-based policy information
+│   ├── prompt.py           # Government schemes prompts
+│   └── __init__.py
+└── general_query_agent/     # General Agricultural Guidance
+    ├── agent.py            # General farming advice
+    └── __init__.py
 ```
 
-### Benefits of This Structure
-- **Separation of Concerns**: Agents focus on AI logic, APIs handle HTTP
-- **Prompt Management**: Centralized prompt templates for easy iteration
-- **Testability**: Each agent can be tested independently
-- **Scalability**: Easy to add new agents and prompts
+### Agent Capabilities
+- **🎯 Coordinator Agent**: Routes queries to specialized agents with intelligent intent classification
+- **🔬 Crop Diagnosis Agent**: AI-powered disease identification with treatment recommendations
+- **🌾 Market Agent**: Real-time price analysis, trends, and revenue calculations
+- **🏛️ RAG Agent**: Government schemes, subsidies, and agricultural policies
+- **💬 General Query Agent**: Best practices, cultivation tips, and seasonal advice
 
-## Core Features (MVP)
+## Core Features (Implemented)
 
-### 1. Crop Disease Identification
-- **Purpose**: Upload crop images for AI-powered disease diagnosis
-- **Status**: 🚧 Needs Implementation
-
-### 2. Voice Interface (Kannada)
+### 1. AI Agent Invocation APIs ✅
 - **Endpoints**: 
-  - `POST /api/v1/voice/speech-to-text`
-  - `POST /api/v1/voice/text-to-speech`
-  - `POST /api/v1/voice/voice-query`
-- **Purpose**: Kannada voice interaction for farmers
-- **Status**: 🚧 Needs Implementation
+  - `POST /api/v1/invoke/voice` - Voice-to-voice AI interaction
+  - `POST /api/v1/invoke/text` - Text-based AI interaction
+- **Features**: Multilingual support, session management, intelligent routing
+- **Status**: ✅ Fully Implemented
 
-### 3. Market Price Display  
+### 2. Crop Disease Diagnosis ✅
 - **Endpoints**:
-  - `GET /api/v1/market/current`
-  - `GET /api/v1/market/trends/{crop}`
-  - `GET /api/v1/market/markets`
-- **Purpose**: Real-time crop price information
-- **Status**: 🚧 Needs Implementation
+  - `POST /api/v1/crop-diagnosis/analyze-image` - Analyze from GCS URL
+  - `POST /api/v1/crop-diagnosis/analyze-upload` - Upload & analyze
+- **Features**: Image upload to GCS, structured diagnosis, treatment recommendations
+- **Status**: ✅ Fully Implemented
+
+### 3. Supporting APIs ✅
+- **Speech Processing**: `/api/v1/speech/transcribe`, `/api/v1/speech/synthesize`
+- **Translation**: `/api/v1/translation/translate`, `/api/v1/translation/detect`
+- **Market Data**: `/api/v1/market/*` endpoints
+- **Status**: ✅ Fully Implemented
 
 ## Project Structure
 
@@ -217,113 +233,24 @@ app/ai/
 backend/
 ├── app/
 │   ├── main.py              # FastAPI app entry point ✅
-│   ├── core/
-│   │   └── config.py        # Configuration management ✅
-|   ├── agents/              # AI Agents
-│   ├── api/v1/
-│   │   ├── crop_diagnosis.py    # Crop disease endpoints 🚧
-│   │   ├── voice_interface.py   # Voice/speech endpoints 🚧
-│   │   └── market_prices.py     # Market data endpoints 🚧
-│   ├── models/              # Pydantic models 📝
-│   └── services/            # Business logic 📝
+│   ├── agents/              # Multi-Agent System ✅
+│   │   ├── coordinator_agent/   # Main router ✅
+│   │   ├── crop_diagnosis_agent/ # Disease analysis ✅
+│   │   ├── market_agent/        # Market intelligence ✅
+│   │   ├── rag_agent/           # Government policies ✅
+│   │   └── general_query_agent/ # General advice ✅
+│   ├── api/v1/              # REST API Endpoints
+│   │   ├── agent_invocation.py  # AI agent APIs ✅
+│   │   ├── crop_diagnosis.py    # Crop analysis APIs ✅
+│   │   ├── speech.py           # Speech processing ✅
+│   │   ├── translation.py      # Translation APIs ✅
+│   │   └── market_prices.py    # Market data APIs ✅
+│   ├── models/              # Pydantic models ✅
+│   ├── services/            # Business logic ✅
+│   ├── core/                # Configuration ✅
+│   └── utils/               # Utilities ✅
+├── scripts/
+│   └── deploy_simple.sh     # Cloud Run deployment ✅
 ├── pyproject.toml           # uv configuration ✅
 └── README.md               # This file ✅
 ```
-
-## Implementation TODOs
-
-### High Priority (Hackathon MVP)
-- [ ] **AI Agents**: Implement in `app/ai/agents/` directory
-  - [ ] **Crop Diagnosis Agent**: Gemini 2.0 Flash integration
-  - [ ] **Voice Assistant Agent**: Kannada speech processing  
-  - [ ] **Market Intelligence Agent**: Real-time price analysis
-  - [ ] **Agent Orchestrator**: Basic routing logic
-- [ ] **Prompt Management**: Structured prompts in `app/ai/prompts/`
-- [ ] **API Integration**: Connect agents to FastAPI endpoints
-- [ ] **Image Upload**: Google Cloud Storage integration
-- [ ] **Basic Error Handling**: Graceful API error responses
-
-### Medium Priority  
-- [ ] **Pydantic Models**: Request/response validation
-- [ ] **Service Layer**: Business logic separation in `app/services/`
-- [ ] **Prompt Engineering**: Advanced prompt templates
-- [ ] **Agent Context**: Memory and conversation state
-- [ ] **Caching**: Redis for market price caching
-- [ ] **Logging**: Structured logging for debugging
-
-### Low Priority (Post-Hackathon)
-- [ ] **Authentication**: User management system
-- [ ] **Rate Limiting**: API usage controls
-- [ ] **Monitoring**: Health checks and metrics
-- [ ] **Docker**: Containerization
-
-## Google Cloud Services
-
-### Required APIs
-1. **Vertex AI API** - Gemini 2.0 Flash for crop diagnosis
-2. **Speech-to-Text API** - Kannada voice recognition
-3. **Text-to-Speech API** - Kannada voice responses  
-4. **Cloud Storage API** - Image and audio file storage
-
-### Setup Commands
-```bash
-# Enable required APIs
-gcloud services enable aiplatform.googleapis.com
-gcloud services enable speech.googleapis.com 
-gcloud services enable texttospeech.googleapis.com
-gcloud services enable storage.googleapis.com
-
-# Create service account
-gcloud iam service-accounts create project-kisan-sa
-gcloud projects add-iam-policy-binding PROJECT_ID \
-  --member="serviceAccount:project-kisan-sa@PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/aiplatform.user"
-```
-
-## Development Workflow
-
-1. **Start with placeholders**: All endpoints return mock data ✅
-2. **Implement one feature at a time**: Focus on working demos
-3. **Test early and often**: Use the `/docs` endpoint for testing
-4. **Keep it simple**: MVP focus, no over-engineering
-
-## Team Coordination
-
-### Zero-Setup Environment
-The `.python-version` file ensures **everyone automatically uses Python 3.13**:
-- New team members just run `uv sync` - no Python installation needed
-- Consistent environment across all development machines
-- No "works on my machine" issues during the hackathon
-
-### Parallel Development
-- **Backend Dev**: Implement API endpoints in `app/api/v1/` and Google Cloud integration
-- **AI/ML Engineer**: Focus on agents in `app/ai/agents/` and prompts in `app/ai/prompts/`
-- **Frontend Dev**: Use placeholder responses to build UI
-- **Full-Stack**: Connect agents to APIs and help with testing
-
-### AI Development Workflow
-1. **Prompt Development**: Create and test prompts in `app/ai/prompts/`
-2. **Agent Implementation**: Build agents in `app/ai/agents/` 
-3. **API Integration**: Connect agents to FastAPI endpoints
-4. **Testing**: Use `/docs` endpoint for agent testing
-
-### Communication
-- Update TODO comments as you implement features
-- Test endpoints using FastAPI docs at `/docs`
-- Commit frequently with clear messages
-
-## Troubleshooting
-
-### Common Issues
-1. **Google Cloud Auth**: Ensure `GOOGLE_APPLICATION_CREDENTIALS` path is correct
-2. **Import Errors**: Run `uv sync` to install dependencies
-3. **Port Conflicts**: Change port in uvicorn command if 8000 is busy
-
-### Debug Mode
-Set `DEBUG=true` in `.env` for detailed error messages.
-
----
-
-**Ready to build! 🚀**
-
-The placeholder endpoints are working - now let's implement the real AI magic! 
