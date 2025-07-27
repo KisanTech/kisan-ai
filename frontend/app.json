@@ -28,18 +28,12 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "ai.codekheti.projectkisan",
-      "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-
-    }
+    "extra": {}
   },
   "plugins": [
     [

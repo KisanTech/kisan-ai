@@ -16,8 +16,11 @@ const getApiUrl = (serviceType: ServiceType = 'default'): string => {
 
   // Fallback URLs for development based on service type
   if (__DEV__) {
-    const baseUrl = Platform.OS === 'android' ? '10.0.2.2' : 'https://kisan-ai-api-556613941388.us-central1.run.app';
-    
+    const baseUrl =
+      Platform.OS === 'android'
+        ? '10.0.2.2'
+        : 'https://kisan-ai-api-556613941388.us-central1.run.app';
+
     switch (serviceType) {
       case 'diagnosis':
         return `${baseUrl}/api/v1`;

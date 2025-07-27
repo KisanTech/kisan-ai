@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, TouchableOpacity, Text, Platform, Alert, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import {
   useAudioRecorder,
   AudioModule,
@@ -20,9 +21,11 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   buttonText = 'Start Recording',
   recordingText = 'Recording...',
 }) => {
-  const [permissionStatus, setPermissionStatus] = useState<'undetermined' | 'granted' | 'denied'>('undetermined');
+  const [permissionStatus, setPermissionStatus] = useState<'undetermined' | 'granted' | 'denied'>(
+    'undetermined'
+  );
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Use the proper expo-audio hooks
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(audioRecorder);
@@ -33,14 +36,15 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     try {
       const status = await AudioModule.requestRecordingPermissionsAsync();
       setPermissionStatus(status.granted ? 'granted' : 'denied');
-      
+
       if (!status.granted) {
-        const errorMsg = 'Audio recording permission denied. Please enable microphone access in your device settings.';
+        const errorMsg =
+          'Audio recording permission denied. Please enable microphone access in your device settings.';
         onError?.(errorMsg);
         Alert.alert('Permission Required', errorMsg);
         return false;
       }
-      
+
       return true;
     } catch (error) {
       const errorMsg = 'Failed to request audio permissions';
@@ -82,7 +86,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       // Prepare and start recording using the hook-based approach
       await audioRecorder.prepareToRecordAsync();
       await audioRecorder.record();
-      
+
       console.log('recording started');
       onRecordingStart?.();
 
@@ -90,16 +94,15 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       timeoutRef.current = setTimeout(() => {
         stopRecording();
       }, 60000);
-
     } catch (error) {
       const errorMsg = 'Failed to start recording';
       console.error(errorMsg, error);
       onError?.(errorMsg);
-      
+
       // Show specific error message for simulator
       if (Platform.OS === 'ios' && __DEV__) {
         Alert.alert(
-          'Simulator Limitation', 
+          'Simulator Limitation',
           'Audio recording typically does not work in iOS Simulator. Please test on a physical iOS device for full functionality.'
         );
       }
@@ -142,7 +145,6 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         console.error(errorMsg);
         onError?.(errorMsg);
       }
-
     } catch (error) {
       const errorMsg = 'Failed to stop recording';
       console.error(errorMsg, error);
@@ -163,7 +165,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   useEffect(() => {
     const setupAudio = async () => {
       await requestPermissions();
-      
+
       try {
         await setAudioModeAsync({
           playsInSilentMode: true,
@@ -173,7 +175,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         console.warn('Failed to set audio mode:', error);
       }
     };
-    
+
     setupAudio();
   }, []);
 
@@ -214,13 +216,14 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         disabled={permissionStatus === 'denied' || disabled}
         activeOpacity={0.8}
       >
-        <Text style={textStyle}>{displayText}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+          <Ionicons name="mic" size={20} color="#ffffff" style={{ marginRight: 8 }} />
+          <Text style={textStyle}>{displayText}</Text>
+        </View>
       </TouchableOpacity>
-      
+
       {permissionStatus === 'denied' && (
-        <Text style={styles.errorText}>
-          Microphone permission required for voice recording
-        </Text>
+        <Text style={styles.errorText}>Microphone permission required for voice recording</Text>
       )}
     </View>
   );
@@ -232,7 +235,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#19BA49',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 25,
@@ -264,4 +267,4 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-}); 
+});

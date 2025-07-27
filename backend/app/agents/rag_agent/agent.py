@@ -5,15 +5,20 @@ from vertexai.preview.rag import RagResource
 
 from app.agents.rag_agent.prompt import GOVERNMENT_SCHEMES_SYSTEM_PROMPT
 
-rag_tool = VertexAiRagRetrieval(name="Government Policies Knowledge Base",
- description="India government schemas for agricultural policies",
- rag_resources=[RagResource(rag_corpus="projects/kisanai-466809/locations/us-central1/ragCorpora/2305843009213693952")]
+rag_tool = VertexAiRagRetrieval(
+    name="Government Policies Knowledge Base",
+    description="India government schemas for agricultural policies",
+    rag_resources=[
+        RagResource(
+            rag_corpus="projects/kisanai-466809/locations/us-central1/ragCorpora/2305843009213693952"
+        )
+    ],
 )
 
 generate_content_config = types.GenerateContentConfig(
     temperature=0.3,  # Lower temperature for more consistent market analysis
-    top_p = 0.95,
-    max_output_tokens = 65535,
+    top_p=0.95,
+    max_output_tokens=65535,
 )
 
 root_agent = Agent(

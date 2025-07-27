@@ -61,11 +61,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     supportedLanguages: SUPPORTED_LANGUAGES,
   };
 
-  return (
-    <LanguageContext.Provider value={value}>
-      {children}
-    </LanguageContext.Provider>
-  );
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 
 export const useLanguage = (): LanguageContextType => {
@@ -74,4 +70,4 @@ export const useLanguage = (): LanguageContextType => {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
-}; 
+};

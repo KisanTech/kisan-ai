@@ -8,4 +8,5 @@ export type RootStackParamList = {
   };
   MarketPrices: undefined;
   GovernmentSchemes: undefined;
+  VoiceChat: undefined;
 };

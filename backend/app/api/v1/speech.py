@@ -2,7 +2,6 @@
 Speech-to-Text API endpoints using Google Cloud Speech API with latest models
 """
 
-
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 

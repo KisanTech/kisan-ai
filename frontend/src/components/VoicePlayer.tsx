@@ -39,7 +39,7 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
       // Create a temporary file path with timestamp to ensure uniqueness
       const timestamp = Date.now();
       const tmpFilename = `${FileSystem.cacheDirectory}audio_${timestamp}.mp3`;
-      
+
       // Write the base64 string to a file
       await FileSystem.writeAsStringAsync(tmpFilename, base64AudioString, {
         encoding: FileSystem.EncodingType.Base64,
@@ -48,16 +48,16 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
       audioUriRef.current = tmpFilename;
       setState(prev => ({ ...prev, isLoading: false, audioUri: tmpFilename }));
       onLoadComplete?.();
-      
+
       return tmpFilename;
     } catch (error) {
       const errorMsg = 'Failed to convert audio for playback';
       console.error(errorMsg, error);
-      setState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        hasError: true, 
-        errorMessage: errorMsg 
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        hasError: true,
+        errorMessage: errorMsg,
       }));
       onError?.(errorMsg);
       throw error;
@@ -92,10 +92,10 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
     } catch (error) {
       const errorMsg = 'Failed to play audio';
       console.error(errorMsg, error);
-      setState(prev => ({ 
-        ...prev, 
-        hasError: true, 
-        errorMessage: errorMsg 
+      setState(prev => ({
+        ...prev,
+        hasError: true,
+        errorMessage: errorMsg,
       }));
       onError?.(errorMsg);
     }
@@ -259,7 +259,7 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
         >
           <Text style={textStyle}>{getDisplayText()}</Text>
         </TouchableOpacity>
-        
+
         {state.audioUri && !state.isLoading && !state.hasError && (
           <TouchableOpacity
             style={[styles.secondaryButton, customStyles.button]}
@@ -271,17 +271,13 @@ export const VoicePlayer: React.FC<VoicePlayerProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      
+
       {state.hasError && state.errorMessage && (
-        <Text style={[styles.errorText, customStyles.errorText]}>
-          {state.errorMessage}
-        </Text>
+        <Text style={[styles.errorText, customStyles.errorText]}>{state.errorMessage}</Text>
       )}
-      
+
       {!base64Audio && !state.isLoading && (
-        <Text style={styles.noAudioText}>
-          No audio available
-        </Text>
+        <Text style={styles.noAudioText}>No audio available</Text>
       )}
     </View>
   );
@@ -329,7 +325,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.20,
+    shadowOpacity: 0.2,
     shadowRadius: 1.41,
   },
   text: {
@@ -362,4 +358,4 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-}); 
+});

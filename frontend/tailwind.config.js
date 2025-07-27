@@ -25,6 +25,7 @@ module.exports = {
         border: '#d7e7cf', // Pale green borders
         muted: '#ebf3e7', // Very light green for separators
         accent: '#d7e7cf', // Pale green accents
+        cardBackground: '#d7e6cf', // Soft off-white green-tinted
       },
     },
   },

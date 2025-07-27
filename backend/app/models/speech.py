@@ -2,7 +2,6 @@
 Pydantic models for Speech-to-Text API
 """
 
-
 from pydantic import BaseModel, Field
 
 
@@ -129,9 +128,7 @@ class TextToSpeechResponse(BaseModel):
     audio_encoding: str = Field(..., description="Audio encoding format used")
     audio_size_bytes: int = Field(..., description="Audio size in bytes")
     audio_size_mb: float = Field(..., description="Audio size in MB")
-    estimated_duration_seconds: float | None = Field(
-        None, description="Estimated audio duration"
-    )
+    estimated_duration_seconds: float | None = Field(None, description="Estimated audio duration")
     voice_used: str | None = Field(None, description="Voice name that was used")
     language_code: str = Field(..., description="Language code used")
     error: str | None = Field(None, description="Error message if conversion failed")

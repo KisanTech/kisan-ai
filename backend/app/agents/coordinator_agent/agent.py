@@ -14,26 +14,22 @@ rag_tool = agent_tool.AgentTool(agent=rag_agent)
 
 generate_content_config = types.GenerateContentConfig(
     temperature=0.3,  # Lower temperature for more consistent market analysis
-    top_p = 0.95,
-    max_output_tokens = 65535,
+    top_p=0.95,
+    max_output_tokens=65535,
 )
 
 root_agent = Agent(
     name="coordinator_agent",
     model="gemini-2.5-flash",
-    description=(
-        "Intent classifier and main router"
-    ),
+    description=("Intent classifier and main router"),
     instruction=(
         "You are Kisan AI, an intelligent agricultural assistant and coordinator that helps farmers and agricultural stakeholders. "
         "Your role is to analyze user queries and route them to the most appropriate specialized agent based on the intent and content.\n\n"
-
         "**ROUTING GUIDELINES:**\n"
         "🌾 **Market Agent**: Route queries about crop prices, market rates, selling opportunities, price trends, revenue calculations, or market analysis\n"
         "🔬 **Crop Diagnosis Agent**: Route queries about plant diseases, pest problems, crop health issues, symptoms identification, or treatment recommendations\n"
         "🏛️ **RAG Agent**: Route queries about government schemes, agricultural policies, subsidies, loan programs, insurance, or regulatory information\n"
         "💬 **General Query Agent**: Route general farming questions, best practices, cultivation tips, seasonal advice, or other agricultural guidance\n\n"
-
         "**INSTRUCTIONS:**\n"
         "1. Carefully analyze each user query to understand the primary intent\n"
         "2. Select the most appropriate specialized agent based on the query type\n"

@@ -45,7 +45,7 @@ const FEATURES: FeatureConfig[] = [
     titleKey: 'home.features.voiceChat.title',
     subtitleKey: 'home.features.voiceChat.subtitle',
     iconName: 'microphone',
-    screen: 'Home', // Placeholder
+    screen: 'VoiceChat',
   },
   {
     id: 'farm-analytics',

@@ -15,8 +15,11 @@ class SchemeQueryRequest(BaseModel):
     """Request model for government scheme queries."""
 
     query: str = Field(..., description="User's query about government schemes")
-    language: str | None = Field("english", description="Response language (hindi, english, kannada)")
+    language: str | None = Field(
+        "english", description="Response language (hindi, english, kannada)"
+    )
     user_context: dict[str, Any] | None = Field(None, description="Additional user context")
+
 
 class FarmerProfile(BaseModel):
     """Farmer profile information for eligibility checking."""
@@ -24,7 +27,10 @@ class FarmerProfile(BaseModel):
     land_size: str | None = Field(None, description="Size of farmer's land (e.g., '2 acres')")
     crop_type: str | None = Field(None, description="Type of crop grown")
     location: str | None = Field(None, description="Farmer's location (state/district)")
-    farmer_category: str | None = Field(None, description="Farmer category (small/marginal/medium/large)")
+    farmer_category: str | None = Field(
+        None, description="Farmer category (small/marginal/medium/large)"
+    )
+
 
 class EligibilityCheckRequest(BaseModel):
     """Request model for scheme eligibility checking."""
@@ -32,17 +38,20 @@ class EligibilityCheckRequest(BaseModel):
     query: str = Field(..., description="Farmer's query about schemes")
     farmer_profile: FarmerProfile = Field(..., description="Farmer's profile information")
 
+
 class DocumentValidationRequest(BaseModel):
     """Request model for document validation."""
 
     scheme_type: str = Field(..., description="Type of scheme")
     available_documents: list[str] = Field(..., description="List of documents farmer has")
 
+
 class ApplicationStatusRequest(BaseModel):
     """Request model for application status checking."""
 
     application_id: str = Field(..., description="Application reference number")
     scheme_type: str = Field(..., description="Type of scheme")
+
 
 class SchemeInfo(BaseModel):
     """Information about a government scheme."""
@@ -57,6 +66,7 @@ class SchemeInfo(BaseModel):
     portal_url: str | None = Field(None, description="Official portal URL")
     helpline: str | None = Field(None, description="Helpline number")
 
+
 class EligibilityResult(BaseModel):
     """Result of eligibility check for a scheme."""
 
@@ -65,6 +75,7 @@ class EligibilityResult(BaseModel):
     eligible: bool = Field(..., description="Whether farmer is eligible")
     reasons: list[str] = Field(..., description="Reasons for eligibility/ineligibility")
     required_documents: list[str] = Field(..., description="Required documents for the scheme")
+
 
 class DocumentValidationResult(BaseModel):
     """Result of document validation."""
@@ -76,7 +87,10 @@ class DocumentValidationResult(BaseModel):
     missing_documents: list[str] = Field(..., description="Missing documents")
     extra_documents: list[str] = Field(..., description="Extra documents")
     completion_percentage: float = Field(..., description="Percentage of documents available")
-    recommendations: list[str] | None = Field(None, description="Recommendations for missing documents")
+    recommendations: list[str] | None = Field(
+        None, description="Recommendations for missing documents"
+    )
+
 
 class ApplicationStatus(BaseModel):
     """Application status information."""
@@ -89,6 +103,7 @@ class ApplicationStatus(BaseModel):
     next_steps: list[str] = Field(..., description="Next steps in the process")
     contact_info: dict[str, str] = Field(..., description="Contact information")
     note: str | None = Field(None, description="Additional notes")
+
 
 class CorpusStatus(BaseModel):
     """RAG corpus status information."""
@@ -103,28 +118,37 @@ class CorpusStatus(BaseModel):
     top_k: int | None = Field(None, description="Top K retrieval setting")
     error: str | None = Field(None, description="Error message if any")
 
+
 class SchemeQueryResponse(BaseModel):
     """Response model for government scheme queries."""
 
     success: bool = Field(..., description="Whether the query was successful")
     response: str = Field(..., description="Generated response text")
-    source: str = Field(..., description="Source of the response (rag_model, rag_retrieval, fallback)")
+    source: str = Field(
+        ..., description="Source of the response (rag_model, rag_retrieval, fallback)"
+    )
     query: str = Field(..., description="Original query")
     user_context: dict[str, Any] | None = Field(None, description="User context")
     retrieved_context: str | None = Field(None, description="Retrieved context from RAG")
     error: str | None = Field(None, description="Error message if any")
     timestamp: datetime = Field(default_factory=datetime.now, description="Response timestamp")
 
+
 class EligibilityCheckResponse(BaseModel):
     """Response model for eligibility checking."""
 
     success: bool = Field(..., description="Whether the check was successful")
-    eligible_schemes: list[EligibilityResult] = Field(..., description="Schemes farmer is eligible for")
-    ineligible_schemes: list[EligibilityResult] = Field(..., description="Schemes farmer is not eligible for")
+    eligible_schemes: list[EligibilityResult] = Field(
+        ..., description="Schemes farmer is eligible for"
+    )
+    ineligible_schemes: list[EligibilityResult] = Field(
+        ..., description="Schemes farmer is not eligible for"
+    )
     farmer_profile: FarmerProfile = Field(..., description="Farmer profile used for checking")
     recommendations: list[str] = Field(..., description="Recommendations based on eligibility")
     error: str | None = Field(None, description="Error message if any")
     timestamp: datetime = Field(default_factory=datetime.now, description="Response timestamp")
+
 
 class SchemeCategoriesResponse(BaseModel):
     """Response model for scheme categories."""
@@ -134,16 +158,19 @@ class SchemeCategoriesResponse(BaseModel):
     last_updated: str = Field(..., description="Last update timestamp")
     error: str | None = Field(None, description="Error message if any")
 
+
 class CorpusStatusResponse(BaseModel):
     """Response model for corpus status."""
 
     corpus_status: CorpusStatus = Field(..., description="RAG corpus status")
     timestamp: datetime = Field(default_factory=datetime.now, description="Response timestamp")
 
+
 class CorpusRefreshRequest(BaseModel):
     """Request model for corpus refresh."""
 
     force_reimport: bool = Field(False, description="Whether to force reimport all documents")
+
 
 class CorpusRefreshResponse(BaseModel):
     """Response model for corpus refresh."""

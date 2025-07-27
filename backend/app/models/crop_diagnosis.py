@@ -2,12 +2,12 @@
 Pydantic models for Crop Diagnosis API with GCS Image URLs
 """
 
-
 from pydantic import BaseModel, Field
 
 
 class CropHealthDiagnosis(BaseModel):
     """Structured crop health diagnosis data"""
+
     crop_detected: str | None = Field(None, description="Type of crop detected")
     disease_detected: bool | None = Field(None, description="Whether disease was detected")
     disease_name: str | None = Field(None, description="Name of the detected disease")
@@ -18,6 +18,7 @@ class CropHealthDiagnosis(BaseModel):
 
 class TreatmentRecommendation(BaseModel):
     """Structured treatment recommendations"""
+
     organic_treatment: str | None = Field(None, description="Organic treatment options")
     chemical_treatment: str | None = Field(None, description="Chemical treatment options")
     application_frequency: str | None = Field(None, description="How often to apply treatments")
@@ -26,21 +27,28 @@ class TreatmentRecommendation(BaseModel):
 
 class PreventionNotes(BaseModel):
     """Prevention and additional notes"""
+
     preventive_measures: str | None = Field(None, description="Preventive measures for future")
-    differential_diagnosis: str | None = Field(None, description="Alternative diagnoses to consider")
+    differential_diagnosis: str | None = Field(
+        None, description="Alternative diagnoses to consider"
+    )
 
 
 class CropDiagnosisImageRequest(BaseModel):
     """Request model for crop diagnosis using GCS image URL"""
 
-    image_url: str = Field(..., description="Google Cloud Storage URL of the crop image", min_length=1)
-    description: str | None = Field(None, description="Optional description of the crop/issue", max_length=1000)
+    image_url: str = Field(
+        ..., description="Google Cloud Storage URL of the crop image", min_length=1
+    )
+    description: str | None = Field(
+        None, description="Optional description of the crop/issue", max_length=1000
+    )
 
     class Config:
         json_schema_extra = {
             "example": {
                 "image_url": "gs://kisan-ai-bucket/crops/tomato_disease_sample.jpg",
-                "description": "My tomato plants have brown spots on leaves"
+                "description": "My tomato plants have brown spots on leaves",
             }
         }
 
@@ -56,13 +64,21 @@ class CropDiagnosisImageResponse(BaseModel):
     )
 
     # Structured diagnosis data
-    crop_health_diagnosis: CropHealthDiagnosis | None = Field(None, description="Structured crop health diagnosis")
-    treatment_recommendation: TreatmentRecommendation | None = Field(None, description="Structured treatment recommendations")
-    prevention_notes: PreventionNotes | None = Field(None, description="Prevention notes and additional information")
+    crop_health_diagnosis: CropHealthDiagnosis | None = Field(
+        None, description="Structured crop health diagnosis"
+    )
+    treatment_recommendation: TreatmentRecommendation | None = Field(
+        None, description="Structured treatment recommendations"
+    )
+    prevention_notes: PreventionNotes | None = Field(
+        None, description="Prevention notes and additional information"
+    )
     disclaimer: str | None = Field(None, description="Disclaimer about AI diagnosis")
 
     # Raw response for debugging/fallback
-    raw_agent_response: str | None = Field(None, description="Raw response from crop diagnosis agent")
+    raw_agent_response: str | None = Field(
+        None, description="Raw response from crop diagnosis agent"
+    )
 
     error: str | None = Field(None, description="Error message if request failed")
 
