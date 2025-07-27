@@ -192,7 +192,6 @@ app/ai/
 ## Core Features (MVP)
 
 ### 1. Crop Disease Identification
-- **Endpoint**: `POST /api/v1/crop/diagnose`
 - **Purpose**: Upload crop images for AI-powered disease diagnosis
 - **Status**: 🚧 Needs Implementation
 

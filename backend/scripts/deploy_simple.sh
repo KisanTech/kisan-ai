@@ -150,11 +150,11 @@ deploy_service() {
         --source . \
         --region ${REGION} \
         --allow-unauthenticated \
-        --memory 1Gi \
-        --cpu 1 \
-        --timeout 300 \
+        --memory 2Gi \
+        --cpu 4 \
+        --timeout 600 \
         --concurrency 100 \
-        --min-instances 0 \
+        --min-instances 2 \
         --max-instances 10 \
         --service-account="${SERVICE_ACCOUNT}" \
         --set-env-vars="${ENV_VARS}" \

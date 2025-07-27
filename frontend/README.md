@@ -93,7 +93,6 @@ npm run build:ios
 
 ### Backend API Endpoints
 
-- `POST /api/v1/crop/diagnose` - Crop disease identification
 - `POST /api/v1/voice/speech-to-text` - Kannada speech processing
 - `GET /api/v1/market/current` - Current market prices
 

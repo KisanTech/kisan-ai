@@ -145,7 +145,6 @@ npm run lint            # Lint entire codebase
 - **Development Server**: http://localhost:8000
 - **Interactive Docs**: http://localhost:8000/docs
 - **Key Endpoints**:
-  - `POST /api/v1/crop/diagnose` - Disease identification
   - `POST /api/v1/voice/speech-to-text` - Kannada speech
   - `GET /api/v1/market/current` - Market prices
 
