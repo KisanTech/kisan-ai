@@ -9,7 +9,7 @@ Let the LLM do the smart work, not hardcoded mappings.
 import logging
 import os
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Dict, Optional
 
 import aiohttp
 from google.adk.tools import FunctionTool
@@ -23,8 +23,8 @@ BACKEND_API_URL = os.getenv("BACKEND_API_URL")
 
 @FunctionTool
 async def get_market_data_smart(
-    state: str, commodity: str | None = None, days: int = 60
-) -> dict[str, Any]:
+    state: str, commodity: Optional[str] = None, days: int = 60
+) -> Dict[str, Any]:
     """
     Get market data with smart filtering using the new filtered endpoint.
 
