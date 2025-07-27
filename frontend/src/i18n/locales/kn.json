@@ -51,6 +51,10 @@
       "assessCropHealth": "ಬೆಳೆ ಆರೋಗ್ಯವನ್ನು ಮೌಲ್ಯಮಾಪನ ಮಾಡಿ"
     }
   },
+  "language": {
+    "selectLanguage": "ಭಾಷೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ",
+    "currentLanguage": "ಪ್ರಸ್ತುತ ಭಾಷೆ"
+  },
   "bottomTabs": {
     "home": "ಮುಖ್ಯಪುಟ",
     "community": "ಸಮುದಾಯ",

@@ -19,7 +19,7 @@ const getApiUrl = (serviceType: ServiceType = 'default'): string => {
     const baseUrl =
       Platform.OS === 'android'
         ? '10.0.2.2'
-        : 'https://kisan-ai-api-556613941388.us-central1.run.app';
+        : 'https://kisan-ai-api-v2-556613941388.us-central1.run.app';
 
     switch (serviceType) {
       case 'diagnosis':

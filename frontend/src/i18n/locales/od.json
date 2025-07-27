@@ -51,6 +51,10 @@
       "assessCropHealth": "ଫସଲ ସ୍ୱାସ୍ଥ୍ୟ ମୂଲ୍ୟାଙ୍କନ କରନ୍ତୁ"
     }
   },
+  "language": {
+    "selectLanguage": "ଭାଷା ବାଛନ୍ତୁ",
+    "currentLanguage": "ବର୍ତ୍ତମାନ ଭାଷା"
+  },
   "bottomTabs": {
     "home": "ମୁଖ୍ୟପୃଷ୍ଠା",
     "community": "ସମ୍ପ୍ରଦାୟ",

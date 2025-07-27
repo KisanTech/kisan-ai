@@ -51,6 +51,10 @@
       "assessCropHealth": "फसल के स्वास्थ्य का आकलन करें"
     }
   },
+  "language": {
+    "selectLanguage": "भाषा चुनें",
+    "currentLanguage": "वर्तमान भाषा"
+  },
   "bottomTabs": {
     "home": "होम",
     "community": "समुदाय",

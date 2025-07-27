@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, Modal, Platform, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { SUPPORTED_LANGUAGES } from '../config/languages';
 
 interface LanguageSelectorProps {
@@ -12,6 +13,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   currentLanguage,
   onLanguageChange,
 }) => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
   const buttonRef = useRef<View>(null);
@@ -35,10 +37,15 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <TouchableOpacity
         ref={buttonRef}
         onPress={measureButton}
-        className="w-10 h-10 rounded-full bg-background items-center justify-center"
+        className="flex-row items-center"
         activeOpacity={0.7}
       >
-        <MaterialCommunityIcons name="translate" size={24} color="#121b0d" />
+        <Text className="text-foreground text-sm font-medium mr-2">
+          {t('language.selectLanguage')}
+        </Text>
+        <View className="w-10 h-10 rounded-full bg-background items-center justify-center">
+          <MaterialCommunityIcons name="translate" size={24} color="#121b0d" />
+        </View>
       </TouchableOpacity>
 
       <Modal
