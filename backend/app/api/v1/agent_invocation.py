@@ -315,6 +315,7 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
             user_id=request.user_id,
             session_id=request.session_id,
             text_length=len(request.text_data),
+            provided_language_code=request.language_code
         )
 
         # Validate text input
@@ -362,7 +363,19 @@ async def invoke_text(request: TextAgentRequest) -> TextAgentResponse:
         )
 
         # Translate agent response back to user's language
-        target_language = detected_language
+        # Use provided language_code if available, otherwise use detected language
+        target_language = request.language_code if request.language_code else detected_language
+        
+        logger.info(
+            "Language selection for response translation",
+            user_id=request.user_id,
+            session_id=request.session_id,
+            provided_language_code=request.language_code,
+            detected_language=detected_language,
+            final_target_language=target_language,
+            language_source="provided" if request.language_code else "detected"
+        )
+            
         agent_response_translated = None
 
         if target_language != "en" and target_language != "unknown":
