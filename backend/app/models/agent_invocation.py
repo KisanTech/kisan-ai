@@ -2,6 +2,7 @@
 Pydantic models for Agent Invocation API
 """
 
+from typing import Optional
 from pydantic import BaseModel, Field
 
 from app.models.speech import SpeechToTextRequest
@@ -10,9 +11,27 @@ from app.models.speech import SpeechToTextRequest
 class TextAgentRequest(BaseModel):
     """Request model for text agent invocation"""
 
-    user_id: str = Field(..., description="Unique user identifier")
-    session_id: str = Field(..., description="Session identifier for conversation continuity")
-    text_data: str = Field(..., description="Text input from user", min_length=1, max_length=5000)
+    user_id: str = Field(
+        ...,
+        description="Unique user identifier",
+        min_length=1,
+        max_length=100  
+    )
+    session_id: str = Field(
+        ...,
+        description="Session identifier for conversation continuity",
+        min_length=1,
+        max_length=100,
+    )
+    text_data: str = Field(
+        ...,
+        description="Text input from user",
+        min_length=1,
+    )
+    language_code: Optional[str] = Field(
+        default=None,
+        description="Optional language code for response translation (e.g., 'hi-IN', 'en-US'). If not provided, auto-detected language will be used.",
+    )
 
     class Config:
         json_schema_extra = {
@@ -20,6 +39,7 @@ class TextAgentRequest(BaseModel):
                 "user_id": "user123",
                 "session_id": "session456",
                 "text_data": "मेरी टमाटर की फसल में कुछ समस्या है",
+                "language_code": "hi-IN"
             }
         }
 
