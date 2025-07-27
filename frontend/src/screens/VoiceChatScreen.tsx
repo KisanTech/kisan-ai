@@ -132,8 +132,10 @@ export const VoiceChatScreen: React.FC = () => {
     addMessage('user', userMessage);
 
     try {
+      const speechLanguageCode = getSpeechRecognitionCode(currentLanguage);
+
       // Use the new text invoke API
-      const response = await voiceChatService.sendTextInvoke(userMessage);
+      const response = await voiceChatService.sendTextInvoke(userMessage, speechLanguageCode);
 
       if (response.success) {
         // Add assistant response (text responses don't include audio)
