@@ -11,11 +11,21 @@ import uuid
 
 from app.agents.crop_diagnosis_agent.agent import root_agent
 from app.models.crop_diagnosis import (
+    ChemicalTreatment,
+    CostAnalysis,
     CropDiagnosisImageRequest,
     CropDiagnosisImageResponse,
     CropHealthDiagnosis,
+    CropIdentification,
+    DiseaseAnalysis,
+    FollowUp,
+    ImmediateAction,
+    OrganicTreatment,
+    PreventionMeasures,
     PreventionNotes,
+    PrimaryDiagnosis,
     TreatmentRecommendation,
+    TreatmentRecommendations,
 )
 from app.utils.gcp.gcp_manager import gcp_manager
 from app.utils.logger import logger
@@ -46,56 +56,138 @@ async def setup_session_and_runner():
     return session, runner, user_id, session_id
 
 
-def parse_agent_json_response(
-    response_text: str,
-) -> tuple[CropHealthDiagnosis, TreatmentRecommendation, PreventionNotes, str]:
+def parse_agent_json_response(response_text: str) -> tuple:
     """
     Parse JSON response from crop diagnosis agent
 
     Returns:
-        Tuple of (crop_health_diagnosis, treatment_recommendation, prevention_notes, disclaimer)
+        Tuple of complex structured data models or None values if parsing fails
     """
     try:
         # Try to parse the response as JSON
         structured_data = json.loads(response_text)
 
-        # Extract crop health diagnosis
-        crop_health_diagnosis = None
-        if "crop_health_diagnosis" in structured_data:
-            chd_data = structured_data["crop_health_diagnosis"]
-            crop_health_diagnosis = CropHealthDiagnosis(
-                crop_detected=chd_data.get("crop_detected"),
-                disease_detected=chd_data.get("disease_detected"),
-                disease_name=chd_data.get("disease_name"),
-                confidence=chd_data.get("confidence"),
-                severity=chd_data.get("severity"),
-                description=chd_data.get("description"),
+        # Extract crop identification
+        crop_identification = None
+        if "crop_identification" in structured_data:
+            ci_data = structured_data["crop_identification"]
+            crop_identification = CropIdentification(
+                crop_name=ci_data.get("crop_name"),
+                variety_hints=ci_data.get("variety_hints"),
+                growth_stage=ci_data.get("growth_stage"),
+                confidence_percentage=ci_data.get("confidence_percentage"),
+            )
+
+        # Extract disease analysis
+        disease_analysis = None
+        if "disease_analysis" in structured_data:
+            da_data = structured_data["disease_analysis"]
+
+            # Extract primary diagnosis
+            primary_diagnosis = None
+            if "primary_diagnosis" in da_data:
+                pd_data = da_data["primary_diagnosis"]
+                primary_diagnosis = PrimaryDiagnosis(
+                    disease_name=pd_data.get("disease_name"),
+                    scientific_name=pd_data.get("scientific_name"),
+                    confidence_percentage=pd_data.get("confidence_percentage"),
+                    severity_level=pd_data.get("severity_level"),
+                    affected_area_percentage=pd_data.get("affected_area_percentage"),
+                )
+
+            disease_analysis = DiseaseAnalysis(
+                disease_detected=da_data.get("disease_detected"),
+                primary_diagnosis=primary_diagnosis,
+                differential_diagnosis=da_data.get("differential_diagnosis"),
+                symptoms_observed=da_data.get("symptoms_observed"),
             )
 
         # Extract treatment recommendations
-        treatment_recommendation = None
-        if "treatment_recommendation" in structured_data:
-            tr_data = structured_data["treatment_recommendation"]
-            treatment_recommendation = TreatmentRecommendation(
-                organic_treatment=tr_data.get("organic_treatment"),
-                chemical_treatment=tr_data.get("chemical_treatment"),
-                application_frequency=tr_data.get("application_frequency"),
-                immediate_action=tr_data.get("immediate_action"),
+        treatment_recommendations = None
+        if "treatment_recommendations" in structured_data:
+            tr_data = structured_data["treatment_recommendations"]
+
+            # Extract immediate action
+            immediate_action = None
+            if "immediate_action" in tr_data:
+                ia_data = tr_data["immediate_action"]
+                immediate_action = ImmediateAction(
+                    steps=ia_data.get("steps"), urgency=ia_data.get("urgency")
+                )
+
+            # Extract organic treatment
+            organic_treatment = None
+            if "organic_treatment" in tr_data:
+                ot_data = tr_data["organic_treatment"]
+                organic_treatment = OrganicTreatment(
+                    primary_recommendation=ot_data.get("primary_recommendation"),
+                    application_method=ot_data.get("application_method"),
+                    frequency=ot_data.get("frequency"),
+                    local_availability=ot_data.get("local_availability"),
+                )
+
+            # Extract chemical treatment
+            chemical_treatment = None
+            if "chemical_treatment" in tr_data:
+                ct_data = tr_data["chemical_treatment"]
+                chemical_treatment = ChemicalTreatment(
+                    primary_recommendation=ct_data.get("primary_recommendation"),
+                    dosage=ct_data.get("dosage"),
+                    application_method=ct_data.get("application_method"),
+                    frequency=ct_data.get("frequency"),
+                    precautions=ct_data.get("precautions"),
+                    indian_brands=ct_data.get("indian_brands"),
+                )
+
+            # Extract cost analysis
+            cost_analysis = None
+            if "cost_analysis" in tr_data:
+                ca_data = tr_data["cost_analysis"]
+                cost_analysis = CostAnalysis(
+                    organic_cost_per_acre=ca_data.get("organic_cost_per_acre"),
+                    chemical_cost_per_acre=ca_data.get("chemical_cost_per_acre"),
+                    recommendation=ca_data.get("recommendation"),
+                )
+
+            treatment_recommendations = TreatmentRecommendations(
+                immediate_action=immediate_action,
+                organic_treatment=organic_treatment,
+                chemical_treatment=chemical_treatment,
+                cost_analysis=cost_analysis,
             )
 
-        # Extract prevention notes
-        prevention_notes = None
-        if "prevention_notes" in structured_data:
-            pn_data = structured_data["prevention_notes"]
-            prevention_notes = PreventionNotes(
-                preventive_measures=pn_data.get("preventive_measures"),
-                differential_diagnosis=pn_data.get("differential_diagnosis"),
+        # Extract prevention measures
+        prevention_measures = None
+        if "prevention_measures" in structured_data:
+            pm_data = structured_data["prevention_measures"]
+            prevention_measures = PreventionMeasures(
+                cultural_practices=pm_data.get("cultural_practices"),
+                resistant_varieties=pm_data.get("resistant_varieties"),
+                seasonal_timing=pm_data.get("seasonal_timing"),
+            )
+
+        # Extract follow up
+        follow_up = None
+        if "follow_up" in structured_data:
+            fu_data = structured_data["follow_up"]
+            follow_up = FollowUp(
+                monitoring_schedule=fu_data.get("monitoring_schedule"),
+                success_indicators=fu_data.get("success_indicators"),
+                escalation_triggers=fu_data.get("escalation_triggers"),
+                lab_testing_needed=fu_data.get("lab_testing_needed"),
             )
 
         # Extract disclaimer
         disclaimer = structured_data.get("disclaimer")
 
-        return crop_health_diagnosis, treatment_recommendation, prevention_notes, disclaimer
+        return (
+            crop_identification,
+            disease_analysis,
+            treatment_recommendations,
+            prevention_measures,
+            follow_up,
+            disclaimer,
+        )
 
     except json.JSONDecodeError as e:
         logger.warning(
@@ -103,7 +195,7 @@ def parse_agent_json_response(
             error=str(e),
             response_preview=response_text[:200] if response_text else "empty",
         )
-        return None, None, None, None
+        return None, None, None, None, None, None
 
 
 async def upload_image_to_gcs(image: UploadFile) -> str:
@@ -296,18 +388,25 @@ async def analyze_crop_image(request: CropDiagnosisImageRequest) -> CropDiagnosi
         )
 
         # Parse structured JSON response from agent
-        crop_health_diagnosis, treatment_recommendation, prevention_notes, disclaimer = (
-            parse_agent_json_response(agent_response)
-        )
+        (
+            crop_identification,
+            disease_analysis,
+            treatment_recommendations,
+            prevention_measures,
+            follow_up,
+            disclaimer,
+        ) = parse_agent_json_response(agent_response)
 
         # Return the complete response
         return CropDiagnosisImageResponse(
             success=True,
             image_url=request.image_url,
             description=request.description,
-            crop_health_diagnosis=crop_health_diagnosis,
-            treatment_recommendation=treatment_recommendation,
-            prevention_notes=prevention_notes,
+            crop_identification=crop_identification,
+            disease_analysis=disease_analysis,
+            treatment_recommendations=treatment_recommendations,
+            prevention_measures=prevention_measures,
+            follow_up=follow_up,
             disclaimer=disclaimer,
             raw_agent_response=agent_response,
         )
@@ -376,9 +475,14 @@ async def analyze_uploaded_image(
         )
 
         # Parse structured JSON response from agent
-        crop_health_diagnosis, treatment_recommendation, prevention_notes, disclaimer = (
-            parse_agent_json_response(agent_response)
-        )
+        (
+            crop_identification,
+            disease_analysis,
+            treatment_recommendations,
+            prevention_measures,
+            follow_up,
+            disclaimer,
+        ) = parse_agent_json_response(agent_response)
 
         # Return the complete response
         return CropDiagnosisImageResponse(
@@ -386,9 +490,11 @@ async def analyze_uploaded_image(
             image_url=gcs_url,
             description=description,
             uploaded_filename=image.filename,
-            crop_health_diagnosis=crop_health_diagnosis,
-            treatment_recommendation=treatment_recommendation,
-            prevention_notes=prevention_notes,
+            crop_identification=crop_identification,
+            disease_analysis=disease_analysis,
+            treatment_recommendations=treatment_recommendations,
+            prevention_measures=prevention_measures,
+            follow_up=follow_up,
             disclaimer=disclaimer,
             raw_agent_response=agent_response,
         )

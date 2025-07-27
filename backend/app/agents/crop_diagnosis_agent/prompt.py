@@ -30,26 +30,77 @@ CROP_HEALTH_ANALYSIS_PROMPT = """
 - Consider cost-effectiveness for small farmers
 
 # STRUCTURED OUTPUT FORMAT:
-Provide response as valid JSON with the following structure:
+Provide response as valid JSON with the following structure (translate field values to detected language):
 
 {
-  "crop_health_diagnosis": {
-    "crop_detected": "Specific crop name (e.g., Rice, Cotton, Maize)",
+  "crop_identification": {
+    "crop_name": "Specific crop name (e.g., 'Rice', 'Cotton', 'Maize')",
+    "variety_hints": "Any variety clues from visual characteristics",
+    "growth_stage": "seedling|vegetative|flowering|fruiting|mature",
+    "confidence_percentage": 92
+  },
+  "disease_analysis": {
     "disease_detected": true,
-    "disease_name": "Specific disease name if found",
-    "confidence": "85%",
-    "severity": "mild|moderate|severe|critical", 
-    "description": "Detailed description of what you observe in the image"
+    "primary_diagnosis": {
+      "disease_name": "Specific disease name",
+      "scientific_name": "Pathogen scientific name if known",
+      "confidence_percentage": 88,
+      "severity_level": "mild|moderate|severe|critical",
+      "affected_area_percentage": 25
+    },
+    "differential_diagnosis": [
+      "Alternative disease 1",
+      "Alternative disease 2"
+    ],
+    "symptoms_observed": [
+      "Symptom 1",
+      "Symptom 2"
+    ]
   },
-  "treatment_recommendation": {
-    "organic_treatment": "Neem oil spray - Apply 5ml per liter of water every 7 days",
-    "chemical_treatment": "Propiconazole 25% EC (Tilt/Score) - 1-2ml per liter, spray every 10-15 days",
-    "application_frequency": "Every 7-10 days until symptoms improve",
-    "immediate_action": "Remove affected leaves, improve air circulation"
+  "treatment_recommendations": {
+    "immediate_action": {
+      "steps": [
+        "Remove affected leaves/parts",
+        "Improve drainage/ventilation"
+      ],
+      "urgency": "high|medium|low"
+    },
+    "organic_treatment": {
+      "primary_recommendation": "Neem oil spray (Azadirachtin)",
+      "application_method": "Foliar spray in evening",
+      "frequency": "Every 7 days for 3 weeks",
+      "local_availability": "Available at all agri shops in Karnataka"
+    },
+    "chemical_treatment": {
+      "primary_recommendation": "Propiconazole 25% EC (e.g., Tilt, Score)",
+      "dosage": "1-2 ml per liter of water", 
+      "application_method": "Foliar spray",
+      "frequency": "10-15 day intervals",
+      "precautions": "Use PPE, avoid during flowering",
+      "indian_brands": ["Tilt (Syngenta)", "Score (Bayer)", "Bumper (Dhanuka)"]
+    },
+    "cost_analysis": {
+      "organic_cost_per_acre": "₹300-500",
+      "chemical_cost_per_acre": "₹400-700",
+      "recommendation": "organic|chemical|integrated"
+    }
   },
-  "prevention_notes": {
-    "preventive_measures": "Crop rotation, proper spacing, avoid overhead irrigation, regular field monitoring",
-    "differential_diagnosis": "Alternative diseases to consider: bacterial spot, nutrient deficiency"
+  "prevention_measures": {
+    "cultural_practices": [
+      "Crop rotation with non-host crops",
+      "Proper spacing for air circulation",
+      "Avoid overhead irrigation"
+    ],
+    "resistant_varieties": [
+      "India-recommended resistant varieties if applicable"
+    ],
+    "seasonal_timing": "Best planting/treatment timing for Indian climate"
+  },
+  "follow_up": {
+    "monitoring_schedule": "Check after 7-10 days",
+    "success_indicators": ["New growth appears healthy", "Spread has stopped"],
+    "escalation_triggers": ["Symptoms worsen", "Spread increases"],
+    "lab_testing_needed": false
   },
   "disclaimer": "AI diagnosis for reference only. Consult local agricultural extension officer or KVK for confirmation. Treatment effectiveness may vary based on local conditions."
 }
