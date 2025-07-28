@@ -1,9 +1,18 @@
-# Kisan AI - Backend API
+# Kisan AI 🌾 - AI-Powered Agricultural Assistant
 
-AI-Powered Agricultural Assistant for Google Agentic AI Day Hackathon
+## 🚀 Demo & Overview
 
-## DEMO Video
-- [DEMO Video](https://drive.google.com/file/d/1rusxMNTvu3lcugK1KyeqOd-ykMpKpL3I/view?usp=sharing)
+**Kisan AI** is an AI-powered agricultural assistant designed specifically for Indian farmers. Our mobile application provides crop disease diagnosis, Kannada voice interface, market intelligence, and government scheme information - all powered by Google Cloud Vertex AI and Gemini 2.0.
+
+### 📱 Live Demo
+🔗 **[Watch Mobile App Demo](https://www.loom.com/share/38ae12c2cfe7480d8bbb952a453d379d?sid=65279b66-9d4e-4315-aba4-b7114de6d8f5)** 
+
+### 🎯 Key Features
+- **🔍 Crop Disease Diagnosis** - AI-powered image analysis using Gemini 2.0 Flash
+- **🗣️ Voice Interface** - Hindi speech-to-text and text-to-speech
+- **📈 Real-time Market Prices** - Live commodity pricing data
+- **🏛️ Government Schemes** - Information about agricultural schemes and subsidies
+
 
 ## Quick Start
 
