@@ -253,6 +253,7 @@ backend/
 │   ├── core/                # Configuration ✅
 │   └── utils/               # Utilities ✅
 ├── scripts/
+├── docs/                    # Project specs, documentations and sequence diagrams ✅
 │   └── deploy_simple.sh     # Cloud Run deployment ✅
 ├── pyproject.toml           # uv configuration ✅
 └── README.md               # This file ✅
