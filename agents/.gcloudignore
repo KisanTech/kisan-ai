@@ -1,8 +1,0 @@
-# .gcloudignore
-
-.env
-.venv/
-__pycache__/
-*.pyc
-.ruff_cache/
-*.lock
